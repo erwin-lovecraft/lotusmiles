@@ -1,11 +1,26 @@
-FROM golang:1.24.6-alpine3.22
+# Build arguments
+# Use docker registry by default
+ARG IMAGE_REGISTRY=docker.io
+ARG GO_IMAGE=golang
+ARG GO_IMAGE_TAG=1.24.6-alpine3.22
+ARG LINUX_IMAGE=alpine:3.22
 
-RUN apk update
+# Build stage
+FROM ${IMAGE_REGISTRY}/${GO_IMAGE}:${GO_IMAGE_TAG} AS builder
 
 WORKDIR /api
 
-# Retrieve application dependencies.
-# This allows the container build to reuse cached dependencies.
-# Expecting to copy go.mod and if present go.sum.
-COPY ./api/go.* ./
+COPY ./api .
+
 RUN go mod download
+
+RUN go build -o serverd ./cmd/serverd
+
+# Run stage
+FROM ${IMAGE_REGISTRY}/${LINUX_IMAGE} AS runner
+
+WORKDIR /
+
+COPY --from=builder /api/serverd /serverd
+
+CMD ["sh", "-c", "/serverd"]
