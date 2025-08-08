@@ -1,0 +1,37 @@
+with-expecter: True
+resolve-type-alias: False
+issue-845-fix: True
+packages:
+  github.com/viebiz/lit:
+    config:
+      recursive: True
+      inpackage: True
+      dir: "{{.InterfaceDir}}"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "{{.PackageName}}"
+      filename: "mock_{{.InterfaceName}}.go"
+      all: True
+  github.com/redis/go-redis/v9:
+    config:
+      dir: "mocks/mockredis"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "mockredis"
+      filename: "mock_{{.InterfaceName}}.go"
+      all: False
+    interfaces:
+      UniversalClient:
+        config:
+      Cmdable:
+        config:
+      Pipeliner:
+        config:
+  github.com/casbin/casbin/v2:
+    config:
+      dir: "mocks/mockcasbin"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "mockcasbin"
+      filename: "mock_{{.InterfaceName}}.go"
+      all: False
+    interfaces:
+      IEnforcer:
+        config:

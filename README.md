@@ -1,10 +1,10 @@
-# 🌟 LotusMiles POC
+# 🌟 aegismiles POC
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)  
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1234/badge)](https://bestpractices.coreinfrastructure.org/projects/1234)  
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/your-org/lotusmiles-poc/badge)](https://securityscorecards.dev)  
-[![Go Report Card](https://goreportcard.com/badge/github.com/your-org/lotusmiles-poc)](https://goreportcard.com/report/github.com/your-org/lotusmiles-poc)  
-[![Coverage Status](https://coveralls.io/repos/github/your-org/lotusmiles-poc/badge.svg)](https://coveralls.io/github/your-org/lotusmiles-poc)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/your-org/aegismiles-poc/badge)](https://securityscorecards.dev)  
+[![Go Report Card](https://goreportcard.com/badge/github.com/your-org/aegismiles-poc)](https://goreportcard.com/report/github.com/your-org/aegismiles-poc)  
+[![Coverage Status](https://coveralls.io/repos/github/your-org/aegismiles-poc/badge.svg)](https://coveralls.io/github/your-org/aegismiles-poc)
 
 ---
 
@@ -41,8 +41,8 @@
 ### Clone & Run
 
 ```bash
-git clone https://@github.com/erwin-lovecraft/lotusmiles
-cd lotusmiles
+git clone https://@github.com/erwin-lovecraft/aegismiles
+cd aegismiles
 ```
 
 ---
@@ -75,7 +75,7 @@ Logging & Monitoring: Sentry
 
 ## System overview
 
-![System Overview](https://raw.githubusercontent.com/your-org/lotusmiles-poc/main/docs/system-overview.png)
+![System Overview](https://raw.githubusercontent.com/your-org/aegismiles-poc/main/docs/system-overview.png)
 
 ## 📈 Roadmap
 

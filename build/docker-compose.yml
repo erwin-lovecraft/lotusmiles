@@ -1,0 +1,57 @@
+services:
+  api:
+    container_name: aegismiles-api
+    image: aegismiles-api:latest
+    restart: "no"
+    ports:
+      - "8080:8080"
+    environment:
+      APP_WEB_PORT: "8080"
+      APP_DATABASE_URL: "postgres://aegismiles:@pg:5432/aegismiles?sslmode=disable"
+      APP_DATABASE_MAX_OPEN_CONNS: "100"
+      APP_DATABASE_MAX_IDLE_CONNS: "10"
+    volumes:
+      - "./api:/api"
+      - "app-build-cache:/root/.cache/go-build"
+    networks:
+      - local-network
+
+  pg:
+    container_name: aegismiles-pg
+    image: postgres:14.17-alpine3.21
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    environment:
+      TZ: UTC
+      POSTGRES_USER: aegismiles
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - local-network
+
+  db-migrate:
+    container_name: aegismiles-db-migrate
+    image: migrate/migrate:v4.15.1
+    restart: "no"
+    environment:
+      DB_URL: "postgres://aegismiles:@pg:5432/aegismiles?sslmode=disable"
+    depends_on:
+      pg:
+        condition: service_healthy
+    volumes:
+      - ./api/data/migrations:/migrations
+    entrypoint: []
+    networks:
+      - local-network
+
+volumes:
+  app-build-cache:
+    name: aegismiles-app-build-cache
+
+networks:
+  local-network:
+    name: aegismiles-local-network

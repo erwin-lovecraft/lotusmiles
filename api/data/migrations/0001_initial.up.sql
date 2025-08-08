@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS "bases" (
+    "id" BIGINT PRIMARY KEY,
+    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "customers" (
+    PRIMARY KEY ("id"),
+    "first_name" TEXT NOT NULL,
+    "last_name" TEXT NOT NULL,
+    "email" TEXT NOT NULL DEFAULT '',
+    "phone" TEXT NOT NULL UNIQUE
+) INHERITS ("bases");
