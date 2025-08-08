@@ -11,8 +11,30 @@ services:
       APP_DATABASE_MAX_OPEN_CONNS: "100"
       APP_DATABASE_MAX_IDLE_CONNS: "10"
     volumes:
-      - "./api:/api"
+      - "./api/config.env:/config.env"
       - "app-build-cache:/root/.cache/go-build"
+    networks:
+      - local-network
+
+  web:
+    container_name: aegismiles-web
+    image: aegismiles-web:latest
+    restart: "no"
+    ports:
+      - "3000:80"
+    environment:
+      APP_API_URL: "http://api:8080"
+    networks:
+      - local-network
+
+  admin:
+    container_name: aegismiles-admin
+    image: aegismiles-admin:latest
+    restart: "no"
+    ports:
+      - "3001:80"
+    environment:
+      APP_API_URL: "http://api:8080"
     networks:
       - local-network
 
