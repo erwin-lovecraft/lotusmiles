@@ -10,6 +10,10 @@ import (
 type Repository interface {
 	Save(ctx context.Context, e entity.Customer) (entity.Customer, error)
 
+	FindByID(ctx context.Context, id int64) (entity.Customer, error)
+
+	FindByExternalID(ctx context.Context, externalID string) (entity.Customer, error)
+
 	FindByPhone(ctx context.Context, phone string) (entity.Customer, error)
 
 	ListAll(ctx context.Context, filter Filter) ([]entity.Customer, int64, error)
