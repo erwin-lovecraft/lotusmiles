@@ -8,17 +8,14 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
+	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/env"
+	"github.com/viebiz/lit/httpclient"
 	"github.com/viebiz/lit/monitoring"
-	"github.com/viebiz/lit/monitoring/instrumentpg"
-	"github.com/viebiz/lit/postgres"
-	driverpg "gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -57,40 +54,34 @@ func run(ctx context.Context) error {
 		return err
 	}
 
+	// HTTP conn pool
+	sharedPool := httpclient.NewSharedCustomPool()
+
 	// Dependency injection
 	// Initialize services, repositories, etc. here
+	auth0Client, err := auth0.New(sharedPool, cfg.Auth0)
+	if err != nil {
+		return err
+	}
+
 	repo := repository.New(db)
-	customerService := customer.New(repo)
+	customerService := customer.New(repo, auth0Client)
 	v1Ctrl := v1.New(customerService)
 
 	// Initialize the server with the handler
-	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, v1Ctrl))
+	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl))
 
 	return srv.Run()
 }
 
-func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
-	pool, err := postgres.NewPool(ctx, cfg.Database.URL, cfg.Database.MaxOpenConns, cfg.Database.MaxIdleConns, postgres.AttemptPingUponStartup())
-	if err != nil {
-		return nil, err
-	}
-
-	gormDB, err := gorm.Open(driverpg.New(driverpg.Config{
-		Conn: instrumentpg.WithInstrumentation(pool), // Adding instrumentation
-	}), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return gormDB, nil
-}
-
-func routes(ctx context.Context, v1Ctrl v1.Controller) http.Handler {
+func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
 
 	v1 := r.Route("/api/v1")
+	//// Disable for testing
+	//v1.Use(middleware.Auth(cfg))
+
+	v1.Get("/profile", v1Ctrl.GetCustomerProfile)
 	v1.Group("/customers", func(customers lit.Router) {
 		customers.Post("", v1Ctrl.CreateCustomer)
 		customers.Get("", v1Ctrl.ListCustomers)

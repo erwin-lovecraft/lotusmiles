@@ -1,3 +1,10 @@
+# filippo.io/edwards25519 v1.1.0
+## explicit; go 1.20
+filippo.io/edwards25519
+filippo.io/edwards25519/field
+# github.com/bmatcuk/doublestar/v4 v4.9.0
+## explicit; go 1.16
+github.com/bmatcuk/doublestar/v4
 # github.com/bytedance/sonic v1.13.3
 ## explicit; go 1.17
 github.com/bytedance/sonic
@@ -39,6 +46,30 @@ github.com/bytedance/sonic/loader/internal/abi
 github.com/bytedance/sonic/loader/internal/iasm/expr
 github.com/bytedance/sonic/loader/internal/iasm/x86_64
 github.com/bytedance/sonic/loader/internal/rt
+# github.com/casbin/casbin/v2 v2.109.0
+## explicit; go 1.13
+github.com/casbin/casbin/v2
+github.com/casbin/casbin/v2/config
+github.com/casbin/casbin/v2/constant
+github.com/casbin/casbin/v2/effector
+github.com/casbin/casbin/v2/errors
+github.com/casbin/casbin/v2/log
+github.com/casbin/casbin/v2/model
+github.com/casbin/casbin/v2/persist
+github.com/casbin/casbin/v2/persist/cache
+github.com/casbin/casbin/v2/persist/file-adapter
+github.com/casbin/casbin/v2/rbac
+github.com/casbin/casbin/v2/rbac/default-role-manager
+github.com/casbin/casbin/v2/util
+# github.com/casbin/gorm-adapter/v3 v3.33.0
+## explicit; go 1.20
+github.com/casbin/gorm-adapter/v3
+# github.com/casbin/govaluate v1.8.0
+## explicit; go 1.13
+github.com/casbin/govaluate
+# github.com/cenkalti/backoff/v4 v4.3.0
+## explicit; go 1.18
+github.com/cenkalti/backoff/v4
 # github.com/cenkalti/backoff/v5 v5.0.2
 ## explicit; go 1.23
 github.com/cenkalti/backoff/v5
@@ -52,6 +83,9 @@ github.com/cloudwego/base64x/internal/rt
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
 github.com/davecgh/go-spew/spew
+# github.com/dustin/go-humanize v1.0.1
+## explicit; go 1.16
+github.com/dustin/go-humanize
 # github.com/fsnotify/fsnotify v1.9.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
@@ -80,6 +114,12 @@ github.com/gin-gonic/gin/binding
 github.com/gin-gonic/gin/internal/bytesconv
 github.com/gin-gonic/gin/internal/json
 github.com/gin-gonic/gin/render
+# github.com/glebarez/go-sqlite v1.22.0
+## explicit; go 1.17
+github.com/glebarez/go-sqlite
+# github.com/glebarez/sqlite v1.11.0
+## explicit; go 1.18
+github.com/glebarez/sqlite
 # github.com/go-logr/logr v1.4.3
 ## explicit; go 1.18
 github.com/go-logr/logr
@@ -97,6 +137,9 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.27.0
 ## explicit; go 1.20
 github.com/go-playground/validator/v10
+# github.com/go-sql-driver/mysql v1.9.3
+## explicit; go 1.21.0
+github.com/go-sql-driver/mysql
 # github.com/go-viper/mapstructure/v2 v2.3.0
 ## explicit; go 1.18
 github.com/go-viper/mapstructure/v2
@@ -112,6 +155,12 @@ github.com/goccy/go-json/internal/encoder/vm_color_indent
 github.com/goccy/go-json/internal/encoder/vm_indent
 github.com/goccy/go-json/internal/errors
 github.com/goccy/go-json/internal/runtime
+# github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9
+## explicit
+github.com/golang-sql/civil
+# github.com/golang-sql/sqlexp v0.1.0
+## explicit; go 1.16
+github.com/golang-sql/sqlexp
 # github.com/google/uuid v1.6.0
 ## explicit
 github.com/google/uuid
@@ -163,12 +212,31 @@ github.com/leodido/go-urn/scim/schema
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
+# github.com/microsoft/go-mssqldb v1.9.2
+## explicit; go 1.23.0
+github.com/microsoft/go-mssqldb
+github.com/microsoft/go-mssqldb/aecmk
+github.com/microsoft/go-mssqldb/integratedauth
+github.com/microsoft/go-mssqldb/integratedauth/ntlm
+github.com/microsoft/go-mssqldb/integratedauth/winsspi
+github.com/microsoft/go-mssqldb/internal/cp
+github.com/microsoft/go-mssqldb/internal/decimal
+github.com/microsoft/go-mssqldb/internal/github.com/swisscom/mssql-always-encrypted/pkg/algorithms
+github.com/microsoft/go-mssqldb/internal/github.com/swisscom/mssql-always-encrypted/pkg/crypto
+github.com/microsoft/go-mssqldb/internal/github.com/swisscom/mssql-always-encrypted/pkg/encryption
+github.com/microsoft/go-mssqldb/internal/github.com/swisscom/mssql-always-encrypted/pkg/keys
+github.com/microsoft/go-mssqldb/internal/github.com/swisscom/mssql-always-encrypted/pkg/utils
+github.com/microsoft/go-mssqldb/internal/querytext
+github.com/microsoft/go-mssqldb/msdsn
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 ## explicit
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.2
 ## explicit; go 1.12
 github.com/modern-go/reflect2
+# github.com/ncruces/go-strftime v0.1.9
+## explicit; go 1.17
+github.com/ncruces/go-strftime
 # github.com/nicksnyder/go-i18n/v2 v2.6.0
 ## explicit; go 1.23.0
 github.com/nicksnyder/go-i18n/v2/i18n
@@ -188,6 +256,9 @@ github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
 github.com/pmezard/go-difflib/difflib
+# github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+## explicit; go 1.12
+github.com/remyoudompheng/bigfft
 # github.com/sagikazarmark/locafero v0.9.0
 ## explicit; go 1.23.0
 github.com/sagikazarmark/locafero
@@ -229,6 +300,7 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/mock
+github.com/stretchr/testify/require
 # github.com/subosito/gotenv v1.6.0
 ## explicit; go 1.18
 github.com/subosito/gotenv
@@ -258,7 +330,11 @@ github.com/ugorji/go/codec
 ## explicit; go 1.24.5
 github.com/viebiz/lit
 github.com/viebiz/lit/env
+github.com/viebiz/lit/httpclient
 github.com/viebiz/lit/i18n
+github.com/viebiz/lit/iam
+github.com/viebiz/lit/ioutil
+github.com/viebiz/lit/jwt
 github.com/viebiz/lit/monitoring
 github.com/viebiz/lit/monitoring/instrumentgrpc
 github.com/viebiz/lit/monitoring/instrumenthttp
@@ -344,8 +420,12 @@ go.uber.org/zap/zapcore
 golang.org/x/arch/x86/x86asm
 # golang.org/x/crypto v0.40.0
 ## explicit; go 1.23.0
+golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/sha3
+# golang.org/x/exp v0.0.0-20250711185948-6ae5c78190dc
+## explicit; go 1.23.0
+golang.org/x/exp/constraints
 # golang.org/x/net v0.42.0
 ## explicit; go 1.23.0
 golang.org/x/net/html
@@ -500,9 +580,15 @@ google.golang.org/protobuf/types/known/wrapperspb
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# gorm.io/driver/mysql v1.6.0
+## explicit; go 1.18
+gorm.io/driver/mysql
 # gorm.io/driver/postgres v1.6.0
 ## explicit; go 1.20
 gorm.io/driver/postgres
+# gorm.io/driver/sqlserver v1.6.0
+## explicit; go 1.14
+gorm.io/driver/sqlserver
 # gorm.io/gorm v1.30.1
 ## explicit; go 1.18
 gorm.io/gorm
@@ -514,3 +600,43 @@ gorm.io/gorm/logger
 gorm.io/gorm/migrator
 gorm.io/gorm/schema
 gorm.io/gorm/utils
+# gorm.io/plugin/dbresolver v1.6.0
+## explicit; go 1.18
+gorm.io/plugin/dbresolver
+# modernc.org/libc v1.66.3
+## explicit; go 1.23.0
+modernc.org/libc
+modernc.org/libc/errno
+modernc.org/libc/fcntl
+modernc.org/libc/fts
+modernc.org/libc/grp
+modernc.org/libc/honnef.co/go/netdb
+modernc.org/libc/langinfo
+modernc.org/libc/limits
+modernc.org/libc/netdb
+modernc.org/libc/netinet/in
+modernc.org/libc/poll
+modernc.org/libc/pthread
+modernc.org/libc/pwd
+modernc.org/libc/signal
+modernc.org/libc/stdio
+modernc.org/libc/stdlib
+modernc.org/libc/sys/socket
+modernc.org/libc/sys/stat
+modernc.org/libc/sys/types
+modernc.org/libc/termios
+modernc.org/libc/time
+modernc.org/libc/unistd
+modernc.org/libc/utime
+modernc.org/libc/uuid
+modernc.org/libc/uuid/uuid
+modernc.org/libc/wctype
+# modernc.org/mathutil v1.7.1
+## explicit; go 1.21
+modernc.org/mathutil
+# modernc.org/memory v1.11.0
+## explicit; go 1.23.0
+modernc.org/memory
+# modernc.org/sqlite v1.38.0
+## explicit; go 1.23.0
+modernc.org/sqlite/lib
