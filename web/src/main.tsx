@@ -1,10 +1,34 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
+import { Auth0Provider } from "@auth0/auth0-react";
 
-createRoot(document.getElementById("root")!).render(
-    <StrictMode>
+import App from "./App";
+import { ThemeProvider } from "@/components/theme-provider";
+import { config } from "@/config/env";
+
+import "./index.css";
+
+const container = document.getElementById("root");
+if (!container) throw new Error("Root element not found");
+
+const root = createRoot(container);
+
+root.render(
+  <StrictMode>
+    <Auth0Provider
+      domain={config.auth0.domain}
+      clientId={config.auth0.clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: config.auth0.audience,
+      }}
+      useRefreshTokens={false}
+      useRefreshTokensFallback={true}
+      cacheLocation="localstorage"
+    >
+      <ThemeProvider defaultTheme="light" storageKey="lotusmiles-app-theme">
         <App />
-    </StrictMode>
+      </ThemeProvider>
+    </Auth0Provider>
+  </StrictMode>
 );

@@ -1,32 +1,78 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Loader2 } from "lucide-react";
 
-function App() {
-  const [count, setCount] = useState(0);
+import { AuthGuard } from "@/components/guards/auth-guard";
+import { OnboardingGuard } from "@/components/guards/onboarding-guard";
+import { LoginPage } from "@/pages/login";
+import { OnboardingPage } from "@/pages/onboarding";
+import { HomePage } from "@/pages/home";
+
+import { setTokenGetter } from "@/lib/http";
+import { isOnboarded } from "@/lib/auth";
+import type { User } from "@/types/auth";
+import { Toaster } from "sonner";
+
+import "./App.css";
+
+function AppRoutes() {
+  const { isAuthenticated, isLoading, user, getAccessTokenSilently } = useAuth0();
+
+  // Set up token getter for HTTP client
+  useEffect(() => {
+    setTokenGetter(getAccessTokenSilently);
+  }, [getAccessTokenSilently]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Fallback route logic
+  const getFallbackRoute = () => {
+    if (!isAuthenticated) return "/login";
+    if (!isOnboarded(user as User)) return "/onboarding";
+    return "/home";
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button onClick={() => setCount((count) => count + 1)}>count is {count}</Button>
-        <p>
-          Edit <p>src/App.tsx</p> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route
+        path="/onboarding"
+        element={
+          <AuthGuard>
+            <OnboardingPage />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/home"
+        element={
+          <AuthGuard>
+            <OnboardingGuard>
+              <HomePage />
+            </OnboardingGuard>
+          </AuthGuard>
+        }
+      />
+
+      <Route path="/*" element={<Navigate to={getFallbackRoute()} replace />} />
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+      <Toaster />
+    </BrowserRouter>
+  );
+}
