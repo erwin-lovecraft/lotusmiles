@@ -7,10 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppSelector } from "@/app/hook.ts";
 import { selectProfile } from "@/features/profile/profileSlice.ts";
+import { useNavigate } from "react-router";
 
 export function HomePage() {
   const { user, logout } = useAuth0();
   const profile = useAppSelector(selectProfile);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
@@ -90,7 +92,11 @@ export function HomePage() {
             <CardDescription>Manage your loyalty account and rewards</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start bg-transparent" variant="outline">
+            <Button
+              className="w-full justify-start bg-transparent"
+              variant="outline"
+              onClick={() => navigate("/profile")}
+            >
               <User className="mr-2 h-4 w-4" />
               View Profile
             </Button>

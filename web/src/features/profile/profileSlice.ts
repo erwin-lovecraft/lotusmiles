@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/app/store";
-import type Profile from "@/types/profile.ts";
 import { httpClient } from "@/lib/http.ts";
-import type { ApiError, OnboardCustomer } from "@/types/auth.ts";
+import type { OnboardCustomer, Profile, UpdateProfile } from "@/types/profile";
 
 interface State {
   data?: Profile;
@@ -27,7 +26,19 @@ export const onboardCustomer = createAsyncThunk(
   "profile/onboardCustomer",
   async (payload: OnboardCustomer, { rejectWithValue }) => {
     try {
-      const res = await httpClient.post<OnboardCustomer>("/api/v1/customers/onboard", payload);
+      const res = await httpClient.post("/api/v1/customers/onboard", payload);
+      return res.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk(
+  "profile/updateProfile",
+  async (payload: UpdateProfile, { rejectWithValue }) => {
+    try {
+      const res = await httpClient.patch("/api/v1/customers", payload);
       return res.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -62,6 +73,18 @@ export const slice = createSlice({
         s.data = a.payload as Profile;
       })
       .addCase(onboardCustomer.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload ? JSON.stringify(a.payload) : "Unknown error";
+      })
+      .addCase(updateProfile.pending, (s) => {
+        s.loading = true;
+        s.error = undefined;
+      })
+      .addCase(updateProfile.fulfilled, (s, a) => {
+        s.loading = false;
+        s.data = a.payload as Profile;
+      })
+      .addCase(updateProfile.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload ? JSON.stringify(a.payload) : "Unknown error";
       });

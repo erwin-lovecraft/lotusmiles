@@ -11,16 +11,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 import { useAppDispatch, useAppSelector } from "@/app/hook";
-import { onboardCustomer, selectProfile } from "@/features/profile/profileSlice";
-import type { OnboardCustomer } from "@/types/profile";
+import { selectProfile, updateProfile } from "@/features/profile/profileSlice";
+import type { UpdateProfile } from "@/types/profile";
 
-export function OnboardingPage() {
+export function ProfilePage() {
   const profile = useAppSelector(selectProfile);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<OnboardCustomer>({
+  const form = useForm<UpdateProfile>({
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -40,15 +40,9 @@ export function OnboardingPage() {
     form.setValue("phone", profile.phone ?? "");
   }, [form, profile]);
 
-  useEffect(() => {
-    if (profile?.onboarded) {
-      navigate("/home");
-    }
-  }, [profile?.onboarded]);
-
-  const onSubmit = async (data: OnboardCustomer) => {
+  const onSubmit = async (data: UpdateProfile) => {
     setIsSubmitting(true);
-    dispatch(onboardCustomer(data));
+    dispatch(updateProfile(data));
     setIsSubmitting(false);
   };
 
@@ -103,7 +97,7 @@ export function OnboardingPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="member@lotusmiles.com" {...field} />
+                        <Input placeholder="member@lotusmiles.com" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -138,23 +132,9 @@ export function OnboardingPage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="referrer_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Referrer Code (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="FRIEND123" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Complete Setup
+                  Submit
                 </Button>
               </form>
             </Form>
