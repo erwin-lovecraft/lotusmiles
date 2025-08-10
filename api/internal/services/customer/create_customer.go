@@ -5,31 +5,29 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
+	"github.com/viebiz/lit/iam"
 )
 
-func (s *service) CreateCustomer(ctx context.Context, req dto.CreateCustomer) (entity.Customer, error) {
-	c, err := s.repo.Customer().FindByPhone(ctx, req.Phone)
+func (s *service) OnboardCustomer(ctx context.Context, req dto.OnboardCustomer) (entity.Customer, error) {
+	// 1. Get Current User from ctx
+	userProfile := iam.GetUserProfileFromContext(ctx)
+
+	// 2. Find exists customer by profile_id
+	existedCustomer, err := s.repo.Customer().FindByExternalID(ctx, userProfile.ID())
 	if err != nil {
 		return entity.Customer{}, err
 	}
 
-	if c.ID != 0 {
-		return entity.Customer{}, ErrCustomerAlreadyExists
-	}
+	// TODO: Check referrer_code if it exists
 
-	newID, err := generator.CustomerID.Generate()
-	if err != nil {
-		return entity.Customer{}, err
-	}
-
-	savedCustomer, err := s.repo.Customer().Save(ctx, entity.Customer{
-		ID:        newID,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Email:     req.Email,
-		Phone:     req.Phone,
-	})
+	existedCustomer.Onboarded = true
+	existedCustomer.Phone = req.Phone
+	existedCustomer.Email = req.Email
+	existedCustomer.FirstName = req.FirstName
+	existedCustomer.LastName = req.LastName
+	
+	// 3. Save customer
+	savedCustomer, err := s.repo.Customer().Save(ctx, existedCustomer)
 	if err != nil {
 		return entity.Customer{}, err
 	}

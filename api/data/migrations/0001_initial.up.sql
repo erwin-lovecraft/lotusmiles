@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "first_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
     "email" TEXT NOT NULL UNIQUE,
-    "phone" TEXT NOT NULL UNIQUE,
+    "phone" TEXT NULL UNIQUE,
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMPTZ DEFAULT NULL 

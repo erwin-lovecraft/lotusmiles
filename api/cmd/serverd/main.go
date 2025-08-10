@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/erwin-lovecraft/aegismiles/internal/constants"
+	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
@@ -15,6 +17,7 @@ import (
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/env"
 	"github.com/viebiz/lit/httpclient"
+	httpmw "github.com/viebiz/lit/middleware/http"
 	"github.com/viebiz/lit/monitoring"
 )
 
@@ -77,14 +80,20 @@ func run(ctx context.Context) error {
 func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
 
-	v1 := r.Route("/api/v1")
-	//// Disable for testing
-	//v1.Use(middleware.Auth(cfg))
+	v1 := r.Route("/api/v1",
+		httpmw.RequestIDMiddleware(),
+		// Disable for testing without Authenticate
+		middleware.Authenticate(cfg),
+	)
 
-	v1.Get("/profile", v1Ctrl.GetCustomerProfile)
+	// User routers
+	v1.Group("/users", func(users lit.Router) {
+		v1.Get("/profile", v1Ctrl.GetCustomerProfile)
+	})
+
+	// Customer routes
 	v1.Group("/customers", func(customers lit.Router) {
-		customers.Post("", v1Ctrl.CreateCustomer)
-		customers.Get("", v1Ctrl.ListCustomers)
+		customers.Post("/onboard", v1Ctrl.OnboardCustomer, middleware.HasRoles(constants.UserRoleMember))
 	})
 
 	return r.Handler()

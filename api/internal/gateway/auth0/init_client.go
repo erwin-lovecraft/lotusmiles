@@ -15,13 +15,18 @@ func getUserClientFunc(
 	clientPool *httpclient.SharedCustomPool,
 	cfg config.Auth0Config,
 ) (*httpclient.Client, error) {
-	// TODO: Replace with OAuth client
-	return httpclient.NewUnauthenticated(
+	return httpclient.NewWithOAuth(
 		httpclient.Config{
 			ServiceName: serviceName,
 			URL:         cfg.Domain + "/api/v2/users/:user_id",
 			Method:      http.MethodGet,
 		},
 		clientPool,
+		httpclient.OAuthConfig{
+			ClientID:         cfg.ClientID,
+			ClientSecret:     cfg.ClientSecret,
+			ReceiverAudience: cfg.Audience,
+			TokenURL:         cfg.TokenURL,
+		},
 	)
 }
