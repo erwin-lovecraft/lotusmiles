@@ -18,3 +18,27 @@ export interface ApiError {
   message: string;
   fields?: Record<string, string[]>;
 }
+
+export interface CustomerProfile {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone?: string
+  address?: string
+  referrer_code?: string
+  onboarded: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ProfileResponse {
+  success: boolean
+  data: CustomerProfile
+}
+
+export interface OnboardResponse {
+  success: boolean
+  message: string
+  data?: CustomerProfile
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
@@ -25,7 +25,7 @@ type OnboardingFormData = {
 };
 
 export function OnboardingPage() {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently, user } = useAuth0();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,6 +38,16 @@ export function OnboardingPage() {
       referrer_code: "",
     },
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    form.setValue("first_name", user.given_name ?? '')
+    form.setValue("last_name", user.family_name ?? '')
+    form.setValue("address", user.address ?? '')
+    form.setValue("phone", user.phone_number ?? '')
+
+  }, [form, user])
 
   const onSubmit = async (data: OnboardingFormData) => {
     setIsSubmitting(true);
@@ -55,9 +65,8 @@ export function OnboardingPage() {
         description: "Your profile has been set up successfully.",
       });
 
-      // Try to silently renew tokens to get updated claims
       try {
-        await getAccessTokenSilently({ cacheMode: "off" });
+        await getAccessTokenSilently();
       } catch (error) {
         console.warn("Token renewal failed, proceeding anyway:", error);
       }
