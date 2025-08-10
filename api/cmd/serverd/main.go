@@ -15,6 +15,7 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
 	"github.com/viebiz/lit"
+	"github.com/viebiz/lit/cors"
 	"github.com/viebiz/lit/env"
 	"github.com/viebiz/lit/httpclient"
 	httpmw "github.com/viebiz/lit/middleware/http"
@@ -79,6 +80,7 @@ func run(ctx context.Context) error {
 
 func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
+	r.Use(cors.Middleware(configCORS(cfg.Cors)))
 
 	v1 := r.Route("/api/v1",
 		httpmw.RequestIDMiddleware(),
