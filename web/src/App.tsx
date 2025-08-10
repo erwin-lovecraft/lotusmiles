@@ -10,14 +10,15 @@ import { OnboardingPage } from "@/pages/onboarding";
 import { HomePage } from "@/pages/home";
 
 import { setTokenGetter } from "@/lib/http";
-import { isOnboarded } from "@/lib/auth";
-import type { User } from "@/types/auth";
 import { Toaster } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/app/hook.ts";
+import { fetchMyProfile, selectProfile } from "@/features/profile/profileSlice.ts";
 
 import "./App.css";
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading, user, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const profile = useAppSelector(selectProfile);
 
   // Set up token getter for HTTP client
   useEffect(() => {
@@ -35,7 +36,7 @@ function AppRoutes() {
   // Fallback route logic
   const getFallbackRoute = () => {
     if (!isAuthenticated) return "/login";
-    if (!isOnboarded(user as User)) return "/onboarding";
+    if (!profile || !profile.onboarded) return "/onboarding";
     return "/home";
   };
 
@@ -69,6 +70,15 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const { isAuthenticated } = useAuth0();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    dispatch(fetchMyProfile());
+  }, [dispatch, isAuthenticated]);
+
   return (
     <BrowserRouter>
       <AppRoutes />

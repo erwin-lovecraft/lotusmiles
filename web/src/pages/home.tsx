@@ -1,13 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { LogOut, User, Gift, Star } from "lucide-react";
+import { Gift, LogOut, Star, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAppSelector } from "@/app/hook.ts";
+import { selectProfile } from "@/features/profile/profileSlice.ts";
 
 export function HomePage() {
   const { user, logout } = useAuth0();
+  const profile = useAppSelector(selectProfile);
 
   const handleLogout = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
@@ -121,6 +124,7 @@ export function HomePage() {
                   2
                 )}
               </pre>
+              <pre className="text-xs bg-muted p-2 rounded overflow-auto">{JSON.stringify(profile, null, 2)}</pre>
             </CardContent>
           </Card>
         )}

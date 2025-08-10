@@ -9,16 +9,14 @@ export function setTokenGetter(tokenGetter: () => Promise<string>) {
 }
 
 const httpClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
 });
 
 // Request interceptor to attach Authorization header
 httpClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const url = config.url || "";
-
-    // Only attach token for API calls to our backend
-    if (url.startsWith(import.meta.env.VITE_API_BASE_URL) && getAccessTokenSilently) {
+    if (getAccessTokenSilently) {
       try {
         const token = await getAccessTokenSilently();
         config.headers.Authorization = `Bearer ${token}`;
@@ -60,11 +58,18 @@ httpClient.interceptors.response.use(
       }
     }
 
+    if (error.response.status === 400) {
+      return Promise.reject({
+        code: "invalid_data",
+        message: "Invalid Data",
+        invalid_fields: error.response.data as Record<string, string>,
+      } as ApiError);
+    }
+
     // Map server errors to ApiError format
     const apiError: ApiError = {
-      code: error.response?.data?.code || "UNKNOWN_ERROR",
-      message: error.response?.data?.message || "An unexpected error occurred",
-      fields: error.response?.data?.fields,
+      code: error.response?.data?.error || "UNKNOWN_ERROR",
+      message: error.response?.data?.error_description || "An unexpected error occurred",
     };
 
     return Promise.reject(apiError);
