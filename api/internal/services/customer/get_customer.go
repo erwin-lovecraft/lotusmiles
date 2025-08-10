@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/viebiz/lit/iam"
 )
 
 func (s *service) GetCustomerProfile(ctx context.Context, userID string) (entity.Customer, error) {
@@ -18,20 +19,21 @@ func (s *service) GetCustomerProfile(ctx context.Context, userID string) (entity
 		return customer, nil
 	}
 
-	// If customer not found on BD
-	// Retrieve from Auth0 and persist to DB
-	userProfile, err := s.auth0Client.GetUser(ctx, userID)
-	if err != nil {
-		return entity.Customer{}, err
+	userProfile := iam.GetUserProfileFromContext(ctx).GetProfile()
+	if userProfile == nil {
+		return entity.Customer{}, ErrUserProfileEmpty
 	}
 
-	customer, err = s.repo.Customer().Save(ctx, entity.Customer{
-		ExternalID: userProfile.UserID,
-		FirstName:  userProfile.GivenName,
-		LastName:   userProfile.FamilyName,
-		Email:      userProfile.Email,
-		Phone:      userProfile.PhoneNumber,
-	})
+	customer.ExternalID = userProfile["user_id"].(string)
+	customer.FirstName = userProfile["given_name"].(string)
+	customer.LastName = userProfile["family_name"].(string)
+	customer.Email = userProfile["email"].(string)
+	if v, exists := userProfile["phone_number"]; exists {
+		phoneNumber := v.(string)
+		customer.Phone = &phoneNumber
+	}
+
+	customer, err = s.repo.Customer().Save(ctx, customer)
 	if err != nil {
 		return entity.Customer{}, err
 	}

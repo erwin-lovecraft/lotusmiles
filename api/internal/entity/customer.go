@@ -10,7 +10,7 @@ type Customer struct {
 	FirstName    string     `json:"first_name"`
 	LastName     string     `json:"last_name"`
 	Email        string     `json:"email"`
-	Phone        string     `json:"phone"`
+	Phone        *string    `json:"phone"`
 	ReferrerCode *string    `json:"referrer_code"`
 	Onboarded    bool       `json:"onboarded"`
 	CreatedAt    time.Time  `json:"created_at" gorm:"created_at"`

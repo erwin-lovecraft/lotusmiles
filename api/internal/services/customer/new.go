@@ -10,7 +10,7 @@ import (
 )
 
 type Service interface {
-	CreateCustomer(ctx context.Context, req dto.CreateCustomer) (entity.Customer, error)
+	OnboardCustomer(ctx context.Context, req dto.OnboardCustomer) (entity.Customer, error)
 
 	GetCustomerProfile(ctx context.Context, userID string) (entity.Customer, error)
 

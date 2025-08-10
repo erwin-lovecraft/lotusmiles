@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
-	"github.com/erwin-lovecraft/aegismiles/internal/pkg/userprofile"
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/httpclient"
 	"github.com/viebiz/lit/iam"
@@ -16,10 +15,9 @@ const (
 	headerAuthorization       = "Authorization"
 	authorizationBearerPrefix = "Bearer"
 	userIDKey                 = "user_id"
-	roleKey                   = "roles"
 )
 
-func Auth(cfg config.Config) lit.HandlerFunc {
+func Authenticate(cfg config.Config) lit.HandlerFunc {
 	validator, err := iam.NewRFC9068Validator("https://"+cfg.Auth0.Domain, cfg.Auth0.Audience, httpclient.NewSharedPool())
 	if err != nil {
 		panic("init auth0 error: " + err.Error())
@@ -39,11 +37,14 @@ func Auth(cfg config.Config) lit.HandlerFunc {
 		}
 
 		// 3. Extract user profile from token claims
-		profile := userprofile.ExtractFromClaims(tk.Claims)
+		profile, err := iam.ExtractUserProfileFromClaims(tk.Claims)
+		if err != nil {
+			return convertError(err)
+		}
 
 		// 4. Inject user information to request context
 		ctx := c.Request().Context()
-		ctx = userprofile.SetInContext(ctx, profile)
+		ctx = iam.SetUserProfileInContext(ctx, profile)
 		ctx = monitoring.InjectField(ctx, userIDKey, profile.ID())
 		c.SetRequestContext(ctx)
 
