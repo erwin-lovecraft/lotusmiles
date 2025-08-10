@@ -9,8 +9,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export function HomePage() {
   const { user, logout } = useAuth0();
 
-  const handleLogout = () => {
-    logout({ logoutParams: { returnTo: window.location.origin } });
+  const handleLogout = async () => {
+    await logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
   const getInitials = (name?: string) => {

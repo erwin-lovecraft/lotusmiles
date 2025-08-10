@@ -6,8 +6,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export function LoginPage() {
   const { loginWithRedirect } = useAuth0();
 
-  const handleLogin = () => {
-    loginWithRedirect();
+  const handleLogin = async () => {
+    await loginWithRedirect();
   };
 
   return (
