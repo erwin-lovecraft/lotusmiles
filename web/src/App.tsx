@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hook.ts";
 import { fetchMyProfile, selectProfile } from "@/features/profile/profileSlice.ts";
 
 import "./App.css";
+import { ProfilePage } from "./pages/profile";
 
 function AppRoutes() {
   const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
@@ -49,6 +50,15 @@ function AppRoutes() {
         element={
           <AuthGuard>
             <OnboardingPage />
+          </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <AuthGuard>
+            <ProfilePage />
           </AuthGuard>
         }
       />
