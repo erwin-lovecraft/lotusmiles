@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/viebiz/lit/cors"
 	"github.com/viebiz/lit/monitoring/instrumentpg"
 	"github.com/viebiz/lit/postgres"
 	driverpg "gorm.io/driver/postgres"
@@ -27,4 +28,25 @@ func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
 	}
 
 	return gormDB, nil
+}
+
+func configCORS(cfg config.CorsConfig) cors.Config {
+	corsCfg := cors.New(cfg.AllowOrigins)
+	if len(cfg.AllowMethods) > 0 {
+		corsCfg.SetAllowMethods(cfg.AllowMethods...)
+	}
+
+	if len(cfg.AllowHeaders) > 0 {
+		corsCfg.SetAllowHeaders(cfg.AllowHeaders...)
+	}
+
+	if len(cfg.ExposeHeaders) > 0 {
+		corsCfg.SetExposeHeaders(cfg.ExposeHeaders...)
+	}
+
+	if !cfg.AllowCredentials {
+		corsCfg.DisableCredentials()
+	}
+
+	return corsCfg
 }

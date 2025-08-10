@@ -3,6 +3,7 @@ package config
 type Config struct {
 	ServerName string         `mapstructure:"SERVER_NAME"`
 	Web        WebConfig      `mapstructure:"WEB"`
+	Cors       CorsConfig     `mapstructure:"CORS"`
 	Database   DatabaseConfig `mapstructure:"DATABASE"`
 	Auth0      Auth0Config    `mapstructure:"AUTH0"`
 	SentryDSN  string         `mapstructure:"SENTRY_DSN"`
@@ -15,6 +16,14 @@ type WebConfig struct {
 
 func (c WebConfig) Addr() string {
 	return c.Host + ":" + c.Port
+}
+
+type CorsConfig struct {
+	AllowOrigins     []string `mapstructure:"ALLOW_ORIGINS"`
+	AllowMethods     []string `mapstructure:"ALLOW_METHODS"`
+	AllowHeaders     []string `mapstructure:"ALLOW_HEADERS"`
+	ExposeHeaders    []string `mapstructure:"EXPOSE_HEADERS"`
+	AllowCredentials bool     `mapstructure:"ALLOW_CREDENTIALS"`
 }
 
 type DatabaseConfig struct {
