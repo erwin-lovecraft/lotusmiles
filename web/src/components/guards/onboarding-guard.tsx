@@ -1,17 +1,16 @@
 import type React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAppSelector } from "@/app/hook.ts";
+import { selectProfile } from "@/features/profile/profileSlice.ts";
 import { Navigate } from "react-router";
-import { isOnboarded } from "@/lib/auth";
-import type { User } from "@/types/auth";
 
 interface OnboardingGuardProps {
   children: React.ReactNode;
 }
 
 export function OnboardingGuard({ children }: OnboardingGuardProps) {
-  const { user } = useAuth0();
+  const profile = useAppSelector(selectProfile)
 
-  if (!isOnboarded(user as User)) {
+  if (!profile || !profile.onboarded) {
     return <Navigate to="/onboarding" replace />;
   }
 

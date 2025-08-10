@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
@@ -11,28 +11,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-import { httpClient } from "@/lib/http";
-import { config } from "@/config/env";
-import type { ApiError } from "@/types/auth";
-import { toast } from "sonner";
-
-type OnboardingFormData = {
-  first_name: string;
-  last_name: string;
-  phone: string;
-  address: string;
-  referrer_code: string;
-};
+import { useAppDispatch, useAppSelector } from "@/app/hook";
+import { onboardCustomer, selectProfile } from "@/features/profile/profileSlice";
+import type { OnboardCustomer } from "@/types/auth";
 
 export function OnboardingPage() {
-  const { getAccessTokenSilently, user } = useAuth0();
+  const profile = useAppSelector(selectProfile);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<OnboardingFormData>({
+  const form = useForm<OnboardCustomer>({
     defaultValues: {
       first_name: "",
       last_name: "",
+      email: "",
       phone: "",
       address: "",
       referrer_code: "",
@@ -40,56 +33,25 @@ export function OnboardingPage() {
   });
 
   useEffect(() => {
-    if (!user) return;
+    if (!profile) return;
 
-    form.setValue("first_name", user.given_name ?? '')
-    form.setValue("last_name", user.family_name ?? '')
-    form.setValue("address", user.address ?? '')
-    form.setValue("phone", user.phone_number ?? '')
+    form.setValue("first_name", profile.first_name ?? "");
+    form.setValue("last_name", profile.last_name ?? "");
+    form.setValue("address", profile.address ?? "");
+    form.setValue("email", profile.email ?? "");
+    form.setValue("phone", profile.phone ?? "");
+  }, [form, profile]);
 
-  }, [form, user])
-
-  const onSubmit = async (data: OnboardingFormData) => {
-    setIsSubmitting(true);
-
-    try {
-      // Clean up referrer_code if empty
-      const submitData = {
-        ...data,
-        referrer_code: data.referrer_code || undefined,
-      };
-
-      await httpClient.post(`${config.api.baseUrl}/api/v1/profile/onboarding`, submitData);
-
-      toast("Welcome!", {
-        description: "Your profile has been set up successfully.",
-      });
-
-      try {
-        await getAccessTokenSilently();
-      } catch (error) {
-        console.warn("Token renewal failed, proceeding anyway:", error);
-      }
-
+  useEffect(() => {
+    if (profile?.onboarded) {
       navigate("/home");
-    } catch (error) {
-      const apiError = error as ApiError;
-
-      toast("Setup Failed", {
-        description: apiError.message,
-      });
-
-      // Set field-level errors if provided
-      if (apiError.fields) {
-        Object.entries(apiError.fields).forEach(([field, messages]) => {
-          form.setError(field as keyof OnboardingFormData, {
-            message: messages[0],
-          });
-        });
-      }
-    } finally {
-      setIsSubmitting(false);
     }
+  }, [profile?.onboarded]);
+
+  const onSubmit = async (data: OnboardCustomer) => {
+    setIsSubmitting(true);
+    dispatch(onboardCustomer(data));
+    setIsSubmitting(false);
   };
 
   return (
@@ -135,6 +97,20 @@ export function OnboardingPage() {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="member@lotusmiles.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

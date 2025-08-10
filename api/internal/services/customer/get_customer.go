@@ -2,6 +2,7 @@ package customer
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/viebiz/lit/iam"
@@ -24,10 +25,10 @@ func (s *service) GetCustomerProfile(ctx context.Context, userID string) (entity
 		return entity.Customer{}, ErrUserProfileEmpty
 	}
 
-	customer.ExternalID = userProfile["user_id"].(string)
-	customer.FirstName = userProfile["given_name"].(string)
-	customer.LastName = userProfile["family_name"].(string)
-	customer.Email = userProfile["email"].(string)
+	customer.ExternalID = getStringValue(userProfile["user_id"])
+	customer.FirstName = getStringValue(userProfile["first_name"])
+	customer.LastName = getStringValue(userProfile["family_name"])
+	customer.Email = getStringValue(userProfile["email"])
 	if v, exists := userProfile["phone_number"]; exists {
 		phoneNumber := v.(string)
 		customer.Phone = &phoneNumber
@@ -39,4 +40,11 @@ func (s *service) GetCustomerProfile(ctx context.Context, userID string) (entity
 	}
 
 	return customer, nil
+}
+
+func getStringValue(v interface{}) string {
+	if v == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", v)
 }
