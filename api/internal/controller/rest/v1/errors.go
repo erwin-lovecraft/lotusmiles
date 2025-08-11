@@ -7,14 +7,12 @@ import (
 	"github.com/viebiz/lit"
 )
 
-var (
-	errMissingParam = lit.HTTPError{Status: http.StatusBadRequest, Code: "validation", Desc: "Missing param"}
-)
-
 func convertError(err error) error {
 	switch err.Error() {
-	case customer.ErrCustomerAlreadyExists.Error():
-		return lit.HTTPError{Status: http.StatusBadRequest, Code: "validation", Desc: err.Error()}
+	case customer.ErrCustomerAlreadyExists.Error(),
+		customer.ErrCustomerAlreadyOnboard.Error():
+		return lit.HTTPError{Status: http.StatusBadRequest, Code: "invalid", Desc: err.Error()}
+
 	default:
 		return err
 	}

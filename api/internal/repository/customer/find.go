@@ -35,7 +35,7 @@ func (r *repository) FindByID(ctx context.Context, id int64) (entity.Customer, e
 
 func (r *repository) FindByExternalID(ctx context.Context, externalID string) (entity.Customer, error) {
 	var customer entity.Customer
-	if err := r.db.WithContext(ctx).First(&customer, "external_id = ?", externalID).Error; err != nil {
+	if err := r.db.WithContext(ctx).First(&customer, "idp_user_id = ?", externalID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return entity.Customer{}, nil
 		}

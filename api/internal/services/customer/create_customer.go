@@ -18,14 +18,21 @@ func (s *service) OnboardCustomer(ctx context.Context, req dto.OnboardCustomer) 
 		return entity.Customer{}, err
 	}
 
+	// 3. Return error if user already onboard
+	if existedCustomer.Onboarded == true {
+		return entity.Customer{}, ErrCustomerAlreadyOnboard
+	}
+
 	// TODO: Check referrer_code if it exists
 
 	existedCustomer.Onboarded = true
-	existedCustomer.Phone = req.Phone
-	existedCustomer.Email = req.Email
+	existedCustomer.Phone = &req.Phone
 	existedCustomer.FirstName = req.FirstName
 	existedCustomer.LastName = req.LastName
-	
+	if req.Address != nil {
+		existedCustomer.Address = *req.Address
+	}
+
 	// 3. Save customer
 	savedCustomer, err := s.repo.Customer().Save(ctx, existedCustomer)
 	if err != nil {
