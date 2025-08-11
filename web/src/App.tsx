@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Loader2 } from "lucide-react";
 
 import { AuthGuard } from "@/components/guards/auth-guard";
 import { OnboardingGuard } from "@/components/guards/onboarding-guard";
-import { LoginPage } from "@/pages/login";
-import { OnboardingPage } from "@/pages/onboarding";
-import { HomePage } from "@/pages/home";
+import LoginPage from "@/pages/login";
+import OnboardingPage from "@/pages/onboarding";
+import HomePage from "@/pages/home";
 
 import { setTokenGetter } from "@/lib/http";
 import { Toaster } from "sonner";
@@ -16,10 +16,18 @@ import { fetchMyProfile, selectProfile } from "@/features/profile/profileSlice.t
 
 import "./App.css";
 import { ProfilePage } from "./pages/profile";
+import ProfileModal from "./components/profile-modal";
+import ProfileView from "./pages/profile-view";
 
 function AppRoutes() {
   const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const profile = useAppSelector(selectProfile);
+
+  const location = useLocation();
+
+  // Lưu location trước khi mở modal
+  const state = location.state as { background?: Location };
+  const background = state?.background;
 
   // Set up token getter for HTTP client
   useEffect(() => {
@@ -42,40 +50,47 @@ function AppRoutes() {
   };
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <Routes location={background || location}>
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/onboarding"
-        element={
-          <AuthGuard>
-            <OnboardingPage />
-          </AuthGuard>
-        }
-      />
+        <Route
+          path="/onboarding"
+          element={
+            <AuthGuard>
+              <OnboardingPage />
+            </AuthGuard>
+          }
+        />
 
-      <Route
-        path="/profile"
-        element={
-          <AuthGuard>
-            <ProfilePage />
-          </AuthGuard>
-        }
-      />
+        <Route
+          path="/home"
+          element={
+            <AuthGuard>
+              <OnboardingGuard>
+                <HomePage />
+              </OnboardingGuard>
+            </AuthGuard>
+          }
+        />
 
-      <Route
-        path="/home"
-        element={
-          <AuthGuard>
-            <OnboardingGuard>
-              <HomePage />
-            </OnboardingGuard>
-          </AuthGuard>
-        }
-      />
+        <Route path="/*" element={<Navigate to={getFallbackRoute()} replace />} />
+      </Routes>
 
-      <Route path="/*" element={<Navigate to={getFallbackRoute()} replace />} />
-    </Routes>
+      {/* If background exists => render modal */}
+      {background && (
+        <Routes>
+          <Route
+            path="/home/profile"
+            element={
+              <AuthGuard>
+                <ProfileView />
+              </AuthGuard>
+            }
+          />
+        </Routes>
+      )}
+    </>
   );
 }
 

@@ -1,46 +1,45 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/theme-toggle";
 
-export function LoginPage() {
-  const { loginWithRedirect } = useAuth0();
+export default function LoginPage() {
+  const { loginWithRedirect, isLoading } = useAuth0();
 
   const handleLogin = async () => {
     await loginWithRedirect();
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="flex justify-end p-4">
-        <ThemeToggle />
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center">
+          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+            ></path>
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-800 mb-2">Welcome to LoyaltyApp</h1>
+        <p className="text-slate-600 mb-8">Earn rewards with every purchase and unlock exclusive benefits</p>
 
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center space-y-4">
-            <CardTitle className="text-3xl font-bold">Loyalty App</CardTitle>
-            <CardDescription className="text-lg">Sign in to access your rewards and benefits</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <Button onClick={handleLogin} className="w-full h-12 text-lg" size="lg">
-              Sign In
-            </Button>
-
-            <div className="text-center space-y-2">
-              <p className="text-xs text-muted-foreground">
-                By signing in, you agree to our{" "}
-                <a href="#" className="underline hover:text-foreground">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="underline hover:text-foreground">
-                  Privacy Policy
-                </a>
-              </p>
+        <Button
+          onClick={handleLogin}
+          disabled={isLoading}
+          className="w-full bg-primary text-white font-semibold py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors duration-200 mb-4"
+        >
+          {isLoading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Signing in...</span>
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            "Sign In / Sign Up"
+          )}
+        </Button>
+
+        <p className="text-xs text-slate-500">Powered by Auth0 Universal Login</p>
       </div>
     </div>
   );
