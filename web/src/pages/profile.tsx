@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import type { UpdateProfile } from "@/types/profile";
 export function ProfilePage() {
   const profile = useAppSelector(selectProfile);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UpdateProfile>({
