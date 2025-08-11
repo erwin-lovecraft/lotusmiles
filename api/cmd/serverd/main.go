@@ -89,9 +89,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 	)
 
 	// User routers
-	v1.Group("/users", func(users lit.Router) {
-		v1.Get("/profile", v1Ctrl.GetCustomerProfile)
-	})
+	v1.Get("/profile", v1Ctrl.GetCustomerProfile)
 
 	// Customer routes
 	v1.Group("/customers", func(customers lit.Router) {

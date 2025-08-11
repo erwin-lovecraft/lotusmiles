@@ -25,8 +25,8 @@ func (s *service) GetCustomerProfile(ctx context.Context, userID string) (entity
 		return entity.Customer{}, ErrUserProfileEmpty
 	}
 
-	customer.ExternalID = getStringValue(userProfile["user_id"])
-	customer.FirstName = getStringValue(userProfile["first_name"])
+	customer.IdPUserID = getStringValue(userProfile["user_id"])
+	customer.FirstName = getStringValue(userProfile["given_name"])
 	customer.LastName = getStringValue(userProfile["family_name"])
 	customer.Email = getStringValue(userProfile["email"])
 	if v, exists := userProfile["phone_number"]; exists {
