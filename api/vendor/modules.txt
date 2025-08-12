@@ -329,7 +329,7 @@ github.com/twitchyliquid64/golang-asm/unsafeheader
 # github.com/ugorji/go/codec v1.3.0
 ## explicit; go 1.21
 github.com/ugorji/go/codec
-# github.com/viebiz/lit v1.1.3
+# github.com/viebiz/lit v1.1.4
 ## explicit; go 1.24.5
 github.com/viebiz/lit
 github.com/viebiz/lit/cors
@@ -443,6 +443,11 @@ golang.org/x/net/idna
 golang.org/x/net/internal/httpcommon
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
+# golang.org/x/oauth2 v0.30.0
+## explicit; go 1.23.0
+golang.org/x/oauth2
+golang.org/x/oauth2/clientcredentials
+golang.org/x/oauth2/internal
 # golang.org/x/sync v0.16.0
 ## explicit; go 1.23.0
 golang.org/x/sync/semaphore
