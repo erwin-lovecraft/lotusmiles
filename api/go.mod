@@ -2,7 +2,7 @@ module github.com/erwin-lovecraft/aegismiles
 
 go 1.24.6
 
-require github.com/viebiz/lit v1.1.3
+require github.com/viebiz/lit v1.1.4
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -22,6 +22,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/exp v0.0.0-20250711185948-6ae5c78190dc // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	gorm.io/driver/mysql v1.6.0 // indirect
 	gorm.io/driver/sqlserver v1.6.0 // indirect
 	gorm.io/plugin/dbresolver v1.6.0 // indirect
