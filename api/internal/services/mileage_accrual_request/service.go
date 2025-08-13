@@ -10,6 +10,7 @@ import (
 type Service interface {
     GetByUserID(ctx context.Context, userID int64) ([]entity.MileageAccrualRequest, error)
     ListByExternalID(ctx context.Context, externalID string) ([]entity.MileageAccrualRequest, error)
+    CreateByExternalID(ctx context.Context, externalID string, metadata entity.JSONValue) (entity.MileageAccrualRequest, error)
 	GetByID(ctx context.Context, id int64) (*entity.MileageAccrualRequest, error)
 	Create(ctx context.Context, request *entity.MileageAccrualRequest) error
 	Update(ctx context.Context, request *entity.MileageAccrualRequest) error
@@ -38,6 +39,26 @@ func (s *service) ListByExternalID(ctx context.Context, externalID string) ([]en
     }
     requests, err := s.repo.MileageAccrualRequest().GetByUserID(ctx, user.ID)
     return requests, err
+}
+
+func (s *service) CreateByExternalID(ctx context.Context, externalID string, metadata entity.JSONValue) (entity.MileageAccrualRequest, error) {
+    u, err := s.repo.User().FindByExternalID(ctx, externalID)
+    if err != nil {
+        return entity.MileageAccrualRequest{}, err
+    }
+    if u.ID == 0 {
+        return entity.MileageAccrualRequest{}, nil
+    }
+    req := entity.MileageAccrualRequest{
+        UserID:     u.ID,
+        Status:     "pending",
+        Metadata:   metadata,
+        ReviewerID: u.ID,
+    }
+    if err := s.repo.MileageAccrualRequest().Create(ctx, &req); err != nil {
+        return entity.MileageAccrualRequest{}, err
+    }
+    return req, nil
 }
 
 func (s *service) GetByID(ctx context.Context, id int64) (*entity.MileageAccrualRequest, error) {
