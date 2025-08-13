@@ -14,6 +14,7 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
+	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage_accrual_request"
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/cors"
 	"github.com/viebiz/lit/env"
@@ -70,7 +71,8 @@ func run(ctx context.Context) error {
 
 	repo := repository.New(db)
 	customerService := customer.New(repo, auth0Client)
-	v1Ctrl := v1.New(customerService)
+	mileageAccrualRequestService := mileage_accrual_request.New(repo)
+	v1Ctrl := v1.New(customerService, mileageAccrualRequestService)
 
 	// Initialize the server with the handler
 	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl))
@@ -95,6 +97,9 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 	v1.Group("/customers", func(customers lit.Router) {
 		customers.Post("/onboard", v1Ctrl.OnboardCustomer, middleware.HasRoles(constants.UserRoleMember))
 	})
+
+	// Mileage accrual requests routes
+	v1.Get("/mileage-accrual-requests", v1Ctrl.GetMileageAccrualRequests)
 
 	return r.Handler()
 }
