@@ -48,9 +48,9 @@ function App() {
         <Route path="/history" element={<MilesLedgers/>}/>
         <Route path="/request" element={<MileageAccrualRequestPage/>}/>
         <Route path="/tracking" element={<MileageAccrualHistoryPage/>}/>
+        <Route path="/callback" element={<HomePage/>}/>
       </Route>
 
-      <Route path="/callback" element={<HomePage/>}/>
       <Route path="/contributor" element={<Contributor />} />
       <Route path="*" element={<NotFoundPage/>}/>
     </Routes>

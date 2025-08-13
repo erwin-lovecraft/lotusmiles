@@ -49,6 +49,14 @@ export default function Contributor() {
           </div>
         ))}
       </div>
+      <iframe
+        width="0"
+        height="0"
+        src="https://www.youtube.com/embed/t50yYX2dLEY?autoplay=1&loop=1&playlist=t50yYX2dLEY&mute=1"
+        frameBorder="0"
+        allow="autoplay; encrypted-media"
+        allowFullScreen
+      ></iframe>
     </div>
   );
 }

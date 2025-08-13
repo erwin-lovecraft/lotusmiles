@@ -3,6 +3,8 @@ import { Calendar, Shield, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import AppBar from "@/components/appbar.tsx";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 const benefits = [
   {
@@ -24,7 +26,14 @@ const benefits = [
 
 
 export default function LandingPage() {
-  const { loginWithRedirect } = useAuth0();
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home")
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleClickGetStarted = async () => {
     await loginWithRedirect();
