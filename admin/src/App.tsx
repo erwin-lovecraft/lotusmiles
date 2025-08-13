@@ -1,31 +1,52 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { Button } from "./components/ui/button";
+import { LandingPage } from "@/pages/landing.tsx";
+import { Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
+import HomePage from "@/pages/home.tsx";
+import AppBar from "@/components/appbar.tsx";
+import Footer from "@/components/footer.tsx";
+import Navbar, { NavbarItem } from "@/components/navbar.tsx";
+import { BarChart2, FileText, Settings } from "lucide-react";
+import AnalyticsPage from "@/pages/analytics.tsx";
+import TransactionsPage from "@/pages/transactions.tsx";
 
-function App() {
-  const [count, setCount] = useState(0);
+function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const onChangePage = (page: string) => {
+    navigate("/" +page);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button onClick={() => setCount((count) => count + 1)}>count is {count}</Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <AppBar />
+      <Navbar activePage={location.pathname} onPageChange={onChangePage}>
+        <NavbarItem id="home" index title="Quản lý yêu cầu tích dặm" icon={<Settings className="w-4 h-4"/>}/>
+        <NavbarItem id="transactions"  title="Giao dịch cộng dặm" icon={<FileText className="w-4 h-4"/>}/>
+        <NavbarItem id="analytics"  title="Báo cáo" icon={<BarChart2 className="w-4 h-4"/>}/>
+      </Navbar>
+
+      <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
+        <Outlet />
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route index element={<LandingPage />} />
+
+      <Route element={<Layout />}>
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/transactions" element={<TransactionsPage/>} />
+        <Route path="/analytics" element={<AnalyticsPage/>} />
+
+        <Route path="/callback" element={<HomePage/>}/>
+      </Route>
+    </Routes>
   );
 }
 
