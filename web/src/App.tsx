@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Loader2 } from "lucide-react";
 
@@ -15,12 +15,10 @@ import { useAppDispatch, useAppSelector } from "@/app/hook.ts";
 import { fetchMyProfile, selectProfile } from "@/features/profile/profileSlice.ts";
 
 import "./App.css";
-import { ProfilePage } from "./pages/profile";
-import ProfileModal from "./components/profile-modal";
 import ProfileView from "./pages/profile-view";
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const {isAuthenticated, isLoading, getAccessTokenSilently} = useAuth0();
   const profile = useAppSelector(selectProfile);
 
   const location = useLocation();
@@ -37,7 +35,7 @@ function AppRoutes() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin"/>
       </div>
     );
   }
@@ -52,13 +50,13 @@ function AppRoutes() {
   return (
     <>
       <Routes location={background || location}>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage/>}/>
 
         <Route
           path="/onboarding"
           element={
             <AuthGuard>
-              <OnboardingPage />
+              <OnboardingPage/>
             </AuthGuard>
           }
         />
@@ -68,13 +66,20 @@ function AppRoutes() {
           element={
             <AuthGuard>
               <OnboardingGuard>
-                <HomePage />
+                <HomePage/>
               </OnboardingGuard>
             </AuthGuard>
           }
         />
 
-        <Route path="/*" element={<Navigate to={getFallbackRoute()} replace />} />
+        <Route
+          path="/about"
+          element={
+            <p>About</p>
+          }
+        />
+
+        <Route path="/*" element={<Navigate to={getFallbackRoute()} replace/>}/>
       </Routes>
 
       {/* If background exists => render modal */}
@@ -84,7 +89,7 @@ function AppRoutes() {
             path="/home/profile"
             element={
               <AuthGuard>
-                <ProfileView />
+                <ProfileView/>
               </AuthGuard>
             }
           />
@@ -95,7 +100,7 @@ function AppRoutes() {
 }
 
 export default function App() {
-  const { isAuthenticated } = useAuth0();
+  const {isAuthenticated} = useAuth0();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -106,8 +111,8 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes />
-      <Toaster />
+      <AppRoutes/>
+      <Toaster/>
     </BrowserRouter>
   );
 }

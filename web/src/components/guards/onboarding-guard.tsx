@@ -13,9 +13,9 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
 
   if (fetchStatus !== "succeeded" && fetchStatus !== "failed") return;
 
-  if (!profile || !profile.onboarded) {
-    return <Navigate to="/onboarding" replace />;
-  }
+  // if (!profile || !profile.onboarded) {
+  //   return <Navigate to="/onboarding" replace />;
+  // }
 
   return <>{children}</>;
 }
