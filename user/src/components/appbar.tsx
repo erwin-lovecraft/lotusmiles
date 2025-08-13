@@ -3,6 +3,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { LogOut, User } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import logo from "@/assets/logo.svg";
+import {
+  DropdownMenu,
+  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu.tsx";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 export default function AppBar() {
   const {user, isAuthenticated, loginWithRedirect, logout} = useAuth0();
@@ -23,7 +30,7 @@ export default function AppBar() {
           <div className="relative">
             <div
               className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-              <img src={logo} alt="Logo" className="w-4 h-4 sm:w-6 sm:h-6 fill-current text-white" />
+              <img src={logo} alt="Logo" className="w-4 h-4 sm:w-6 sm:h-6 fill-current text-white"/>
             </div>
           </div>
           <span className="text-lg sm:text-xl font-semibold text-gray-900">Lotusmile</span>
@@ -45,28 +52,56 @@ export default function AppBar() {
           ) : (
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* User info - hide name on mobile */}
-              <div className="flex items-center space-x-2 sm:space-x-3 text-gray-700">
-                <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
-                  <AvatarImage
-                    src={user?.picture}
-                    alt={user?.name}
-                  />
-                  <AvatarFallback
-                    className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm">
-                    USER
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:inline text-sm sm:text-base">{user?.name}</span>
-              </div>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center space-x-1 sm:space-x-2 p-2 sm:px-3"
-              >
-                <LogOut className="w-3 h-3 sm:w-4 sm:h-4"/>
-                <span className="hidden sm:inline text-sm">Đăng xuất</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div className="flex items-center space-x-2 sm:space-x-3 text-gray-700">
+                    <Avatar className="w-8 h-8 sm:w-8 sm:h-8 rounded-lg grayscale">
+                      <AvatarImage
+                        src={user?.picture}
+                        alt={user?.name}
+                      />
+                      <AvatarFallback
+                        className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm">
+                        USER
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline text-sm sm:text-base">{user?.name}</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
+                        <AvatarImage
+                          src={user?.picture}
+                          alt={user?.name}
+                        />
+                        <AvatarFallback
+                          className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm">
+                          USER
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm sm:text-base">{user?.name}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+
+              {/*<Button*/}
+              {/*  onClick={handleLogout}*/}
+              {/*  variant="outline"*/}
+              {/*  size="sm"*/}
+              {/*  className="border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center space-x-1 sm:space-x-2 p-2 sm:px-3"*/}
+              {/*>*/}
+              {/*  <LogOut className="w-3 h-3 sm:w-4 sm:h-4"/>*/}
+              {/*  <span className="hidden sm:inline text-sm">Đăng xuất</span>*/}
+              {/*</Button>*/}
             </div>
           )}
         </div>
