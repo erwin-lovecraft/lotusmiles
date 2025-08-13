@@ -1,17 +1,17 @@
 package entity
 
 import (
-    "database/sql/driver"
-    "fmt"
-    "time"
+	"database/sql/driver"
+	"fmt"
+	"time"
 )
 
 type MileageAccrualRequest struct {
 	ID                       int64           `json:"id" gorm:"primaryKey"`
 	UserID                   int64           `json:"user_id" gorm:"not null"`
 	Status                   string          `json:"status" gorm:"not null;default:'pending'"`
-    Metadata                 JSONValue       `json:"metadata" gorm:"type:jsonb;not null;default:'{}'"`
-    EvidenceURLs             JSONValue       `json:"evidence_urls" gorm:"type:jsonb"`
+    	Metadata                 JSONValue       `json:"metadata" gorm:"type:jsonb;not null;default:'{}'"`
+	EvidenceURLs             JSONValue       `json:"evidence_urls" gorm:"type:jsonb[];not null;default:'{}'"`
 	DistanceMiles            int             `json:"distance_miles" gorm:"not null;default:0"`
 	AccrualRate              float64         `json:"accrual_rate" gorm:"not null;default:0"`
 	QualifyingMilesEarned    int             `json:"qualifying_miles_earned" gorm:"not null;default:0"`

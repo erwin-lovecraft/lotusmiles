@@ -100,6 +100,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 
 	// Mileage accrual requests routes
 	v1.Get("/mileage-accrual-requests", v1Ctrl.GetMileageAccrualRequests)
+	v1.Post("/mileage-accrual-requests", v1Ctrl.CreateMileageAccrualRequest)
 
 	return r.Handler()
 }
