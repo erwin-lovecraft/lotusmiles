@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { LogOut, User } from "lucide-react";
+import { Bell, LogOut, User } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import logo from "@/assets/logo.svg";
 import {
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator
+  DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 export default function AppBar() {
   const {user, isAuthenticated, loginWithRedirect, logout} = useAuth0();
@@ -24,7 +23,7 @@ export default function AppBar() {
 
   return (
     <header className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="max-w-6xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="relative">
@@ -36,7 +35,6 @@ export default function AppBar() {
           <span className="text-lg sm:text-xl font-semibold text-gray-900">Lotusmile</span>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {!isAuthenticated ? (
             <Button
@@ -85,23 +83,19 @@ export default function AppBar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <Bell />
+                      Notifications
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator/>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-
-              {/*<Button*/}
-              {/*  onClick={handleLogout}*/}
-              {/*  variant="outline"*/}
-              {/*  size="sm"*/}
-              {/*  className="border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center space-x-1 sm:space-x-2 p-2 sm:px-3"*/}
-              {/*>*/}
-              {/*  <LogOut className="w-3 h-3 sm:w-4 sm:h-4"/>*/}
-              {/*  <span className="hidden sm:inline text-sm">Đăng xuất</span>*/}
-              {/*</Button>*/}
             </div>
           )}
         </div>

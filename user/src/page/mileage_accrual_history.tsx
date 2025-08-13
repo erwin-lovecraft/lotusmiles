@@ -105,7 +105,7 @@ export interface RequestDetail {
   submissionDate: string,
   documents: string[],
   timeline: {date: string, action: string, status:string}[]
-  rejectionReason: string
+  rejectionReason?: string
 }
 
 export default function MileageAccrualHistory() {
@@ -154,11 +154,6 @@ export default function MileageAccrualHistory() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Theo dõi trạng thái yêu cầu</h1>
-        <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Kiểm tra tình trạng xử lý các yêu cầu tích dặm thủ công</p>
-      </div>
-
       {/* Search */}
       <Card>
         <CardContent className="p-4 sm:p-6">
@@ -252,7 +247,7 @@ export default function MileageAccrualHistory() {
 
       {/* Detail Modal */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto mx-auto sm:mx-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base">
               <FileText className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -310,108 +305,38 @@ export default function MileageAccrualHistory() {
               <Separator />
 
               {/* Service Specific Info */}
-              <div>
-                <h4 className="font-semibold mb-3 text-sm sm:text-base">Thông tin chi tiết dịch vụ</h4>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  {selectedRequest.details.flightInfo && (
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600 block">Số hiệu chuyến bay:</span>
-                        <span className="font-medium">{selectedRequest.details.flightInfo.flightNumber}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Tuyến đường:</span>
-                        <span>{selectedRequest.details.flightInfo.route}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Ngày bay:</span>
-                        <span>{selectedRequest.details.flightInfo.date}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Mã đặt chỗ:</span>
-                        <span className="font-medium">{selectedRequest.details.flightInfo.bookingCode}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600 block">Số vé:</span>
-                        <span className="font-medium">{selectedRequest.details.flightInfo.ticketNumber}</span>
-                      </div>
-                    </div>
-                  )}
+              {/*<div>*/}
+              {/*  <h4 className="font-semibold mb-3 text-sm sm:text-base">Thông tin chi tiết dịch vụ</h4>*/}
+              {/*  <div className="bg-gray-50 p-4 rounded-lg">*/}
+              {/*    {selectedRequest.details.flightInfo && (*/}
+              {/*      <div className="grid grid-cols-2 gap-4 text-sm">*/}
+              {/*        <div>*/}
+              {/*          <span className="text-gray-600 block">Số hiệu chuyến bay:</span>*/}
+              {/*          <span className="font-medium">{selectedRequest.details.flightInfo.flightNumber}</span>*/}
+              {/*        </div>*/}
+              {/*        <div>*/}
+              {/*          <span className="text-gray-600 block">Tuyến đường:</span>*/}
+              {/*          <span>{selectedRequest.details.flightInfo.route}</span>*/}
+              {/*        </div>*/}
+              {/*        <div>*/}
+              {/*          <span className="text-gray-600 block">Ngày bay:</span>*/}
+              {/*          <span>{selectedRequest.details.flightInfo.date}</span>*/}
+              {/*        </div>*/}
+              {/*        <div>*/}
+              {/*          <span className="text-gray-600 block">Mã đặt chỗ:</span>*/}
+              {/*          <span className="font-medium">{selectedRequest.details.flightInfo.bookingCode}</span>*/}
+              {/*        </div>*/}
+              {/*        <div className="col-span-2">*/}
+              {/*          <span className="text-gray-600 block">Số vé:</span>*/}
+              {/*          <span className="font-medium">{selectedRequest.details.flightInfo.ticketNumber}</span>*/}
+              {/*        </div>*/}
+              {/*      </div>*/}
+              {/*    )}*/}
 
-                  {selectedRequest.details.hotelInfo && (
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600 block">Tên khách sạn:</span>
-                        <span className="font-medium">{selectedRequest.details.hotelInfo.hotelName}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Số đêm:</span>
-                        <span>{selectedRequest.details.hotelInfo.nights} đêm</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Check-in:</span>
-                        <span>{selectedRequest.details.hotelInfo.checkIn}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Check-out:</span>
-                        <span>{selectedRequest.details.hotelInfo.checkOut}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600 block">Mã xác nhận:</span>
-                        <span className="font-medium">{selectedRequest.details.hotelInfo.confirmationNumber}</span>
-                      </div>
-                    </div>
-                  )}
+              {/*  </div>*/}
+              {/*</div>*/}
 
-                  {selectedRequest.details.cardInfo && (
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600 block">Loại thẻ:</span>
-                        <span className="font-medium">{selectedRequest.details.cardInfo.cardType}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Kỳ giao dịch:</span>
-                        <span>{selectedRequest.details.cardInfo.transactionPeriod}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Tổng chi tiêu:</span>
-                        <span>{selectedRequest.details.cardInfo.totalAmount}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Chi tiêu hợp lệ:</span>
-                        <span className="font-medium">{selectedRequest.details.cardInfo.qualifyingAmount}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedRequest.details.rentalInfo && (
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600 block">Công ty:</span>
-                        <span className="font-medium">{selectedRequest.details.rentalInfo.company}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Số ngày thuê:</span>
-                        <span>{selectedRequest.details.rentalInfo.days} ngày</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Ngày nhận xe:</span>
-                        <span>{selectedRequest.details.rentalInfo.pickupDate}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 block">Ngày trả xe:</span>
-                        <span>{selectedRequest.details.rentalInfo.returnDate}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600 block">Mã xác nhận:</span>
-                        <span className="font-medium">{selectedRequest.details.rentalInfo.confirmationNumber}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <Separator />
+              {/*<Separator />*/}
 
               {/* Documents */}
               <div>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -28,87 +27,85 @@ interface Transaction {
   };
 }
 
-export default function MilesLedgers() {
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-
-  const transactions: Transaction[] = [
-    {
-      id: "TXN001",
-      date: "15/01/2025",
-      type: "flight",
-      description: "Chuyến bay VN123 - HCM đến Hà Nội",
-      miles: "+1,200",
-      status: "completed",
-      details: {
-        flightNumber: "VN123",
-        route: "Tp. Hồ Chí Minh (SGN) → Hà Nội (HAN)",
-        bookingRef: "ABC123XYZ"
-      }
-    },
-    {
-      id: "TXN002",
-      date: "12/01/2025",
-      type: "hotel",
-      description: "Đặt phòng Hilton Saigon - 2 đêm",
-      miles: "+800",
-      status: "completed",
-      details: {
-        hotelName: "Hilton Saigon Hotel",
-        nights: 2,
-        location: "Quận 1, Tp. Hồ Chí Minh",
-        bookingRef: "HLT789456"
-      }
-    },
-    {
-      id: "TXN003",
-      date: "10/01/2025",
-      type: "redeem",
-      description: "Đổi voucher mua sắm Vincom",
-      miles: "-2,500",
-      status: "completed",
-      details: {
-        rewardType: "Voucher mua sắm Vincom 500.000đ",
-        validUntil: "10/04/2025"
-      }
-    },
-    {
-      id: "TXN004",
-      date: "08/01/2025",
-      type: "flight",
-      description: "Chuyến bay VN456 - Hà Nội đến HCM",
-      miles: "+1,200",
-      status: "completed",
-      details: {
-        flightNumber: "VN456",
-        route: "Hà Nội (HAN) → Tp. Hồ Chí Minh (SGN)",
-        bookingRef: "DEF456ABC"
-      }
-    },
-    {
-      id: "TXN005",
-      date: "05/01/2025",
-      type: "credit",
-      description: "Thanh toán thẻ tín dụng Lotusmile",
-      miles: "+350",
-      status: "pending",
-      details: {
-        cardType: "Lotusmile Platinum Credit Card",
-        merchantName: "Vinmart - Nguyễn Văn Cừ"
-      }
-    },
-    {
-      id: "TXN006",
-      date: "02/01/2025",
-      type: "bonus",
-      description: "Thưởng sinh nhật thành viên Gold",
-      miles: "+1,000",
-      status: "completed",
-      details: {
-        rewardType: "Bonus sinh nhật Gold Member"
-      }
+const transactions: Transaction[] = [
+  {
+    id: "TXN001",
+    date: "15/01/2025",
+    type: "flight",
+    description: "Chuyến bay VN123 - HCM đến Hà Nội",
+    miles: "+1,200",
+    status: "completed",
+    details: {
+      flightNumber: "VN123",
+      route: "Tp. Hồ Chí Minh (SGN) → Hà Nội (HAN)",
+      bookingRef: "ABC123XYZ"
     }
-  ];
+  },
+  {
+    id: "TXN002",
+    date: "12/01/2025",
+    type: "hotel",
+    description: "Đặt phòng Hilton Saigon - 2 đêm",
+    miles: "+800",
+    status: "completed",
+    details: {
+      hotelName: "Hilton Saigon Hotel",
+      nights: 2,
+      location: "Quận 1, Tp. Hồ Chí Minh",
+      bookingRef: "HLT789456"
+    }
+  },
+  {
+    id: "TXN003",
+    date: "10/01/2025",
+    type: "redeem",
+    description: "Đổi voucher mua sắm Vincom",
+    miles: "-2,500",
+    status: "completed",
+    details: {
+      rewardType: "Voucher mua sắm Vincom 500.000đ",
+      validUntil: "10/04/2025"
+    }
+  },
+  {
+    id: "TXN004",
+    date: "08/01/2025",
+    type: "flight",
+    description: "Chuyến bay VN456 - Hà Nội đến HCM",
+    miles: "+1,200",
+    status: "completed",
+    details: {
+      flightNumber: "VN456",
+      route: "Hà Nội (HAN) → Tp. Hồ Chí Minh (SGN)",
+      bookingRef: "DEF456ABC"
+    }
+  },
+  {
+    id: "TXN005",
+    date: "05/01/2025",
+    type: "credit",
+    description: "Thanh toán thẻ tín dụng Lotusmile",
+    miles: "+350",
+    status: "pending",
+    details: {
+      cardType: "Lotusmile Platinum Credit Card",
+      merchantName: "Vinmart - Nguyễn Văn Cừ"
+    }
+  },
+  {
+    id: "TXN006",
+    date: "02/01/2025",
+    type: "bonus",
+    description: "Thưởng sinh nhật thành viên Gold",
+    miles: "+1,000",
+    status: "completed",
+    details: {
+      rewardType: "Bonus sinh nhật Gold Member"
+    }
+  }
+];
 
+export default function MilesLedgers() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'flight':
@@ -147,58 +144,36 @@ export default function MilesLedgers() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h1>Lịch sử tích dặm</h1>
-        <p className="text-muted-foreground mt-1 sm:mt-2">Theo dõi tất cả giao dịch tích dặm và đổi thưởng</p>
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"/>
-                <Input
-                  placeholder="Tìm kiếm giao dịch..."
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Loại giao dịch"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="flight">Chuyến bay</SelectItem>
-                <SelectItem value="hotel">Khách sạn</SelectItem>
-                <SelectItem value="credit">Thẻ tín dụng</SelectItem>
-                <SelectItem value="redeem">Đổi thưởng</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Thời gian"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="thisMonth">Tháng này</SelectItem>
-                <SelectItem value="lastMonth">Tháng trước</SelectItem>
-                <SelectItem value="thisYear">Năm nay</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Transaction List - Ticket Style */}
       <Card>
-        <CardHeader className="pb-3 sm:pb-6">
+        <CardHeader className="pb-2 sm:pb-6">
           <CardTitle>Danh sách giao dịch</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-4">
+            <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"/>
+                  <Input
+                    placeholder="Tìm kiếm giao dịch..."
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Select>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Thời gian"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  <SelectItem value="thisMonth">Tháng này</SelectItem>
+                  <SelectItem value="lastMonth">Tháng trước</SelectItem>
+                  <SelectItem value="thisYear">Năm nay</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {transactions.map((transaction) => (
               <div
                 key={transaction.id}
@@ -261,7 +236,6 @@ export default function MilesLedgers() {
                             variant="outline"
                             size="sm"
                             className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1"
-                            onClick={() => setSelectedTransaction(transaction)}
                           >
                             <Eye className="w-4 h-4"/>
                             <span className="hidden sm:inline">Chi tiết</span>

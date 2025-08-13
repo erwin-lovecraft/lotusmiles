@@ -22,16 +22,16 @@ function Layout() {
     <div className="min-h-screen bg-white">
       <AppBar/>
 
-      <main className="p-4 sm:p-6 lg:p-8 pb-20 sm:pg-24">
+      <main className="max-w-7xl lg:mx-auto p-4 sm:p-6 lg:p-8 pb-20 sm:pg-24">
         <Outlet/>
       </main>
 
       <BottomNavigationBar onTabChange={handleSelectTab}>
-        <BottomNavigationBarItem id="home" index label="Home" icon={<Home/>}/>
-        <BottomNavigationBarItem id="profile" label="Profile" icon={<User/>}/>
         <BottomNavigationBarItem id="history" label="History" icon={<History/>}/>
-        <BottomNavigationBarItem id="request" label="Request" icon={<Plus/>}/>
         <BottomNavigationBarItem id="tracking" label="Tracking" icon={<ClipboardList/>}/>
+        <BottomNavigationBarItem id="home" index label="Home" icon={<Home/>}/>
+        <BottomNavigationBarItem id="request" label="Request" icon={<Plus/>}/>
+        <BottomNavigationBarItem id="profile" label="Profile" icon={<User/>}/>
       </BottomNavigationBar>
     </div>
   )
