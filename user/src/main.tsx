@@ -5,6 +5,7 @@ import '@/index.css'
 import { Auth0Provider } from "@auth0/auth0-react";
 import { config } from "@/config/env";
 import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { BrowserRouter } from "react-router";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')!).render(
       cacheLocation="localstorage"
     >
       <ThemeProvider defaultTheme="light" storageKey="lotusmiles-app-theme">
-        <App/>
+        <BrowserRouter>
+          <App/>
+        </BrowserRouter>
       </ThemeProvider>
     </Auth0Provider>
   </StrictMode>,

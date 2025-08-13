@@ -1,28 +1,39 @@
 import { Button } from "@/components/ui/button.tsx";
 import { Calendar, Shield, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card.tsx";
+import AppBar from "@/components/appbar.tsx";
+import { useAuth0 } from "@auth0/auth0-react";
+
+const benefits = [
+  {
+    icon: TrendingUp,
+    title: "Accumulate Miles",
+    description: "Earn points on every flight and linked activities."
+  },
+  {
+    icon: Calendar,
+    title: "Redeem Exciting Rewards",
+    description: "Use points to redeem flight tickets, hotels, and many valuable gifts."
+  },
+  {
+    icon: Shield,
+    title: "Absolute Security",
+    description: "Personal information is encrypted and comprehensively protected."
+  }
+];
+
 
 export default function LandingPage() {
-  const benefits = [
-    {
-      icon: TrendingUp,
-      title: "Accumulate Miles",
-      description: "Earn points on every flight and linked activities."
-    },
-    {
-      icon: Calendar,
-      title: "Redeem Exciting Rewards",
-      description: "Use points to redeem flight tickets, hotels, and many valuable gifts."
-    },
-    {
-      icon: Shield,
-      title: "Absolute Security",
-      description: "Personal information is encrypted and comprehensively protected."
-    }
-  ];
+  const { loginWithRedirect } = useAuth0();
+
+  const handleClickGetStarted = async () => {
+    await loginWithRedirect();
+  }
 
   return (
     <>
+      <AppBar />
+
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
           <div className="text-center space-y-6 sm:space-y-8">
@@ -38,6 +49,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 className="bg-white text-purple-600 hover:bg-purple-50 px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+                onClick={handleClickGetStarted}
               >
                 Get Started Now
               </Button>
