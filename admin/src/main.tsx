@@ -14,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
       authorizationParams={{
         redirect_uri: window.location.origin + '/callback',
         audience: config.auth0.audience,
+        connection: config.auth0.connection,
       }}
       useRefreshTokens={true}
       useRefreshTokensFallback={true}

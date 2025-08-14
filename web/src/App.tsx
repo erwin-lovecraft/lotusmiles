@@ -10,6 +10,9 @@ import MileageAccrualHistoryPage from "@/page/mileage_accrual_history.tsx";
 import NotFoundPage from "@/page/notfound.tsx";
 import Profile from "@/page/profile.tsx";
 import Contributor from "@/page/contributor.tsx";
+import CallbackPage from "@/page/auth0-callback.tsx";
+import AuthErrorPage from "@/page/auth-error.tsx";
+import ProtectedRoute from "@/components/protected-route.tsx";
 
 function Layout() {
   const navigate = useNavigate();
@@ -41,14 +44,15 @@ function App() {
   return (
     <Routes>
       <Route index element={<LandingPage/>}/>
+      <Route path="/callback" element={<CallbackPage/>}/>
+      <Route path="/auth-error" element={<AuthErrorPage/>}/>
 
-      <Route element={<Layout/>}>
+      <Route element={<ProtectedRoute children={<Layout/>}/>}>
         <Route path="/home" element={<HomePage/>}/>
         <Route path="/profile" element={<Profile />}/>
         <Route path="/history" element={<MilesLedgers/>}/>
         <Route path="/request" element={<MileageAccrualRequestPage/>}/>
         <Route path="/tracking" element={<MileageAccrualHistoryPage/>}/>
-        <Route path="/callback" element={<HomePage/>}/>
       </Route>
 
       <Route path="/contributor" element={<Contributor />} />

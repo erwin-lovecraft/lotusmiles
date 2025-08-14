@@ -4,6 +4,7 @@ interface Config {
     clientId: string;
     audience: string;
     onboardedClaim: string;
+    connection: string;
   };
   api: {
     baseUrl: string;
@@ -20,6 +21,7 @@ function validateEnv(): Config {
     "VITE_AUTH0_AUDIENCE",
     "VITE_API_BASE_URL",
     "VITE_APP_ENV",
+    "VITE_AUTH0_CONNECTION"
   ] as const;
 
   // Check for missing required environment variables
@@ -40,6 +42,7 @@ function validateEnv(): Config {
       clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
       audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       onboardedClaim: import.meta.env.VITE_AUTH0_ONBOARDED_CLAIM,
+      connection: import.meta.env.VITE_AUTH0_CONNECTION,
     },
     api: {
       baseUrl: import.meta.env.VITE_API_BASE_URL,

@@ -7,6 +7,9 @@ import Navbar, { NavbarItem } from "@/components/navbar.tsx";
 import { BarChart2, FileText, Settings } from "lucide-react";
 import AnalyticsPage from "@/pages/analytics.tsx";
 import TransactionsPage from "@/pages/transactions.tsx";
+import CallbackPage from "@/pages/auth0-callback.tsx";
+import AuthErrorPage from "@/pages/auth-error.tsx";
+import ProtectedRoute from "@/components/protected-route.tsx";
 
 function Layout() {
   const navigate = useNavigate();
@@ -38,13 +41,13 @@ function App() {
   return (
     <Routes>
       <Route index element={<LandingPage />} />
+      <Route path="/callback" element={<CallbackPage/>}/>
+      <Route path="/auth-error" element={<AuthErrorPage/>}/>
 
-      <Route element={<Layout />}>
+      <Route element={<ProtectedRoute children={<Layout />}/> }>
         <Route path="/home" element={<HomePage />} />
         <Route path="/transactions" element={<TransactionsPage/>} />
         <Route path="/analytics" element={<AnalyticsPage/>} />
-
-        <Route path="/callback" element={<HomePage/>}/>
       </Route>
     </Routes>
   );
