@@ -2,18 +2,18 @@ import { Award, Calendar, Clock, Crown, Diamond, Star, TrendingUp } from "lucide
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Progress } from "@/components/ui/progress.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import MemberCard from "@/components/member-card.tsx";
+import MemberTierCard, { type Tier } from "@/components/tier-member-card.tsx";
 
 // Mock member data
 const memberData = {
   name: "Nguyễn Văn An",
   memberId: "LM123456789",
-  currentTier: "million_miles" as keyof typeof membershipTiers,
-  memberSince: new Date(2019,12,5,0,0,0,0),
-  validThrough: new Date(2025,31,12,0,0,0,0),
+  currentTier: "platinum" as Tier,
+  memberSince: new Date(2019, 12, 5, 0, 0, 0, 0),
+  validThrough: new Date(2025, 31, 12, 0, 0, 0, 0),
   currentMiles: 15420,
   expiringMiles: 2500,
-  expiringDate: new Date(2025,31,12,0,0,0,0),
+  expiringDate: new Date(2025, 31, 12, 0, 0, 0, 0),
   tierReviewPeriod: "01/01/2025 - 31/12/2025",
   qualifyingMiles: 38750,
   tierFlights: 6
@@ -53,7 +53,7 @@ const membershipTiers = {
     icon: Crown,
     requirements: {miles: 75000, flights: 12}
   },
-  million_miles: {
+  million_miler: {
     name: "Million Miles",
     color: "from-rose-600 to-pink-700",
     bgColor: "bg-gradient-to-br from-rose-100 to-pink-200",
@@ -82,13 +82,15 @@ export default function HomePage() {
     <div className="space-y-4 sm:space-y-6">
       {/* Membership Card */}
       <div className="min-h-[20vh] w-full grid place-items-center md:bg-neutral-100 md:p-4">
-        <div className="w-full max-w-[390px] sm:max-w-[720px]">
-          <MemberCard name={memberData.name}
-                      memberID={memberData.memberId}
-                      currentTier={memberData.currentTier}
-                      memberSince={memberData.memberSince}
-                      validThrough={memberData.validThrough}
-                      expiringDate={memberData.expiringDate}/>
+        <div className="w-full max-w-[390px]">
+          <MemberTierCard
+            name={memberData.name}
+            memberId={memberData.memberId}
+            tier={memberData.currentTier as Tier}
+            memberSince={memberData.memberSince}
+            validThrough={memberData.validThrough}
+            issuer="Apollo Team"
+          />
         </div>
       </div>
 
