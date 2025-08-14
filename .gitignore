@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-.env
-.env.*
-*.env
+/api/config.env
+/api/.env
+/web/.env
+/admin/.env
