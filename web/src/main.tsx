@@ -1,39 +1,30 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+import '@/index.css'
 import { Auth0Provider } from "@auth0/auth0-react";
-
-import App from "./App";
-import { ThemeProvider } from "@/components/theme-provider";
 import { config } from "@/config/env";
-import { Provider } from "react-redux";
-import { store } from "@/app/store.ts";
-import "@/lib/icons"
+import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { BrowserRouter } from "react-router";
 
-import "./index.css";
-
-const container = document.getElementById("root");
-if (!container) throw new Error("Root element not found");
-
-const root = createRoot(container);
-
-root.render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
-      <Auth0Provider
-        domain={config.auth0.domain}
-        clientId={config.auth0.clientId}
-        authorizationParams={{
-          redirect_uri: window.location.origin + '/callback',
-          audience: config.auth0.audience,
-        }}
-        useRefreshTokens={true}
-        useRefreshTokensFallback={true}
-        cacheLocation="localstorage"
-      >
-        <ThemeProvider defaultTheme="light" storageKey="lotusmiles-app-theme">
+    <Auth0Provider
+      domain={config.auth0.domain}
+      clientId={config.auth0.clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin + '/callback',
+        audience: config.auth0.audience,
+      }}
+      useRefreshTokens={true}
+      useRefreshTokensFallback={true}
+      cacheLocation="localstorage"
+    >
+      <ThemeProvider defaultTheme="light" storageKey="lotusmiles-app-theme">
+        <BrowserRouter>
           <App/>
-        </ThemeProvider>
-      </Auth0Provider>
-    </Provider>
-  </StrictMode>
-);
+        </BrowserRouter>
+      </ThemeProvider>
+    </Auth0Provider>
+  </StrictMode>,
+)

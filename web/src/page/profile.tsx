@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Award, Calendar, Mail, MapPin, Phone, User } from "lucide-react";
+import {  Calendar, Mail, MapPin, Phone, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -10,12 +10,7 @@ export default function Profile() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Thông tin thành viên</h1>
-        <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Quản lý thông tin cá nhân và hạng thành viên</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3 sm:pb-6">
@@ -89,53 +84,6 @@ export default function Profile() {
                   className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 w-full sm:w-auto text-sm sm:text-base">
                   Cập nhật thông tin
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div>
-          <Card>
-            <CardHeader className="pb-3 sm:pb-6">
-              <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
-                <Award className="w-4 h-4 sm:w-5 sm:h-5"/>
-                <span>Hạng thành viên</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0">
-              <div className="text-center">
-                <Badge
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 text-base sm:text-lg">
-                  GOLD
-                </Badge>
-                <p className="text-xs sm:text-sm text-gray-600 mt-2">Hạng hiện tại</p>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-xs sm:text-sm">
-                    <span>Tiến độ lên Platinum</span>
-                    <span>15,420 / 25,000 dặm</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 h-2 rounded-full"
-                         style={{width: '61.7%'}}></div>
-                  </div>
-                </div>
-
-                <div className="text-xs sm:text-sm text-gray-600">
-                  <p>Còn <span className="font-semibold text-purple-600">9,580 dặm</span> nữa để lên hạng Platinum</p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t">
-                <h4 className="font-medium mb-2 text-sm sm:text-base">Quyền lợi Gold</h4>
-                <ul className="text-xs sm:text-sm text-gray-600 space-y-1">
-                  <li>• Ưu tiên check-in</li>
-                  <li>• Hành lý thêm 10kg</li>
-                  <li>• Tích dặm thưởng x1.5</li>
-                  <li>• Lounge miễn phí</li>
-                </ul>
               </div>
             </CardContent>
           </Card>

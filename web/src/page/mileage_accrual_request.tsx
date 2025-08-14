@@ -1,7 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert.tsx";
 import { AlertCircle, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -25,28 +24,8 @@ export default function MileageAccrualRequestPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <Card>
-            <CardHeader className="pb-3 sm:pb-6">
-              <CardTitle className="text-lg sm:text-xl">Thông tin yêu cầu</CardTitle>
-            </CardHeader>
             <CardContent className="space-y-4 sm:space-y-6 pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="requestType" className="text-sm">Loại yêu cầu</Label>
-                  <Select>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Chọn loại yêu cầu" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="missing-flight">Chuyến bay thiếu dặm</SelectItem>
-                      <SelectItem value="hotel">Đặt phòng khách sạn</SelectItem>
-                      <SelectItem value="car-rental">Thuê xe</SelectItem>
-                      <SelectItem value="partner">Đối tác liên kết</SelectItem>
-                      <SelectItem value="credit-card">Thẻ tín dụng</SelectItem>
-                      <SelectItem value="other">Khác</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 <div>
                   <Label htmlFor="activityDate" className="text-sm">Ngày thực hiện</Label>
                   <Input type="date" id="activityDate" className="mt-1" />

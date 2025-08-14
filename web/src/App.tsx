@@ -1,118 +1,60 @@
-import { useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
-import { useAuth0 } from "@auth0/auth0-react";
-import { Loader2 } from "lucide-react";
+import LandingPage from "@/page/landing.tsx";
+import AppBar from "@/components/appbar.tsx";
+import BottomNavigationBar, { BottomNavigationBarItem } from "@/components/bottom-navigation-bar.tsx";
+import { ClipboardList, History, Home, Plus, User } from "lucide-react";
+import { Outlet, Route, Routes, useNavigate } from "react-router";
+import HomePage from "@/page/home.tsx";
+import MileageAccrualRequestPage from "@/page/mileage_accrual_request.tsx";
+import MilesLedgers from "@/page/miles_ledgers.tsx";
+import MileageAccrualHistoryPage from "@/page/mileage_accrual_history.tsx";
+import NotFoundPage from "@/page/notfound.tsx";
+import Profile from "@/page/profile.tsx";
+import Contributor from "@/page/contributor.tsx";
 
-import { AuthGuard } from "@/components/guards/auth-guard";
-import { OnboardingGuard } from "@/components/guards/onboarding-guard";
-import LoginPage from "@/pages/login";
-import OnboardingPage from "@/pages/onboarding";
-import HomePage from "@/pages/home";
+function Layout() {
+  const navigate = useNavigate();
 
-import { setTokenGetter } from "@/lib/http";
-import { Toaster } from "sonner";
-import { useAppDispatch, useAppSelector } from "@/app/hook.ts";
-import { fetchMyProfile, selectProfile } from "@/features/profile/profileSlice.ts";
-
-import "./App.css";
-import ProfileView from "./pages/profile-view";
-
-function AppRoutes() {
-  const {isAuthenticated, isLoading, getAccessTokenSilently} = useAuth0();
-  const profile = useAppSelector(selectProfile);
-
-  const location = useLocation();
-
-  // Lưu location trước khi mở modal
-  const state = location.state as { background?: Location };
-  const background = state?.background;
-
-  // Set up token getter for HTTP client
-  useEffect(() => {
-    setTokenGetter(getAccessTokenSilently);
-  }, [getAccessTokenSilently]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin"/>
-      </div>
-    );
+  const handleSelectTab = (value: string) => {
+    navigate("/" + value);
   }
 
-  // Fallback route logic
-  const getFallbackRoute = () => {
-    if (!isAuthenticated) return "/login";
-    if (!profile || !profile.onboarded) return "/onboarding";
-    return "/home";
-  };
-
   return (
-    <>
-      <Routes location={background || location}>
-        <Route path="/login" element={<LoginPage/>}/>
+    <div className="min-h-screen bg-white">
+      <AppBar/>
 
-        <Route
-          path="/onboarding"
-          element={
-            <AuthGuard>
-              <OnboardingPage/>
-            </AuthGuard>
-          }
-        />
+      <main className="max-w-7xl lg:mx-auto p-4 sm:p-6 lg:p-8 pb-20 sm:pg-24">
+        <Outlet/>
+      </main>
 
-        <Route
-          path="/home"
-          element={
-            <AuthGuard>
-              <OnboardingGuard>
-                <HomePage/>
-              </OnboardingGuard>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/about"
-          element={
-            <p>About</p>
-          }
-        />
-
-        <Route path="/*" element={<Navigate to={getFallbackRoute()} replace/>}/>
-      </Routes>
-
-      {/* If background exists => render modal */}
-      {background && (
-        <Routes>
-          <Route
-            path="/home/profile"
-            element={
-              <AuthGuard>
-                <ProfileView/>
-              </AuthGuard>
-            }
-          />
-        </Routes>
-      )}
-    </>
-  );
+      <BottomNavigationBar onTabChange={handleSelectTab}>
+        <BottomNavigationBarItem id="history" label="History" icon={<History/>}/>
+        <BottomNavigationBarItem id="tracking" label="Tracking" icon={<ClipboardList/>}/>
+        <BottomNavigationBarItem id="home" index label="Home" icon={<Home/>}/>
+        <BottomNavigationBarItem id="request" label="Request" icon={<Plus/>}/>
+        <BottomNavigationBarItem id="profile" label="Profile" icon={<User/>}/>
+      </BottomNavigationBar>
+    </div>
+  )
 }
 
-export default function App() {
-  const {isAuthenticated} = useAuth0();
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    dispatch(fetchMyProfile());
-  }, [dispatch, isAuthenticated]);
-
+function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes/>
-      <Toaster/>
-    </BrowserRouter>
-  );
+    <Routes>
+      <Route index element={<LandingPage/>}/>
+
+      <Route element={<Layout/>}>
+        <Route path="/home" element={<HomePage/>}/>
+        <Route path="/profile" element={<Profile />}/>
+        <Route path="/history" element={<MilesLedgers/>}/>
+        <Route path="/request" element={<MileageAccrualRequestPage/>}/>
+        <Route path="/tracking" element={<MileageAccrualHistoryPage/>}/>
+        <Route path="/callback" element={<HomePage/>}/>
+      </Route>
+
+      <Route path="/contributor" element={<Contributor />} />
+      <Route path="*" element={<NotFoundPage/>}/>
+    </Routes>
+  )
 }
+
+export default App
