@@ -472,7 +472,7 @@ export default function HomePage() {
                           Danh sách xác minh
                         </h4>
                         <div className="space-y-2">
-                          {request.verificationChecklist.map((item, index) => (
+                          {request.verificationChecklist?.map((item, index) => (
                             <div key={index} className="flex items-center space-x-2 text-sm">
                               {getVerificationStatusIcon(item.status)}
                               <span className={
