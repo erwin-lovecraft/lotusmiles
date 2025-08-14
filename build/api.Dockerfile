@@ -22,5 +22,6 @@ FROM ${IMAGE_REGISTRY}/${LINUX_IMAGE} AS runner
 WORKDIR /
 
 COPY --from=builder /api/serverd /serverd
+COPY --from=builder /api/config.env.template /config.env
 
 CMD ["sh", "-c", "/serverd"]
