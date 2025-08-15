@@ -24,9 +24,13 @@ CREATE TABLE IF NOT EXISTS "customers" (
 CREATE TABLE IF NOT EXISTS "mileage_accrual_requests" (
     "id" BIGINT PRIMARY KEY,
     "user_id" BIGINT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'pending',           -- pending, approved, rejected, cancelled
-    "metadata" JSONB NOT NULL DEFAULT '{}',             -- contains user request data { flight_number, flight_date, booking_class ...)
-    "evidence_urls" JSONB[] NOT NULL DEFAULT '{}',
+    "status" TEXT NOT NULL DEFAULT 'pending', -- pending, approved, rejected, cancelled
+    "carrier" TEXT NOT NULL,
+    "booking_class" TEXT NOT NULL,
+    "from" TEXT NOT NULL,
+    "to" TEXT NOT NULL, 
+    "departure_date" TEXT NOT NULL,
+    "tier" TEXT NOT NULL, 
     "distance_miles" INT NOT NULL DEFAULT 0,
     "accrual_rate" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "qualifying_miles_earned" INT NOT NULL DEFAULT 0,

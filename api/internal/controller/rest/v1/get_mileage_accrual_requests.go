@@ -63,11 +63,8 @@ func (c Controller) GetMileageAccrualRequests(ctx lit.Context) error {
 	fmt.Println("response", response)
 	for i, req := range requests {
 		response.Data[i] = MileageAccrualRequestResponse{
-			ID:                       req.ID,
 			UserID:                   req.UserID,
 			Status:                   req.Status,
-			Metadata:                 req.Metadata,
-			EvidenceURLs:             req.EvidenceURLs,
 			DistanceMiles:            req.DistanceMiles,
 			AccrualRate:              req.AccrualRate,
 			QualifyingMilesEarned:    req.QualifyingMilesEarned,
@@ -75,14 +72,8 @@ func (c Controller) GetMileageAccrualRequests(ctx lit.Context) error {
 			BonusMilesEarned:         req.BonusMilesEarned,
 			ReviewerID:               req.ReviewerID,
 			RejectReason:             req.RejectReason,
-			CreatedAt:                req.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:                req.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		}
 
-		if req.ReviewedAt != nil {
-			reviewedAt := req.ReviewedAt.Format("2006-01-02T15:04:05Z07:00")
-			response.Data[i].ReviewedAt = &reviewedAt
-		}
 	}
 
 	return ctx.JSON(http.StatusOK, response)
