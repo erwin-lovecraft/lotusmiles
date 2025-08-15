@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	GetByUserID(ctx context.Context, userID int64) ([]entity.MileageAccrualRequest, error)
 	GetByID(ctx context.Context, id int64) (*entity.MileageAccrualRequest, error)
-	Create(ctx context.Context, request *entity.MileageAccrualRequest) error
+	Create(ctx context.Context, request entity.MileageAccrualRequest) error
 	Update(ctx context.Context, request *entity.MileageAccrualRequest) error
 	Delete(ctx context.Context, id int64) error
 }
@@ -44,7 +45,15 @@ func (r *repository) GetByID(ctx context.Context, id int64) (*entity.MileageAccr
 	return &request, nil
 }
 
-func (r *repository) Create(ctx context.Context, request *entity.MileageAccrualRequest) error {
+func (r *repository) Create(ctx context.Context, request entity.MileageAccrualRequest) error {
+
+	if request.ID == 0 {
+		id, err := generator.CustomerID.Generate()
+		if err != nil {
+			return err
+		}
+		request.ID = id
+	}
 	return r.db.WithContext(ctx).Create(request).Error
 }
 
