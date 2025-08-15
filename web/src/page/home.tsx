@@ -1,14 +1,15 @@
-import { Award, Calendar, Clock, Crown, Diamond, Star, TrendingUp } from "lucide-react";
+import { Award, Calendar, Clock, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Progress } from "@/components/ui/progress.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import MemberTierCard, { type Tier } from "@/components/tier-member-card.tsx";
+import { MemberTier, type Tier } from "@/lib/member-tier.ts";
+import MemberTierCard from "@/components/member-tier-card.tsx";
 
 // Mock member data
 const memberData = {
   name: "Nguyễn Văn An",
   memberId: "LM123456789",
-  currentTier: "platinum" as Tier,
+  currentTier: "register" as Tier,
   memberSince: new Date(2019, 12, 5, 0, 0, 0, 0),
   validThrough: new Date(2025, 31, 12, 0, 0, 0, 0),
   currentMiles: 15420,
@@ -19,57 +20,13 @@ const memberData = {
   tierFlights: 6
 };
 
-// Mock Membership tier configuration
-const membershipTiers = {
-  register: {
-    name: "Register",
-    color: "from-gray-400 to-gray-600",
-    bgColor: "bg-gradient-to-br from-gray-100 to-gray-200",
-    textColor: "text-gray-800",
-    icon: Star,
-    requirements: {miles: 0, flights: 0}
-  },
-  silver: {
-    name: "Silver",
-    color: "from-gray-500 to-slate-600",
-    bgColor: "bg-gradient-to-br from-slate-200 to-slate-300",
-    textColor: "text-slate-800",
-    icon: Star,
-    requirements: {miles: 25000, flights: 4}
-  },
-  gold: {
-    name: "Gold",
-    color: "from-yellow-500 to-amber-600",
-    bgColor: "bg-gradient-to-br from-yellow-100 to-amber-200",
-    textColor: "text-amber-900",
-    icon: Award,
-    requirements: {miles: 50000, flights: 8}
-  },
-  platinum: {
-    name: "Platinum",
-    color: "from-purple-600 to-indigo-700",
-    bgColor: "bg-gradient-to-br from-purple-100 to-indigo-200",
-    textColor: "text-purple-900",
-    icon: Crown,
-    requirements: {miles: 75000, flights: 12}
-  },
-  million_miler: {
-    name: "Million Miles",
-    color: "from-rose-600 to-pink-700",
-    bgColor: "bg-gradient-to-br from-rose-100 to-pink-200",
-    textColor: "text-rose-900",
-    icon: Diamond,
-    requirements: {miles: 1000000, flights: 100}
-  }
-};
-
 export default function HomePage() {
   // const currentTierConfig = membershipTiers[memberData.currentTier];
 
-  const tierKeys = Object.keys(membershipTiers) as Array<keyof typeof membershipTiers>;
+  const tierKeys = Object.keys(MemberTier) as Array<keyof typeof MemberTier>;
   const currentTierIndex = tierKeys.indexOf(memberData.currentTier);
   const nextTier = currentTierIndex < tierKeys.length - 1 ? tierKeys[currentTierIndex + 1] : null;
-  const nextTierConfig = nextTier ? membershipTiers[nextTier] : null;
+  const nextTierConfig = nextTier ? MemberTier[nextTier] : null;
 
   // Calculate progress to next tier
   const progressToNextTier = nextTierConfig ?
@@ -100,7 +57,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Dặm thưởng hiện tại</p>
-              <p className="text-2xl font-bold text-emerald-600">{memberData.currentMiles.toLocaleString()}</p>
+              <p className="text-xl font-bold text-emerald-600">{memberData.currentMiles.toLocaleString()}</p>
             </div>
             <TrendingUp className="w-8 h-8 text-emerald-600"/>
           </div>
@@ -109,7 +66,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Dặm hết hạn</p>
-              <p className="text-2xl font-bold text-amber-600">{memberData.expiringMiles.toLocaleString()}</p>
+              <p className="text-xl font-bold text-amber-600">{memberData.expiringMiles.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground mt-1">Hết hạn: {memberData.expiringDate.toDateString()}</p>
             </div>
             <Clock className="w-8 h-8 text-amber-600"/>
@@ -128,7 +85,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Tổng dặm xét hạng</p>
-              <p className="text-2xl font-bold text-purple-600">{memberData.qualifyingMiles.toLocaleString()}</p>
+              <p className="text-xl font-bold text-purple-600">{memberData.qualifyingMiles.toLocaleString()}</p>
             </div>
             <Award className="w-8 h-8 text-purple-600"/>
           </div>
@@ -141,10 +98,10 @@ export default function HomePage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <div
-                className={`w-8 h-8 bg-gradient-to-br ${nextTierConfig.color} rounded-lg flex items-center justify-center text-white`}>
+                className={`w-8 h-8 bg-gradient-to-br ${nextTierConfig.gradient} ${nextTierConfig.outline} rounded-lg flex items-center justify-center text-white ${nextTierConfig.shadow}`}>
                 <nextTierConfig.icon className="w-4 h-4"/>
               </div>
-              <span>Nâng cấp lên hạng {nextTierConfig.name}</span>
+              <span>Nâng cấp lên hạng {nextTierConfig.label}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -178,7 +135,7 @@ export default function HomePage() {
               </div>
 
               <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-medium mb-2">Quyền lợi khi nâng cấp lên {nextTierConfig.name}:</h4>
+                <h4 className="font-medium mb-2">Quyền lợi khi nâng cấp lên {nextTierConfig.label}:</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Ưu tiên check-in và lên máy bay</li>
                   <li>• Tăng hành lý ký gửi miễn phí</li>
@@ -198,14 +155,14 @@ export default function HomePage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {Object.entries(membershipTiers).map(([key, tier]) => {
+            {Object.entries(MemberTier).map(([key, tier]) => {
               const TierIcon = tier.icon;
               const isCurrentTier = key === memberData.currentTier;
 
               return (
                 <div
                   key={key}
-                  className={`relative p-4 rounded-xl transition-all duration-200 ${tier.bgColor} ${
+                  className={`relative p-4 rounded-xl transition-all duration-200 bg-gradient-to-br ${tier.gradient} ${
                     isCurrentTier ? 'ring-2 ring-purple-500 ring-offset-2 scale-105' : 'hover:scale-102'
                   }`}
                 >
@@ -216,19 +173,19 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  <div className={`absolute inset-0 bg-gradient-to-br ${tier.color} opacity-10 rounded-xl`}/>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${tier.gradient} opacity-10 rounded-xl`}/>
 
                   <div className="relative text-center">
                     <div
-                      className={`w-10 h-10 bg-gradient-to-br ${tier.color} rounded-lg flex items-center justify-center text-white shadow-lg mx-auto mb-3`}>
+                      className={`w-10 h-10 bg-gradient-to-br ${tier.logoFrom} ${tier.logoTo} rounded-lg flex items-center justify-center ${tier.text} shadow-lg mx-auto mb-3`}>
                       <TierIcon className="w-5 h-5"/>
                     </div>
-                    <h3 className={`font-semibold ${tier.textColor} mb-1`}>{tier.name}</h3>
+                    <h3 className={`font-semibold ${tier.text} mb-1`}>{tier.label}</h3>
                     <div className="text-xs space-y-1">
-                      <p className={`${tier.textColor} opacity-70`}>
+                      <p className={`${tier.text} opacity-70`}>
                         {tier.requirements.miles.toLocaleString()} dặm
                       </p>
-                      <p className={`${tier.textColor} opacity-70`}>
+                      <p className={`${tier.text} opacity-70`}>
                         {tier.requirements.flights} chuyến bay
                       </p>
                     </div>

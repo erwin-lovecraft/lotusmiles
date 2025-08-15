@@ -1,81 +1,5 @@
-export type Tier = "register" | "silver" | "gold" | "platinum" | "million_miler";
-
-const themes: Record<
-  Tier,
-  {
-    label: string;
-    gradient: string; // tailwind gradient classes
-    text: string; // primary text color
-    subtext: string; // secondary text color
-    accentDot: string; // bg color for the lotus dot
-    logoFrom: string; // gradient for lotus petals
-    logoTo: string;
-    outline: string; // subtle border
-    shadow: string; // shadow color
-    rfid: string; // rfid icon color
-  }
-> = {
-  register: {
-    label: "Register",
-    gradient: "from-slate-100 to-slate-300",
-    text: "text-slate-800",
-    subtext: "text-slate-600",
-    accentDot: "bg-slate-500",
-    logoFrom: "from-slate-400",
-    logoTo: "to-slate-300",
-    outline: "ring-1 ring-slate-200",
-    shadow: "shadow-slate-300/50",
-    rfid: "text-slate-500",
-  },
-  silver: {
-    label: "Silver",
-    gradient: "from-slate-100 to-slate-300",
-    text: "text-slate-800",
-    subtext: "text-slate-600",
-    accentDot: "bg-slate-500",
-    logoFrom: "from-slate-400",
-    logoTo: "to-slate-300",
-    outline: "ring-1 ring-slate-200",
-    shadow: "shadow-slate-300/50",
-    rfid: "text-slate-500",
-  },
-  gold: {
-    label: "Gold",
-    gradient: "from-amber-50 to-amber-300",
-    text: "text-stone-900",
-    subtext: "text-stone-700",
-    accentDot: "bg-amber-600",
-    logoFrom: "from-amber-400",
-    logoTo: "to-amber-300",
-    outline: "ring-1 ring-amber-200",
-    shadow: "shadow-amber-300/50",
-    rfid: "text-amber-600",
-  },
-  platinum: {
-    label: "Platinum",
-    gradient: "from-zinc-100 to-white",
-    text: "text-zinc-900",
-    subtext: "text-zinc-600",
-    accentDot: "bg-zinc-500",
-    logoFrom: "from-zinc-400",
-    logoTo: "to-zinc-200",
-    outline: "ring-1 ring-zinc-200",
-    shadow: "shadow-zinc-300/50",
-    rfid: "text-zinc-500",
-  },
-  million_miler: {
-    label: "Million Miler",
-    gradient: "from-fuchsia-900 to-rose-900",
-    text: "text-white",
-    subtext: "text-white/80",
-    accentDot: "bg-rose-200",
-    logoFrom: "from-rose-300",
-    logoTo: "to-rose-200",
-    outline: "ring-1 ring-white/15",
-    shadow: "shadow-fuchsia-900/40",
-    rfid: "text-white/80",
-  },
-};
+import lotusmiles from '@/assets/lotusmiles.png';
+import { MemberTier, type Tier } from "@/lib/member-tier.ts";
 
 export interface MemberTierCardProps {
   name: string,
@@ -89,7 +13,7 @@ export interface MemberTierCardProps {
 export default function MemberTierCard(props: MemberTierCardProps) {
   const memberSince = formatCardDate(props.memberSince)
   const validThrough = formatCardDate(props.validThrough)
-  const tierTheme = themes[props.tier];
+  const tierTheme = MemberTier[props.tier];
 
   return (
     <Card name={props.name}
@@ -164,9 +88,9 @@ function Card({
       <div className={["mt-3 text-sm font-medium", theme.text].join(" ")}>{name}</div>
 
       {/* Lotus logo */}
-      {/*<div className="absolute right-4 bottom-16 sm:bottom-10 opacity-90">*/}
-      {/*  <Lotus theme={theme} size={small ? 72 : 96}/>*/}
-      {/*</div>*/}
+      <div className="absolute right-6 bottom-6 sm:bottom-10 opacity-90">
+        <img src={lotusmiles} alt="lotusmiles" className="w-16 h-auto" />
+      </div>
 
       {/* Footer */}
       <div className="absolute left-5 right-5 bottom-4 flex items-end justify-between">
