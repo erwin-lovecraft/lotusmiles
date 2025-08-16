@@ -1,0 +1,509 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AegisMiles API",
+    "description": "API for AegisMiles mileage accrual system",
+    "version": "1.0",
+    "contact": {
+      "name": "API Support",
+      "url": "http://www.swagger.io/support",
+      "email": "support@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/api/v1",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Type \"Bearer\" followed by a space and JWT token."
+    }
+  },
+  "paths": {
+    "/profile": {
+      "get": {
+        "summary": "Get customer profile",
+        "description": "Retrieve the current customer's profile information",
+        "tags": ["customers"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/entity.Customer"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/customers/onboard": {
+      "post": {
+        "summary": "Onboard a new customer",
+        "description": "Create a new customer account with the provided information",
+        "tags": ["customers"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Customer onboarding information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dto.OnboardCustomer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/entity.Customer"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/mileage-accrual-requests": {
+      "get": {
+        "summary": "Get mileage accrual requests",
+        "description": "Retrieve list of mileage accrual requests",
+        "tags": ["mileage-accrual-requests"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/entity.MileageAccrualRequest"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create mileage accrual request",
+        "description": "Create a new mileage accrual request",
+        "tags": ["mileage-accrual-requests"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Mileage accrual request information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/entity.MileageAccrualRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/entity.MileageAccrualRequest"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/mileage-accrual-requests/{id}": {
+      "put": {
+        "summary": "Update mileage accrual request",
+        "description": "Update an existing mileage accrual request",
+        "tags": ["mileage-accrual-requests"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Mileage Accrual Request ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Updated mileage accrual request information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/entity.MileageAccrualRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/entity.MileageAccrualRequest"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/mileage-accrual-requests/{id}/status": {
+      "put": {
+        "summary": "Update mileage accrual request status",
+        "description": "Update the status of a mileage accrual request (approve, reject, cancel, etc.)",
+        "tags": ["mileage-accrual-requests"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Mileage Accrual Request ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Status update information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dto.UpdateMileageStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "entity.Customer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Customer ID"
+        },
+        "idp_user_id": {
+          "type": "string",
+          "description": "Identity Provider User ID"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "Customer first name"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Customer last name"
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer phone number"
+        },
+        "address": {
+          "type": "string",
+          "description": "Customer address"
+        },
+        "onboarded": {
+          "type": "boolean",
+          "description": "Whether customer is onboarded"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Deletion timestamp"
+        }
+      }
+    },
+    "entity.MileageAccrualRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Request ID"
+        },
+        "user_id": {
+          "type": "integer",
+          "description": "User ID"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "cancelled"],
+          "description": "Request status"
+        },
+        "carrier": {
+          "type": "string",
+          "description": "Airline carrier"
+        },
+        "booking_class": {
+          "type": "string",
+          "description": "Booking class"
+        },
+        "from": {
+          "type": "string",
+          "description": "Departure location"
+        },
+        "to": {
+          "type": "string",
+          "description": "Arrival location"
+        },
+        "departure_date": {
+          "type": "string",
+          "description": "Departure date"
+        },
+        "tier": {
+          "type": "string",
+          "description": "Customer tier"
+        },
+        "distance_miles": {
+          "type": "integer",
+          "description": "Distance in miles"
+        },
+        "accrual_rate": {
+          "type": "number",
+          "format": "float",
+          "description": "Accrual rate"
+        },
+        "qualifying_miles_earned": {
+          "type": "integer",
+          "description": "Qualifying miles earned"
+        },
+        "qualifying_segments_earned": {
+          "type": "integer",
+          "description": "Qualifying segments earned"
+        },
+        "bonus_miles_earned": {
+          "type": "integer",
+          "description": "Bonus miles earned"
+        },
+        "reviewer_id": {
+          "type": "integer",
+          "description": "Reviewer ID"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Review timestamp"
+        },
+        "reject_reason": {
+          "type": "string",
+          "description": "Rejection reason"
+        }
+      }
+    },
+    "dto.OnboardCustomer": {
+      "type": "object",
+      "required": ["first_name", "last_name", "address", "phone"],
+      "properties": {
+        "first_name": {
+          "type": "string",
+          "description": "Customer first name"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Customer last name"
+        },
+        "address": {
+          "type": "string",
+          "description": "Customer address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer phone number"
+        },
+        "referrer_code": {
+          "type": "string",
+          "description": "Referrer code"
+        }
+      }
+    },
+    "dto.UpdateMileageStatus": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "cancelled"],
+          "description": "New status for the request"
+        },
+        "reject_reason": {
+          "type": "string",
+          "description": "Reason for rejection (required when status is rejected)"
+        }
+      }
+    }
+  }
+}

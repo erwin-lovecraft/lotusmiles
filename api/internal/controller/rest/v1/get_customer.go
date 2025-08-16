@@ -7,6 +7,17 @@ import (
 	"github.com/viebiz/lit/iam"
 )
 
+// @Summary      Get customer profile
+// @Description  Retrieve the current customer's profile information
+// @Tags         customers
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  entity.Customer
+// @Failure      401  {string}  string
+// @Failure      404  {string}  string
+// @Failure      500  {string}  string
+// @Security     BearerAuth
+// @Router       /profile [get]
 func (ctrl Controller) GetCustomerProfile(c lit.Context) error {
 	userProfile := iam.GetUserProfileFromContext(c.Request().Context())
 
