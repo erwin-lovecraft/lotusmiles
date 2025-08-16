@@ -22,8 +22,8 @@ type MileageAccrualRequest struct {
 	ReviewerID               int64      `json:"reviewer_id" gorm:"column:reviewer_id;not null"`
 	ReviewedAt               *time.Time `json:"reviewed_at,omitempty" gorm:"column:reviewed_at;type:timestamptz"`
 	RejectReason             *string    `json:"reject_reason,omitempty" gorm:"column:reject_reason;type:text"`
-	// CreatedAt                time.Time  `json:"created_at" gorm:"column:created_at;type:timestamptz;autoCreateTime"`
-	// UpdatedAt                time.Time  `json:"updated_at" gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
+	CreatedAt                time.Time  `json:"created_at" gorm:"column:created_at;type:timestamptz;autoCreateTime"`
+	UpdatedAt                time.Time  `json:"updated_at" gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
 }
 
 // TableName specifies the table name for GORM

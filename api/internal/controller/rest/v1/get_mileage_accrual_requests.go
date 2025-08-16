@@ -33,22 +33,10 @@ type MileageAccrualRequestResponse struct {
 func (c Controller) GetMileageAccrualRequests(ctx lit.Context) error {
 	// Get user profile from context
 	userProfile := iam.GetUserProfileFromContext(ctx.Request().Context())
-	// Convert user ID from string to int64
-	// userID, err := strconv.ParseInt(userProfile.ID(), 10, 64)
-	// fmt.Println("userID", userProfile.ID())
-
-	// if err != nil {
-	// 	return lit.HTTPError{
-	// 		Status: http.StatusBadRequest,
-	// 		Code:   "invalid_user_id",
-	// 		Desc:   "Invalid user ID format",
-	// 	}
-	// }
 
 	// Get mileage accrual requests for the user via external id lookup
 	requests, err := c.mileageAccrualRequestService.ListByExternalID(ctx.Request().Context(), userProfile.ID())
 	if err != nil {
-		fmt.Printf("GetMileageAccrualRequests error: %v\n", err)
 		return lit.HTTPError{
 			Status: http.StatusInternalServerError,
 			Code:   "internal_error",

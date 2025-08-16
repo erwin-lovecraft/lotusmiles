@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,23 +10,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 import { useAppDispatch, useAppSelector } from "@/app/hook";
-import { onboardCustomer, selectProfile } from "@/features/profile/profileSlice";
-import type { OnboardCustomer } from "@/types/auth";
+import { selectProfile, updateProfile } from "@/features/profile/profileSlice";
+import type { UpdateProfile } from "@/types/profile";
 
-export function OnboardingPage() {
+export function ProfilePage() {
   const profile = useAppSelector(selectProfile);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<OnboardCustomer>({
+  const form = useForm<UpdateProfile>({
     defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
       phone: "",
       address: "",
-      referrer_code: "",
     },
   });
 
@@ -42,15 +38,9 @@ export function OnboardingPage() {
     form.setValue("phone", profile.phone ?? "");
   }, [form, profile]);
 
-  useEffect(() => {
-    if (profile?.onboarded) {
-      navigate("/home");
-    }
-  }, [profile?.onboarded]);
-
-  const onSubmit = async (data: OnboardCustomer) => {
+  const onSubmit = async (data: UpdateProfile) => {
     setIsSubmitting(true);
-    dispatch(onboardCustomer(data));
+    dispatch(updateProfile(data));
     setIsSubmitting(false);
   };
 
@@ -105,7 +95,7 @@ export function OnboardingPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="member@lotusmiles.com" {...field} />
+                        <Input placeholder="member@lotusmiles.com" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,14 +107,9 @@ export function OnboardingPage() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">Phone Number</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input
-                          type="tel"
-                          placeholder="+1 (555) 123-4567"
-                          className="px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                          {...field}
-                        />
+                        <Input placeholder="+1234567890" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -136,58 +121,23 @@ export function OnboardingPage() {
                   name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">Address</FormLabel>
+                      <FormLabel>Address</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter your address"
-                          className="px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                          {...field}
-                        />
+                        <Textarea placeholder="123 Main St, City, State, ZIP" className="resize-none" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="referrer_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">Referrer Code (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter referrer code if you have one"
-                          className="px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 bg-primary text-white font-semibold py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors duration-200"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Submitting...</span>
-                  </div>
-                ) : (
-                  "Complete Setup"
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Submit
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
