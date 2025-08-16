@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/viebiz/lit"
@@ -48,7 +47,6 @@ func (c Controller) GetMileageAccrualRequests(ctx lit.Context) error {
 	response := GetMileageAccrualRequestsResponse{
 		Data: make([]MileageAccrualRequestResponse, len(requests)),
 	}
-	fmt.Println("response", response)
 	for i, req := range requests {
 		response.Data[i] = MileageAccrualRequestResponse{
 			UserID:                   req.UserID,
