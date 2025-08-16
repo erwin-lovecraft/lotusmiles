@@ -1,3 +1,23 @@
+// @title           AegisMiles API
+// @version         1.0
+// @description     API for AegisMiles mileage accrual system
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 package main
 
 import (
@@ -21,6 +41,7 @@ import (
 	"github.com/viebiz/lit/httpclient"
 	httpmw "github.com/viebiz/lit/middleware/http"
 	"github.com/viebiz/lit/monitoring"
+	_ "github.com/erwin-lovecraft/aegismiles/docs"
 )
 
 func main() {
@@ -83,6 +104,38 @@ func run(ctx context.Context) error {
 func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
 	r.Use(cors.Middleware(configCORS(cfg.Cors)))
+
+	// Serve Swagger UI files
+	r.Get("/swagger/index.html", func(c lit.Context) error {
+		// Read and serve the HTML file
+		content, err := os.ReadFile("docs/index.html")
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "File not found"})
+		}
+		c.Writer().Header().Set("Content-Type", "text/html")
+		c.Writer().Write(content)
+		return nil
+	})
+	
+	// Serve swagger.json
+	r.Get("/docs/swagger.json", func(c lit.Context) error {
+		// Read and serve the JSON file
+		content, err := os.ReadFile("docs/swagger.json")
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "File not found"})
+		}
+		c.Writer().Header().Set("Content-Type", "application/json")
+		c.Writer().Write(content)
+		return nil
+	})
+	
+	// Swagger UI redirect
+	r.Get("/swagger", func(c lit.Context) error {
+		// Return redirect response
+		c.Writer().Header().Set("Location", "/swagger/index.html")
+		c.Status(http.StatusMovedPermanently)
+		return nil
+	})
 
 	v1 := r.Route("/api/v1",
 		httpmw.RequestIDMiddleware(),
