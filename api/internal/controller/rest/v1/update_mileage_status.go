@@ -8,6 +8,20 @@ import (
 	"github.com/viebiz/lit"
 )
 
+// @Summary      Update mileage accrual request status
+// @Description  Update the status of a mileage accrual request (approve, reject, cancel, etc.)
+// @Tags         mileage-accrual-requests
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Mileage Accrual Request ID"
+// @Param        request body   dto.UpdateMileageStatus true "Status update information"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {string}  string
+// @Failure      401  {string}  string
+// @Failure      404  {string}  string
+// @Failure      500  {string}  string
+// @Security     BearerAuth
+// @Router       /mileage-accrual-requests/{id}/status [put]
 func (ctrl Controller) UpdateMileageStatus(c lit.Context) error {
 	// Lấy ID từ URL parameter
 	idStr := c.Param("id")
