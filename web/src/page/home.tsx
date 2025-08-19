@@ -4,23 +4,10 @@ import { Progress } from "@/components/ui/progress.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import { MemberTier, type Tier } from "@/lib/member-tier.ts";
 import MemberTierCard from "@/components/member-tier-card.tsx";
-
-// Mock member data
-const memberData = {
-  name: "Nguyễn Văn An",
-  memberId: "LM123456789",
-  currentTier: "register" as Tier,
-  memberSince: new Date(2019, 12, 5, 0, 0, 0, 0),
-  validThrough: new Date(2025, 31, 12, 0, 0, 0, 0),
-  currentMiles: 15420,
-  expiringMiles: 2500,
-  expiringDate: new Date(2025, 31, 12, 0, 0, 0, 0),
-  tierReviewPeriod: "01/01/2025 - 31/12/2025",
-  qualifyingMiles: 38750,
-  tierFlights: 6
-};
+import { MEMBER_DATA } from "@/mocks/mocks.ts";
 
 export default function HomePage() {
+  const memberData = MEMBER_DATA;
   const tierKeys = Object.keys(MemberTier) as Array<keyof typeof MemberTier>;
   const currentTierIndex = tierKeys.indexOf(memberData.currentTier);
   const nextTier = currentTierIndex < tierKeys.length - 1 ? tierKeys[currentTierIndex + 1] : null;

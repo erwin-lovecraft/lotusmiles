@@ -1,5 +1,6 @@
 import type { MileageTransaction } from "@/types/mileage-ledgers.ts";
 import type { MileageAccrualRequest } from "@/types/mileage-accrual-request.ts";
+import type { Tier } from "@/lib/member-tier.ts";
 
 export const BOOKING_CLASSES = [
   // Economy
@@ -168,3 +169,17 @@ export const MILEAGE_TRANSACTIONS: MileageTransaction[] = [
   },
 ];
 
+// Mock member data
+export const MEMBER_DATA= {
+  name: "Nguyễn Văn An",
+  memberId: "LM123456789",
+  currentTier: "register" as Tier,
+  memberSince: new Date(2019, 12, 5, 0, 0, 0, 0),
+  validThrough: new Date(2025, 31, 12, 0, 0, 0, 0),
+  currentMiles: 15420,
+  expiringMiles: 2500,
+  expiringDate: new Date(2025, 31, 12, 0, 0, 0, 0),
+  tierReviewPeriod: "01/01/2025 - 31/12/2025",
+  qualifyingMiles: 38750,
+  tierFlights: 6
+};
