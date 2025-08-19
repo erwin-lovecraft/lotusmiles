@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button.tsx";
 import { cn } from "@/lib/utils.ts";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2, Upload, X } from "lucide-react";
+import { CalendarIcon, Upload, X } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { useCallback, useRef, useState } from "react";
 
@@ -118,7 +118,7 @@ export function ValidatedSelect<
                 <SelectValue placeholder={props.placeholder}/>
               </SelectTrigger>
             </FormControl>
-            <SelectContent>
+            <SelectContent className="h-64">
               {props.children}
             </SelectContent>
           </Select>
@@ -159,7 +159,7 @@ export function ValidatedDatePicker<
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[240px] pl-3 text-left font-normal",
+                    "pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
                 >
@@ -392,10 +392,6 @@ export function ValidatedFileUpload<
                   {placeholder}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button type="button" variant="secondary" size="sm" onClick={handlePick} disabled={uploading}>
-                    {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Browse
-                  </Button>
                   {accept && <span className="text-xs text-muted-foreground">({accept})</span>}
                   {maxSizeMB && (
                     <span className="text-xs text-muted-foreground">Max {maxSizeMB} MB</span>

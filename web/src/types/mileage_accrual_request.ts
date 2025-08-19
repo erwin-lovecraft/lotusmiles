@@ -12,4 +12,19 @@ export const MileageAccrualRequestSchema = z.object({
   boarding_pass_image_url: z.url(),
 })
 
-export type MileageAccrualRequest = z.infer<typeof MileageAccrualRequestSchema>;
+export type MileageAccrualRequestForm = z.infer<typeof MileageAccrualRequestSchema>;
+
+export type MileageAccrualRequest = {
+  id: bigint;
+  member_id: bigint;
+  status: string;
+  from_code: string;
+  to_code: string;
+  departure_date: string;
+  distance_miles: number;
+  qualifying_miles: number;
+  bonus_miles: number;
+  reviewed_at: Date;
+  rejected_reason?: string;
+  submitted_date: Date;
+}

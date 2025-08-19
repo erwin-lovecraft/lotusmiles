@@ -21,8 +21,6 @@ const memberData = {
 };
 
 export default function HomePage() {
-  // const currentTierConfig = membershipTiers[memberData.currentTier];
-
   const tierKeys = Object.keys(MemberTier) as Array<keyof typeof MemberTier>;
   const currentTierIndex = tierKeys.indexOf(memberData.currentTier);
   const nextTier = currentTierIndex < tierKeys.length - 1 ? tierKeys[currentTierIndex + 1] : null;
