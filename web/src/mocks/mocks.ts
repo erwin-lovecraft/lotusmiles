@@ -1,4 +1,5 @@
-import type { MileageAccrualRequest } from "@/types/mileage_accrual_request.ts";
+import type { MileageTransaction } from "@/types/mileage-ledgers.ts";
+import type { MileageAccrualRequest } from "@/types/mileage-accrual-request.ts";
 
 export const BOOKING_CLASSES = [
   // Economy
@@ -123,3 +124,47 @@ export const MILEAGE_ACCRUAL_REQUESTS: MileageAccrualRequest[] = [
     submitted_date: new Date("2025-04-03T08:40:00Z"),
   },
 ];
+
+export const MILEAGE_TRANSACTIONS: MileageTransaction[] = [
+  {
+    id: 8792349823749234n,
+    member_id: 9238475629384756n,
+    qualifying_miles_delta: 5230,
+    bonus_miles_delta: -1046, // ~20% promo bonus
+    accrual_request_id: 7238492374982374n,
+    created_at: new Date("2025-08-01T10:23:00Z"),
+  },
+  {
+    id: 8792349823749235n,
+    member_id: 9238475629384756n,
+    qualifying_miles_delta: -812,
+    bonus_miles_delta: 0, // short haul, no bonus
+    accrual_request_id: 7238492374982375n,
+    created_at: new Date("2025-08-03T15:45:00Z"),
+  },
+  {
+    id: 8792349823749236n,
+    member_id: 8123498756234875n,
+    qualifying_miles_delta: 9680, // long haul
+    bonus_miles_delta: 2904, // ~30% promo
+    accrual_request_id: 7238492374982376n,
+    created_at: new Date("2025-08-07T08:10:00Z"),
+  },
+  {
+    id: 8792349823749237n,
+    member_id: 8123498756234875n,
+    qualifying_miles_delta: -1520,
+    bonus_miles_delta: 152, // ~10% elite bonus
+    accrual_request_id: 7238492374982377n,
+    created_at: new Date("2025-08-12T12:00:00Z"),
+  },
+  {
+    id: 8792349823749238n,
+    member_id: 7001234987562398n,
+    qualifying_miles_delta: 3420,
+    bonus_miles_delta: 0,
+    accrual_request_id: 7238492374982378n,
+    created_at: new Date("2025-08-15T18:30:00Z"),
+  },
+];
+

@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/types/mileage_accrual_request.ts";
 import { createValidatedForm } from "@/components/validated-form-factory.ts";
 import { SelectItem } from "@/components/ui/select.tsx";
 import { BOOKING_CLASSES, LOCATIONS } from "@/mocks/mocks.ts";
 import { unsignedUpload } from "@/lib/cloudinary.ts";
+import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/types/mileage-accrual-request.ts";
 
 export default function MileageAccrualRequestPage() {
   const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequestForm>()
