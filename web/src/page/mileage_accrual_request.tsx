@@ -7,6 +7,7 @@ import { type MileageAccrualRequest, MileageAccrualRequestSchema } from "@/types
 import { createValidatedForm } from "@/components/validated-form-factory.ts";
 import { SelectItem } from "@/components/ui/select.tsx";
 import { BOOKING_CLASSES, LOCATIONS } from "@/mocks/mocks.ts";
+import { unsignedUpload } from "@/lib/cloudinary.ts";
 
 export default function MileageAccrualRequestPage() {
   const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequest>()
@@ -15,11 +16,24 @@ export default function MileageAccrualRequestPage() {
   const iatas = LOCATIONS;
 
   const handleSubmit = (values: MileageAccrualRequest) => {
-    console.log(values);
+    console.log(JSON.stringify(values));
+  }
+
+  const handleUploadToCloud = async (files: File[]) => {
+    const results: string[] = [];
+    for (const file of files) {
+      try {
+        const res = await unsignedUpload(file)
+        results.push(res.display_name)
+      } catch (e) {
+        throw new Error(`Upload failed: ${e}`);
+      }
+    }
+    return results; // array of URLs
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 mb-20">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Gửi yêu cầu tích dặm thủ công</h1>
         <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Gửi yêu cầu tích dặm cho các hoạt động chưa được
@@ -69,9 +83,21 @@ export default function MileageAccrualRequestPage() {
                 <DatePicker name="departure_date" label="Departure Date"/>
               </div>
 
-              <FileUpload name="ticket_image_url" label="Ticket Image"/>
+              <FileUpload
+                name="ticket_image_url"
+                label="Ticket Image"
+                maxFiles={1}
+                accept="image/*,.pdf"
+                onUpload={handleUploadToCloud}
+              />
 
-              <FileUpload name="boarding_pass_image_url" label="Boarding Pass Image"/>
+              <FileUpload
+                name="boarding_pass_image_url"
+                label="Boarding Pass Image"
+                maxFiles={1}
+                accept="image/*,.pdf"
+                onUpload={handleUploadToCloud}
+              />
 
               <div className="pt-4 border-t">
                 <Button
