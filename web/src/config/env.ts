@@ -11,6 +11,10 @@ interface Config {
   app: {
     env: "development" | "staging" | "production";
   };
+  cloudinary: {
+    cloudName: string;
+    unsignedPreset: string;
+  }
 }
 
 function validateEnv(): Config {
@@ -20,6 +24,8 @@ function validateEnv(): Config {
     "VITE_AUTH0_AUDIENCE",
     "VITE_API_BASE_URL",
     "VITE_APP_ENV",
+    "VITE_CLOUDINARY_NAME",
+    "VITE_CLOUDINARY_UNSIGNED_PRESET",
   ] as const;
 
   // Check for missing required environment variables
@@ -47,6 +53,10 @@ function validateEnv(): Config {
     app: {
       env: env as "development" | "staging" | "production",
     },
+    cloudinary: {
+      unsignedPreset: import.meta.env.VITE_CLOUDINARY_UNSIGNED_PRESET,
+      cloudName: import.meta.env.VITE_CLOUDINARY_NAME,
+    }
   };
 }
 

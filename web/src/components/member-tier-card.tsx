@@ -87,11 +87,6 @@ function Card({
       {/* Name */}
       <div className={["mt-3 text-sm font-medium", theme.text].join(" ")}>{name}</div>
 
-      {/* Lotus logo */}
-      <div className="absolute right-6 bottom-6 sm:bottom-10 opacity-90">
-        <img src={lotusmiles} alt="lotusmiles" className="w-16 h-auto" />
-      </div>
-
       {/* Footer */}
       <div className="absolute left-5 right-5 bottom-4 flex items-end justify-between">
         <div className="flex gap-8 text-[10px]">
@@ -104,8 +99,9 @@ function Card({
             <div className={["mt-0.5 font-semibold", theme.text].join(" ")}>{validThrough}</div>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <span className="opacity-90">{issuer}</span>
+        <div className="flex flex-col items-center text-xs">
+          <img src={lotusmiles} alt="lotusmiles" className="w-24 h-auto" />
+          <span className="opacity-70">{issuer}</span>
         </div>
       </div>
     </div>
