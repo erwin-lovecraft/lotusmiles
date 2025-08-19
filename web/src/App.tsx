@@ -6,13 +6,13 @@ import { Outlet, Route, Routes, useNavigate } from "react-router";
 import HomePage from "@/page/home.tsx";
 import MileageAccrualRequestPage from "@/page/mileage_accrual_request.tsx";
 import MilesLedgers from "@/page/miles_ledgers.tsx";
-import MileageAccrualHistoryPage from "@/page/mileage_accrual_history.tsx";
 import NotFoundPage from "@/page/notfound.tsx";
 import Profile from "@/page/profile.tsx";
 import Contributor from "@/page/contributor.tsx";
 import CallbackPage from "@/page/auth0-callback.tsx";
 import AuthErrorPage from "@/page/auth-error.tsx";
 import ProtectedRoute from "@/components/protected-route.tsx";
+import MileageAccrualTrackingPage from "@/page/accrual-request-tracking.tsx";
 
 function Layout() {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ function App() {
         <Route path="/profile" element={<Profile />}/>
         <Route path="/history" element={<MilesLedgers/>}/>
         <Route path="/request" element={<MileageAccrualRequestPage/>}/>
-        <Route path="/tracking" element={<MileageAccrualHistoryPage/>}/>
+        <Route path="/tracking" element={<MileageAccrualTrackingPage/>}/>
       </Route>
 
       <Route path="/contributor" element={<Contributor />} />

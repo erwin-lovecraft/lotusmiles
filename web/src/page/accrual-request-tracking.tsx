@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { MILEAGE_ACCRUAL_REQUESTS } from "@/mocks/mocks.ts";
 import MileageRequestPreview from "@/components/mileage-request-preview.tsx";
 
-export default function MileageAccrualHistory() {
+export default function MileageAccrualTrackingPage() {
   const requests = MILEAGE_ACCRUAL_REQUESTS;
 
   // const [selectedRequest] = useState<null | Request>(null);
