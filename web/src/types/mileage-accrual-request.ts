@@ -20,15 +20,25 @@ export type MileageAccrualRequestForm = z.infer<typeof MileageAccrualRequestSche
 
 export type MileageAccrualRequest = {
   id: bigint;
-  member_id: bigint;
+  customer_id: bigint;
   status: string;
+  ticket_id: string;
+  pnr: string;
+  carrier: string;
+  booking_class: string;
   from_code: string;
   to_code: string;
   departure_date: string;
+  ticket_image_url: string;
+  boarding_pass_image_url: string;
   distance_miles: number;
+  qualifying_accrual_rate: number;
   qualifying_miles: number;
+  bonus_accrual_rate: number;
   bonus_miles: number;
-  reviewed_at: Date;
+  reviewer_id?: string;
+  reviewed_at?: string;
   rejected_reason?: string;
-  submitted_date: Date;
+  created_at: string;
+  updated_at: string;
 }

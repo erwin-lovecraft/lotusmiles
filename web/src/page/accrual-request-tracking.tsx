@@ -1,222 +1,247 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { MILEAGE_ACCRUAL_REQUESTS } from "@/mocks/mocks.ts";
+import { Search, Loader2, Filter } from "lucide-react";
 import MileageRequestPreview from "@/components/mileage-request-preview.tsx";
+import AccrualRequestDetailDialog from "@/components/accrual-request-detail-dialog.tsx";
+import { useInfiniteAccrualRequests } from "@/lib/hooks/use-infinite-accrual-requests";
+import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useState, useRef, useCallback } from "react";
+import type { MileageAccrualRequest } from "@/types/mileage-accrual-request";
 
 export default function MileageAccrualTrackingPage() {
-  const requests = MILEAGE_ACCRUAL_REQUESTS;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState<MileageAccrualRequest | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  
+  // Debounce search term with 500ms delay
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // const [selectedRequest] = useState<null | Request>(null);
-  // const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteAccrualRequests({
+    keyword: debouncedSearchTerm,
+  });
 
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Search */}
-      <Card>
-        <CardContent className="p-2 sm:p-4">
+  // Intersection observer for infinite scroll
+  const observer = useRef<IntersectionObserver | undefined>(undefined);
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasNextPage, isFetchingNextPage, fetchNextPage]
+  );
+
+  // Flatten all pages data
+  const allRequests = data?.pages.flatMap((page) => page.data) || [];
+  const total = data?.pages[0]?.total || 0;
+
+  const handleViewDetail = (request: MileageAccrualRequest) => {
+    setSelectedRequest(request);
+    setIsDetailOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailOpen(false);
+    setSelectedRequest(null);
+  };
+
+  if (isLoading && !data) {
+    return (
+      <div className="space-y-6">
+        {/* Search Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Search className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Mileage Accrual Requests</h1>
+              <p className="text-gray-500">Track and manage your mileage requests</p>
+            </div>
+          </div>
+          
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"/>
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"/>
             <Input
-              placeholder="Find by ticket ID..."
-              className="pl-10 text-sm sm:text-base"
+              placeholder="Search by ticket ID or PNR..."
+              className="pl-12 h-12 text-base border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+              disabled
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Request List */}
-      <Card>
-        <CardHeader className="pb-2 sm:pb-4">
-          <CardTitle className="text-lg sm:text-xl">Mileage Accrual Requests</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="space-y-3 sm:space-y-4">
-            {requests.map((request) =>
-              <MileageRequestPreview id={`request-${request.id}`} data={request}/>
-            )}
+        {/* Loading State */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="relative">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+              <div className="absolute inset-0 rounded-full border-2 border-purple-200 animate-ping"></div>
+            </div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Loading your requests...</p>
+            <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your data</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+    );
+  }
 
-      {/* Status Guide */}
-      {/*<Card>*/}
-      {/*  <CardHeader className="pb-3 sm:pb-6">*/}
-      {/*    <CardTitle className="text-lg sm:text-xl">Giải thích trạng thái</CardTitle>*/}
-      {/*  </CardHeader>*/}
-      {/*  <CardContent className="pt-0">*/}
-      {/*    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">*/}
-      {/*      <div className="flex items-center space-x-2">*/}
-      {/*        <Clock className="w-4 h-4 text-gray-600 flex-shrink-0"/>*/}
-      {/*        <span className="text-xs sm:text-sm">Chờ xử lý - Yêu cầu đã được tiếp nhận</span>*/}
-      {/*      </div>*/}
-      {/*      <div className="flex items-center space-x-2">*/}
-      {/*        <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0"/>*/}
-      {/*        <span className="text-xs sm:text-sm">Đang xử lý - Đang xác minh thông tin</span>*/}
-      {/*      </div>*/}
-      {/*      <div className="flex items-center space-x-2">*/}
-      {/*        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0"/>*/}
-      {/*        <span className="text-xs sm:text-sm">Hoàn thành - Đã cộng dặm thành công</span>*/}
-      {/*      </div>*/}
-      {/*      <div className="flex items-center space-x-2">*/}
-      {/*        <XCircle className="w-4 h-4 text-red-600 flex-shrink-0"/>*/}
-      {/*        <span className="text-xs sm:text-sm">Từ chối - Yêu cầu không hợp lệ</span>*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  </CardContent>*/}
-      {/*</Card>*/}
+  if (error) {
+    return (
+      <div className="space-y-6">
+        {/* Search Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Search className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Mileage Accrual Requests</h1>
+              <p className="text-gray-500">Track and manage your mileage requests</p>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"/>
+            <Input
+              placeholder="Search by ticket ID or PNR..."
+              className="pl-12 h-12 text-base border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+              disabled
+            />
+          </div>
+        </div>
 
-      {/* Detail Modal */}
-      {/*<Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>*/}
-      {/*  <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto mx-auto sm:mx-auto">*/}
-      {/*    <DialogHeader>*/}
-      {/*      <DialogTitle className="flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base">*/}
-      {/*        <FileText className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"/>*/}
-      {/*        <span>Chi tiết yêu cầu {selectedRequest?.id}</span>*/}
-      {/*      </DialogTitle>*/}
-      {/*    </DialogHeader>*/}
+        {/* Error State */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="p-3 bg-red-100 rounded-full mb-4">
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold">!</span>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load requests</h3>
+            <p className="text-gray-500 text-center max-w-md">
+              We encountered an error while loading your requests. Please try refreshing the page or contact support if the problem persists.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-      {/*    {selectedRequest && (*/}
-      {/*      <div className="space-y-4 sm:space-y-6">*/}
-      {/*        /!* Basic Info *!/*/}
-      {/*        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">*/}
-      {/*          <div>*/}
-      {/*            <h4 className="font-semibold mb-3 text-sm sm:text-base">Thông tin cơ bản</h4>*/}
-      {/*            <div className="space-y-2 text-xs sm:text-sm">*/}
-      {/*              <div className="flex justify-between">*/}
-      {/*                <span className="text-gray-600">Mã yêu cầu:</span>*/}
-      {/*                <span className="font-medium">{selectedRequest.id}</span>*/}
-      {/*              </div>*/}
-      {/*              <div className="flex justify-between">*/}
-      {/*                <span className="text-gray-600">Loại yêu cầu:</span>*/}
-      {/*                <span>{selectedRequest.type}</span>*/}
-      {/*              </div>*/}
-      {/*              <div className="flex justify-between">*/}
-      {/*                <span className="text-gray-600">Dặm dự kiến:</span>*/}
-      {/*                <span className="font-semibold text-purple-600">{selectedRequest.expectedMiles}</span>*/}
-      {/*              </div>*/}
-      {/*              <div className="flex justify-between items-center">*/}
-      {/*                <span className="text-gray-600">Trạng thái:</span>*/}
-      {/*                <span>{getStatusInfo(selectedRequest.status).badge}</span>*/}
-      {/*              </div>*/}
-      {/*            </div>*/}
-      {/*          </div>*/}
+  return (
+    <div className="space-y-6">
+      {/* Search Header */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <Search className="w-5 h-5 text-purple-600" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900">Mileage Accrual Requests</h1>
+            <p className="text-gray-500">Track and manage your mileage requests</p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Filter className="w-4 h-4" />
+            <span>{total} total requests</span>
+          </div>
+        </div>
+        
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"/>
+          <Input
+            placeholder="Search by ticket ID or PNR..."
+            className="pl-12 h-12 text-base border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            </div>
+          )}
+        </div>
+      </div>
 
-      {/*          <div>*/}
-      {/*            <h4 className="font-semibold mb-3 text-sm sm:text-base">Thông tin gửi yêu cầu</h4>*/}
-      {/*            <div className="space-y-2 text-xs sm:text-sm">*/}
-      {/*              <div className="flex justify-between">*/}
-      {/*                <span className="text-gray-600">Người gửi:</span>*/}
-      {/*                <span className="flex items-center">*/}
-      {/*                  <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1"/>*/}
-      {/*                  {selectedRequest.details.submittedBy}*/}
-      {/*                </span>*/}
-      {/*              </div>*/}
-      {/*              <div className="flex justify-between">*/}
-      {/*                <span className="text-gray-600">Thời gian gửi:</span>*/}
-      {/*                <span className="flex items-center">*/}
-      {/*                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1"/>*/}
-      {/*                  {selectedRequest.details.submissionDate}*/}
-      {/*                </span>*/}
-      {/*              </div>*/}
-      {/*            </div>*/}
-      {/*          </div>*/}
-      {/*        </div>*/}
+      {/* Results */}
+      <div className="space-y-4">
+        {allRequests.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="p-3 bg-gray-100 rounded-full mb-4">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {debouncedSearchTerm ? "No matching requests found" : "No requests yet"}
+              </h3>
+              <p className="text-gray-500 text-center max-w-md">
+                {debouncedSearchTerm 
+                  ? "Try adjusting your search terms or check the spelling."
+                  : "Your mileage accrual requests will appear here once submitted."
+                }
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Results Grid */}
+            <div className="grid gap-4">
+              {allRequests.map((request, index) => {
+                const isLast = index === allRequests.length - 1;
+                return (
+                  <div key={request.id.toString()} ref={isLast ? lastElementRef : undefined}>
+                    <MileageRequestPreview 
+                      id={`request-${request.id}`} 
+                      data={request}
+                      onViewDetail={handleViewDetail}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Loading indicator for next page */}
+            {isFetchingNextPage && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-600 mr-3" />
+                  <span className="text-gray-600 font-medium">Loading more requests...</span>
+                </div>
+              </div>
+            )}
+            
+            {/* End of results indicator */}
+            {!hasNextPage && allRequests.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-center py-4">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                    <span className="text-sm">You've reached the end</span>
+                    <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {/*        <Separator/>*/}
-
-      {/*        /!* Service Specific Info *!/*/}
-      {/*        /!*<div>*!/*/}
-      {/*        /!*  <h4 className="font-semibold mb-3 text-sm sm:text-base">Thông tin chi tiết dịch vụ</h4>*!/*/}
-      {/*        /!*  <div className="bg-gray-50 p-4 rounded-lg">*!/*/}
-      {/*        /!*    {selectedRequest.details.flightInfo && (*!/*/}
-      {/*        /!*      <div className="grid grid-cols-2 gap-4 text-sm">*!/*/}
-      {/*        /!*        <div>*!/*/}
-      {/*        /!*          <span className="text-gray-600 block">Số hiệu chuyến bay:</span>*!/*/}
-      {/*        /!*          <span className="font-medium">{selectedRequest.details.flightInfo.flightNumber}</span>*!/*/}
-      {/*        /!*        </div>*!/*/}
-      {/*        /!*        <div>*!/*/}
-      {/*        /!*          <span className="text-gray-600 block">Tuyến đường:</span>*!/*/}
-      {/*        /!*          <span>{selectedRequest.details.flightInfo.route}</span>*!/*/}
-      {/*        /!*        </div>*!/*/}
-      {/*        /!*        <div>*!/*/}
-      {/*        /!*          <span className="text-gray-600 block">Ngày bay:</span>*!/*/}
-      {/*        /!*          <span>{selectedRequest.details.flightInfo.date}</span>*!/*/}
-      {/*        /!*        </div>*!/*/}
-      {/*        /!*        <div>*!/*/}
-      {/*        /!*          <span className="text-gray-600 block">Mã đặt chỗ:</span>*!/*/}
-      {/*        /!*          <span className="font-medium">{selectedRequest.details.flightInfo.bookingCode}</span>*!/*/}
-      {/*        /!*        </div>*!/*/}
-      {/*        /!*        <div className="col-span-2">*!/*/}
-      {/*        /!*          <span className="text-gray-600 block">Số vé:</span>*!/*/}
-      {/*        /!*          <span className="font-medium">{selectedRequest.details.flightInfo.ticketNumber}</span>*!/*/}
-      {/*        /!*        </div>*!/*/}
-      {/*        /!*      </div>*!/*/}
-      {/*        /!*    )}*!/*/}
-
-      {/*        /!*  </div>*!/*/}
-      {/*        /!*</div>*!/*/}
-
-      {/*        /!*<Separator />*!/*/}
-
-      {/*        /!* Documents *!/*/}
-      {/*        <div>*/}
-      {/*          <h4 className="font-semibold mb-3 text-sm sm:text-base">Tài liệu đính kèm</h4>*/}
-      {/*          <div className="space-y-2">*/}
-      {/*            {selectedRequest.details.documents.map((doc: string, index: number) => (*/}
-      {/*              <div key={index} className="flex items-center space-x-2 text-sm">*/}
-      {/*                <FileText className="w-4 h-4 text-blue-600"/>*/}
-      {/*                <span>{doc}</span>*/}
-      {/*              </div>*/}
-      {/*            ))}*/}
-      {/*          </div>*/}
-      {/*        </div>*/}
-
-      {/*        <Separator/>*/}
-
-      {/*        /!* Timeline *!/*/}
-      {/*        <div>*/}
-      {/*          <h4 className="font-semibold mb-3 text-sm sm:text-base">Lịch sử xử lý</h4>*/}
-      {/*          <div className="space-y-4">*/}
-      {/*            {selectedRequest.details.timeline.map((event: any, index: number) => (*/}
-      {/*              <div key={index} className="flex items-start space-x-3">*/}
-      {/*                <div className={`w-3 h-3 rounded-full mt-1 ${*/}
-      {/*                  event.status === 'completed' ? 'bg-green-500' :*/}
-      {/*                    event.status === 'current' ? 'bg-blue-500' :*/}
-      {/*                      'bg-gray-300'*/}
-      {/*                }`}/>*/}
-      {/*                <div className="flex-1">*/}
-      {/*                  <div className="flex items-center justify-between">*/}
-      {/*                    <span className="text-sm font-medium">{event.action}</span>*/}
-      {/*                    {event.date && (*/}
-      {/*                      <span className="text-xs text-gray-500">{event.date}</span>*/}
-      {/*                    )}*/}
-      {/*                  </div>*/}
-      {/*                  {event.status === 'current' && (*/}
-      {/*                    <span className="text-xs text-blue-600">Đang thực hiện</span>*/}
-      {/*                  )}*/}
-      {/*                </div>*/}
-      {/*              </div>*/}
-      {/*            ))}*/}
-      {/*          </div>*/}
-      {/*        </div>*/}
-
-      {/*        /!* Rejection Reason *!/*/}
-      {/*        {selectedRequest.details.rejectionReason && (*/}
-      {/*          <>*/}
-      {/*            <Separator/>*/}
-      {/*            <div>*/}
-      {/*              <h4 className="font-semibold mb-3 text-red-600">Lý do từ chối</h4>*/}
-      {/*              <div className="bg-red-50 border border-red-200 p-4 rounded-lg">*/}
-      {/*                <p className="text-sm text-red-800">{selectedRequest.details.rejectionReason}</p>*/}
-      {/*              </div>*/}
-      {/*            </div>*/}
-      {/*          </>*/}
-      {/*        )}*/}
-      {/*      </div>*/}
-      {/*    )}*/}
-      {/*  </DialogContent>*/}
-      {/*</Dialog>*/}
+      {/* Detail Dialog */}
+      <AccrualRequestDetailDialog
+        request={selectedRequest}
+        open={isDetailOpen}
+        onOpenChange={handleCloseDetail}
+      />
     </div>
   );
 }

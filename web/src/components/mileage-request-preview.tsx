@@ -6,8 +6,9 @@ import { format } from "date-fns";
 
 export type MileageRequestPreviewProps = {
   id: string;
-  data: MileageAccrualRequest
+  data: MileageAccrualRequest;
   className?: string;
+  onViewDetail: (request: MileageAccrualRequest) => void;
 }
 
 const getStatusInfo = (data: MileageAccrualRequest) => {
@@ -15,82 +16,124 @@ const getStatusInfo = (data: MileageAccrualRequest) => {
     case 'pending':
       return {
         icon: <Clock className="w-4 h-4"/>,
-        badge: <Badge variant="secondary" className="bg-gray-100 text-gray-800">Chờ xử lý</Badge>,
-        color: 'text-gray-600',
+        badge: <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200">Pending</Badge>,
+        color: 'text-amber-600',
         label: "Submitted to Admin"
       };
     case 'inprogress':
       return {
         icon: <AlertCircle className="w-4 h-4"/>,
-        badge: <Badge variant="secondary" className="bg-blue-100 text-blue-800">In Progress</Badge>,
+        badge: <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">In Progress</Badge>,
         color: 'text-blue-600',
         label: 'Admin reviewing'
       };
     case 'approved':
       return {
         icon: <CheckCircle className="w-4 h-4"/>,
-        badge: <Badge variant="default" className="bg-green-100 text-green-800">Approved</Badge>,
+        badge: <Badge variant="default" className="bg-green-50 text-green-700 border-green-200">Approved</Badge>,
         color: 'text-green-600',
         label: "Admin approved"
       };
     case 'rejected':
       return {
         icon: <XCircle className="w-4 h-4"/>,
-        badge: <Badge variant="destructive" className="bg-red-100 text-red-800">Rejected</Badge>,
+        badge: <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-200">Rejected</Badge>,
         color: 'text-red-600',
         label: data.rejected_reason
       };
     default:
       return {
         icon: <Clock className="w-4 h-4"/>,
-        badge: <Badge variant="secondary">Unknown</Badge>,
+        badge: <Badge variant="secondary" className="bg-gray-50 text-gray-700 border-gray-200">Unknown</Badge>,
         color: 'text-gray-600'
       };
   }
 };
 
 export default function MileageRequestPreview(props: MileageRequestPreviewProps) {
-  const {data} = props;
+  const { data, onViewDetail } = props;
 
-  const statusInfo = getStatusInfo(data)
+  const statusInfo = getStatusInfo(data);
 
-  const handleViewDetail = (requestID: bigint) => {
-    console.log(requestID)
-  }
+  const handleViewDetail = () => {
+    onViewDetail(data);
+  };
 
   return (
-    <div key={data.id} className="border border-gray-200 rounded-lg p-4 sm:p-6 hover:bg-gray-50 transition-colors">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-3 sm:space-y-0">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
-            <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{data.id}</h4>
-            {statusInfo.badge}
-          </div>
-
-          <div className="space-y-1 mb-3">
-            <p className="text-xs sm:text-sm text-gray-500">Submit Date: {format(data.submitted_date, "dd/MM/yyyy")}</p>
-          </div>
-
-          <div className="flex items-center space-x-2 mb-2">
-            <div className={statusInfo.color}>
-              {statusInfo.icon}
+    <div 
+      key={data.id} 
+      className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden"
+    >
+      {/* Status indicator bar */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${data.status === 'approved' ? 'bg-green-500' : data.status === 'rejected' ? 'bg-red-500' : data.status === 'inprogress' ? 'bg-blue-500' : 'bg-amber-500'}`} />
+      
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 truncate">
+                Request #{data.id}
+              </h3>
+              {statusInfo.badge}
             </div>
-            <p className="text-xs sm:text-sm text-gray-600">{statusInfo.label}</p>
+            
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className={statusInfo.color}>
+                {statusInfo.icon}
+              </div>
+              <span>{statusInfo.label}</span>
+            </div>
           </div>
         </div>
 
-        <div
-          className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start sm:text-right sm:ml-4 space-x-2 sm:space-x-0">
-          <div>
-            <p className="font-semibold text-purple-600 text-sm sm:text-base">Qualifying Miles: {data.qualifying_miles}</p>
-            <p className="font-semibold text-purple-600 text-sm sm:text-base">Bonus Miles: {data.bonus_miles}</p>
+        {/* Content */}
+        <div className="space-y-4">
+          {/* Key metrics */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                Qualifying Miles
+              </p>
+              <p className="text-xl font-bold text-purple-600">
+                {data.qualifying_miles.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                Bonus Miles
+              </p>
+              <p className="text-xl font-bold text-purple-600">
+                {data.bonus_miles.toLocaleString()}
+              </p>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => handleViewDetail(data.id)} className="flex-shrink-0">
-            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
-            <span className="text-xs sm:text-sm">Detail</span>
-          </Button>
+
+          {/* Additional info */}
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">📅</span>
+                <span>{format(new Date(data.created_at), "MMM dd, yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">✈️</span>
+                <span>{data.distance_miles.toLocaleString()} miles</span>
+              </div>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleViewDetail}
+              className="group-hover:bg-purple-50 group-hover:border-purple-200 group-hover:text-purple-700 transition-colors"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View Details
+            </Button>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
