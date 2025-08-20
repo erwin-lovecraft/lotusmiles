@@ -9,6 +9,7 @@ import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/t
 import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-request.ts";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/types/api-error";
+import { useNavigate } from "react-router";
 
 export default function MileageAccrualRequestPage() {
   const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequestForm>()
@@ -17,11 +18,15 @@ export default function MileageAccrualRequestPage() {
   const iatas = LOCATIONS;
 
   const createMileageAccrualRequestMutation = useCreateMileageAccrualRequest();
+  const navigate = useNavigate();
 
   const handleSubmit = async (values: MileageAccrualRequestForm) => {
     try {
       await createMileageAccrualRequestMutation.mutateAsync(values);
       toast.success('Mileage accrual request submitted successfully!');
+      
+      // Navigate to tracking page after successful submission
+      navigate('/tracking');
     } catch (error) {
       if (error instanceof ApiError) {
         // Show the error_description from the API response
@@ -72,6 +77,7 @@ export default function MileageAccrualRequestPage() {
             ticket_image_url: "",
             boarding_pass_image_url: "",
           }}
+          resetOnSuccess={true}
         >
           <Card>
             <CardContent className="space-y-4 sm:space-y-6 pt-0">

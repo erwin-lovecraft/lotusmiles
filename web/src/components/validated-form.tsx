@@ -32,19 +32,29 @@ export type ValidatedFormProps<TModel extends FieldValues> = {
   className?: string;
   onSubmit: SubmitHandler<TModel>;
   children: React.ReactNode;
+  /** If true, form will be reset to defaultValues after successful submission */
+  resetOnSuccess?: boolean;
 }
 
 export function ValidatedForm<TModel extends FieldValues>(props: ValidatedFormProps<TModel>) {
-  const {defaultValues, resolver, className, onSubmit, children} = props;
+  const {defaultValues, resolver, className, onSubmit, children, resetOnSuccess = false} = props;
 
   const methods = useForm({
     defaultValues: defaultValues,
     resolver: resolver,
   })
 
+  const handleSubmit: SubmitHandler<TModel> = async (data) => {
+    await onSubmit(data);
+    // Reset form after successful submission if resetOnSuccess is true
+    if (resetOnSuccess) {
+      methods.reset(defaultValues);
+    }
+  }
+
   return (
     <Form {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className={className}>
+      <form onSubmit={methods.handleSubmit(handleSubmit)} className={className}>
         {children}
       </form>
     </Form>
