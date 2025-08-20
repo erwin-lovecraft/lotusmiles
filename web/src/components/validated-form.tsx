@@ -112,7 +112,7 @@ export function ValidatedSelect<
         <FormItem>
           {props.label &&
             <FormLabel>{props.label}</FormLabel>}
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select onValueChange={field.onChange} value={field.value || ""}>
             <FormControl>
               <SelectTrigger className={props.className}>
                 <SelectValue placeholder={props.placeholder}/>
@@ -166,7 +166,7 @@ export function ValidatedDatePicker<
                   {field.value ? (
                     format(field.value, "dd/MM/yyyy")
                   ) : (
-                    <span>Pick a date</span>
+                    <span>{props.placeholder || "Pick a date"}</span>
                   )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
@@ -212,8 +212,8 @@ export type ValidatedFileUploadProps<
   TName extends FieldPath<TModel> = FieldPath<TModel>
 > = BaseProps & {
   name: TName;
-  /** Optional async uploader. Return array of URLs (strings) to be saved to form. */
-  onUpload?: (files: File[]) => Promise<string[]>;
+  /** Optional async uploader. Return array of URLs (strings) or objects with url and display_name to be saved to form. */
+  onUpload?: (files: File[]) => Promise<string[] | { url: string; display_name: string }[]>;
   /** If true, show a small list of selected files with remove actions. */
   showList?: boolean;       // default: true
   /** Placeholder text inside the dropzone. */
@@ -288,7 +288,18 @@ export function ValidatedFileUpload<
     if (onUpload) {
       try {
         setUploading(true);
-        const urls = await onUpload(ok);
+        const result = await onUpload(ok);
+        
+        // Handle both string arrays and object arrays
+        let urls: string[];
+        if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && 'url' in result[0]) {
+          // Object array with url and display_name
+          urls = (result as { url: string; display_name: string }[]).map(item => item.url);
+        } else {
+          // String array
+          urls = result as string[];
+        }
+        
         // Save URLs to form (single/multiple consistent with prop)
         onChange(multiple ? urls : urls[0] ?? null);
       } catch (e: any) {
@@ -341,11 +352,22 @@ export function ValidatedFileUpload<
 
   const describeItem = (item: unknown): { name: string; size?: number } => {
     if (typeof item === "string") {
-      // URL string
-      return { name: item };
+      // URL string - try to extract filename from URL
+      try {
+        const url = new URL(item);
+        const pathname = url.pathname;
+        const filename = pathname.split('/').pop() || item;
+        return { name: filename };
+      } catch {
+        return { name: item };
+      }
     }
     if (item instanceof File) {
       return { name: item.name, size: item.size };
+    }
+    if (typeof item === "object" && item !== null && "display_name" in item) {
+      // Object with display_name
+      return { name: (item as { display_name: string }).display_name };
     }
     return { name: String(item ?? "") };
   };
@@ -356,7 +378,7 @@ export function ValidatedFileUpload<
       name={name}
       render={({ field }) => {
         const value = field.value;
-        const list: Array<File | string> =
+        const list: Array<File | string | { url: string; display_name: string }> =
           value == null
             ? []
             : Array.isArray(value)

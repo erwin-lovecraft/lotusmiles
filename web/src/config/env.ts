@@ -14,7 +14,7 @@ interface Config {
   cloudinary: {
     cloudName: string;
     unsignedPreset: string;
-  }
+  };
 }
 
 function validateEnv(): Config {
@@ -56,7 +56,7 @@ function validateEnv(): Config {
     cloudinary: {
       unsignedPreset: import.meta.env.VITE_CLOUDINARY_UNSIGNED_PRESET,
       cloudName: import.meta.env.VITE_CLOUDINARY_NAME,
-    }
+    },
   };
 }
 

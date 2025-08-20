@@ -8,8 +8,8 @@ export const MileageAccrualRequestSchema = z.object({
   from_code: z.string(),
   to_code: z.string(),
   departure_date: z.date(),
-  ticket_image_url: z.url(),
-  boarding_pass_image_url: z.url(),
+  ticket_image_url: z.string().optional(),
+  boarding_pass_image_url: z.string().optional(),
 })
 
 export type MileageAccrualRequestForm = z.infer<typeof MileageAccrualRequestSchema>;

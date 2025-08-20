@@ -6,6 +6,8 @@ import { SelectItem } from "@/components/ui/select.tsx";
 import { BOOKING_CLASSES, LOCATIONS } from "@/mocks/mocks.ts";
 import { unsignedUpload } from "@/lib/cloudinary.ts";
 import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/types/mileage-accrual-request.ts";
+import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-request.ts";
+import { toast } from "sonner";
 
 export default function MileageAccrualRequestPage() {
   const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequestForm>()
@@ -13,21 +15,29 @@ export default function MileageAccrualRequestPage() {
   const bookingClasses = BOOKING_CLASSES;
   const iatas = LOCATIONS;
 
-  const handleSubmit = (values: MileageAccrualRequestForm) => {
-    console.log(JSON.stringify(values));
+  const createMileageAccrualRequestMutation = useCreateMileageAccrualRequest();
+
+  const handleSubmit = async (values: MileageAccrualRequestForm) => {
+    try {
+      await createMileageAccrualRequestMutation.mutateAsync(values);
+      toast.success('Mileage accrual request submitted successfully!');
+    } catch (error) {
+      toast.error('An error occurred while submitting the request. Please try again.');
+      console.error('Submit error:', error);
+    }
   }
 
   const handleUploadToCloud = async (files: File[]) => {
-    const results: string[] = [];
+    const results: { url: string; display_name: string }[] = [];
     for (const file of files) {
       try {
         const res = await unsignedUpload(file)
-        results.push(res.display_name)
+        results.push({ url: res.secure_url, display_name: res.display_name })
       } catch (e) {
         throw new Error(`Upload failed: ${e}`);
       }
     }
-    return results; // array of URLs
+    return results; // array of objects with url and display_name
   }
 
   return (
@@ -41,43 +51,59 @@ export default function MileageAccrualRequestPage() {
       {/*</Alert>*/}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <Form resolver={zodResolver(MileageAccrualRequestSchema)} onSubmit={handleSubmit} className="lg:col-span-2">
+        <Form 
+          resolver={zodResolver(MileageAccrualRequestSchema)} 
+          onSubmit={handleSubmit} 
+          className="lg:col-span-2"
+          defaultValues={{
+            ticket_id: "",
+            pnr: "",
+            carrier: "",
+            booking_class: "",
+            from_code: "",
+            to_code: "",
+            departure_date: new Date(),
+            ticket_image_url: "",
+            boarding_pass_image_url: "",
+          }}
+        >
           <Card>
             <CardContent className="space-y-4 sm:space-y-6 pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input name="ticket_id" label="Ticket ID"/>
-                <Input name="pnr" label="PNR"/>
+                <Input name="ticket_id" label="Ticket ID" placeholder="e.g., 123-4567890123"/>
+                <Input name="pnr" label="PNR" placeholder="e.g., ABC123"/>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select name="carrier" label="Carrier" className="w-full">
+                <Select name="carrier" label="Carrier" placeholder="Select airline" className="w-full">
                   <SelectItem value="VN">Vietnam Airlines - VN</SelectItem>
                 </Select>
-                <Select name="booking_class" label="Booking Class" className="w-full h-1/4VH">
+                <Select name="booking_class" label="Booking Class" placeholder="Select booking class" className="w-full h-1/4VH">
                   {bookingClasses.map((bookingClass) => (
-                    <SelectItem value={bookingClass}>{bookingClass}</SelectItem>
+                    <SelectItem key={`booking-class-${bookingClass}`} value={bookingClass}>{bookingClass}</SelectItem>
                   ))}
                 </Select>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select name="from_code" label="From" className="w-full">
+                <Select name="from_code" label="From" placeholder="Select departure airport" className="w-full">
                   {iatas.map((iata) => (
-                    <SelectItem value={iata.code}>{iata.name} - {iata.code}</SelectItem>
+                    <SelectItem key={`from-${iata.code}`} value={iata.code}>{iata.name} - {iata.code}</SelectItem>
                   ))}
                 </Select>
-                <Select name="to_code" label="To" className="w-full">
+                <Select name="to_code" label="To" placeholder="Select arrival airport" className="w-full">
                   {iatas.map((iata) => (
-                    <SelectItem value={iata.code}>{iata.name} - {iata.code}</SelectItem>
+                    <SelectItem key={`to-${iata.code}`} value={iata.code}>{iata.name} - {iata.code}</SelectItem>
                   ))}
                 </Select>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DatePicker name="departure_date" label="Departure Date"/>
+                <DatePicker name="departure_date" label="Departure Date" placeholder="Select departure date"/>
               </div>
 
               <FileUpload
                 name="ticket_image_url"
                 label="Ticket Image"
+                placeholder="Upload your flight ticket (JPG, PNG, PDF)"
                 maxFiles={1}
                 accept="image/*,.pdf"
                 onUpload={handleUploadToCloud}
@@ -86,6 +112,7 @@ export default function MileageAccrualRequestPage() {
               <FileUpload
                 name="boarding_pass_image_url"
                 label="Boarding Pass Image"
+                placeholder="Upload your boarding pass (JPG, PNG, PDF)"
                 maxFiles={1}
                 accept="image/*,.pdf"
                 onUpload={handleUploadToCloud}
@@ -93,8 +120,10 @@ export default function MileageAccrualRequestPage() {
 
               <div className="pt-4 border-t">
                 <Button
+                  type="submit"
+                  disabled={createMileageAccrualRequestMutation.isPending}
                   className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 w-full sm:w-auto text-sm sm:text-base">
-                  Gửi yêu cầu
+                  {createMileageAccrualRequestMutation.isPending ? 'Submitting...' : 'Submit Request'}
                 </Button>
               </div>
             </CardContent>

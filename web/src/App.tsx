@@ -13,6 +13,7 @@ import CallbackPage from "@/page/auth0-callback.tsx";
 import AuthErrorPage from "@/page/auth-error.tsx";
 import ProtectedRoute from "@/components/protected-route.tsx";
 import MileageAccrualTrackingPage from "@/page/accrual-request-tracking.tsx";
+import { Toaster } from "sonner";
 
 function Layout() {
   const navigate = useNavigate();
@@ -42,22 +43,25 @@ function Layout() {
 
 function App() {
   return (
-    <Routes>
-      <Route index element={<LandingPage/>}/>
-      <Route path="/callback" element={<CallbackPage/>}/>
-      <Route path="/auth-error" element={<AuthErrorPage/>}/>
+    <>
+      <Routes>
+        <Route index element={<LandingPage/>}/>
+        <Route path="/callback" element={<CallbackPage/>}/>
+        <Route path="/auth-error" element={<AuthErrorPage/>}/>
 
-      <Route element={<ProtectedRoute children={<Layout/>}/>}>
-        <Route path="/home" element={<HomePage/>}/>
-        <Route path="/profile" element={<Profile />}/>
-        <Route path="/history" element={<MilesLedgers/>}/>
-        <Route path="/request" element={<MileageAccrualRequestPage/>}/>
-        <Route path="/tracking" element={<MileageAccrualTrackingPage/>}/>
-      </Route>
+        <Route element={<ProtectedRoute children={<Layout/>}/>}>
+          <Route path="/home" element={<HomePage/>}/>
+          <Route path="/profile" element={<Profile />}/>
+          <Route path="/history" element={<MilesLedgers/>}/>
+          <Route path="/request" element={<MileageAccrualRequestPage/>}/>
+          <Route path="/tracking" element={<MileageAccrualTrackingPage/>}/>
+        </Route>
 
-      <Route path="/contributor" element={<Contributor />} />
-      <Route path="*" element={<NotFoundPage/>}/>
-    </Routes>
+        <Route path="/contributor" element={<Contributor />} />
+        <Route path="*" element={<NotFoundPage/>}/>
+      </Routes>
+      <Toaster />
+    </>
   )
 }
 

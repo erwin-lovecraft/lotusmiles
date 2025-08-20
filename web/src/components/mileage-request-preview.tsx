@@ -1,4 +1,4 @@
-import type { MileageAccrualRequest } from "@/types/mileage_accrual_request.ts";
+import type { MileageAccrualRequest } from "@/types/mileage-accrual-request.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { AlertCircle, CheckCircle, Clock, Eye, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge.tsx";
