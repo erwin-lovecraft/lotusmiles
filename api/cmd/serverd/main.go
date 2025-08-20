@@ -28,21 +28,65 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
+	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
+	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
+	"github.com/viebiz/lit/cors"
+	"github.com/viebiz/lit/monitoring/instrumentpg"
+	"github.com/viebiz/lit/postgres"
+	driverpg "gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	_ "github.com/erwin-lovecraft/aegismiles/docs"
 	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage_accrual_request"
 	"github.com/viebiz/lit"
-	"github.com/viebiz/lit/cors"
 	"github.com/viebiz/lit/env"
-	"github.com/viebiz/lit/httpclient"
 	httpmw "github.com/viebiz/lit/middleware/http"
 	"github.com/viebiz/lit/monitoring"
-	_ "github.com/erwin-lovecraft/aegismiles/docs"
 )
+
+func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
+	pool, err := postgres.NewPool(ctx, cfg.Database.URL, cfg.Database.MaxOpenConns, cfg.Database.MaxIdleConns, postgres.AttemptPingUponStartup())
+	if err != nil {
+		return nil, err
+	}
+
+	gormDB, err := gorm.Open(driverpg.New(driverpg.Config{
+		Conn: instrumentpg.WithInstrumentation(pool), // Adding instrumentation
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return gormDB, nil
+}
+
+func configCORS(cfg config.CorsConfig) cors.Config {
+	corsCfg := cors.New(cfg.AllowOrigins)
+	if len(cfg.AllowMethods) > 0 {
+		corsCfg.SetAllowMethods(cfg.AllowMethods...)
+	}
+
+	if len(cfg.AllowHeaders) > 0 {
+		corsCfg.SetAllowHeaders(cfg.AllowHeaders...)
+	}
+
+	if len(cfg.ExposeHeaders) > 0 {
+		corsCfg.SetExposeHeaders(cfg.ExposeHeaders...)
+	}
+
+	if !cfg.AllowCredentials {
+		corsCfg.DisableCredentials()
+	}
+
+	return corsCfg
+}
 
 func main() {
 	ctx := context.Background()
@@ -80,20 +124,14 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	// HTTP conn pool
-	sharedPool := httpclient.NewSharedCustomPool()
-
 	// Dependency injection
 	// Initialize services, repositories, etc. here
-	auth0Client, err := auth0.New(sharedPool, cfg.Auth0)
-	if err != nil {
-		return err
-	}
+	authGwy, err := auth0.New(cfg.UserAPI)
 
 	repo := repository.New(db)
-	customerService := customer.New(repo, auth0Client)
-	mileageAccrualRequestService := mileage_accrual_request.New(repo)
-	v1Ctrl := v1.New(customerService, mileageAccrualRequestService)
+	mileageSvc := mileage.New(repo)
+	customerSvc := customer.New(repo, authGwy)
+	v1Ctrl := v1.New(customerSvc, mileageSvc)
 
 	// Initialize the server with the handler
 	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl))
@@ -105,60 +143,41 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 	r := lit.NewRouter(ctx)
 	r.Use(cors.Middleware(configCORS(cfg.Cors)))
 
-	// Serve Swagger UI files
-	r.Get("/swagger/index.html", func(c lit.Context) error {
-		// Read and serve the HTML file
-		content, err := os.ReadFile("docs/index.html")
-		if err != nil {
-			return c.JSON(http.StatusNotFound, map[string]string{"error": "File not found"})
-		}
-		c.Writer().Header().Set("Content-Type", "text/html")
-		c.Writer().Write(content)
-		return nil
-	})
-	
-	// Serve swagger.json
-	r.Get("/docs/swagger.json", func(c lit.Context) error {
-		// Read and serve the JSON file
-		content, err := os.ReadFile("docs/swagger.json")
-		if err != nil {
-			return c.JSON(http.StatusNotFound, map[string]string{"error": "File not found"})
-		}
-		c.Writer().Header().Set("Content-Type", "application/json")
-		c.Writer().Write(content)
-		return nil
-	})
-	
-	// Swagger UI redirect
-	r.Get("/swagger", func(c lit.Context) error {
-		// Return redirect response
-		c.Writer().Header().Set("Location", "/swagger/index.html")
-		c.Status(http.StatusMovedPermanently)
-		return nil
-	})
-
-	v1 := r.Route("/api/v1",
+	v1Route := r.Route("/api/v1",
 		httpmw.RequestIDMiddleware(),
-		// Disable for testing without Authenticate
+		// Disable auth for testing
 		middleware.Authenticate(cfg),
 	)
 
-	// User routers
-	v1.Get("/profile", v1Ctrl.GetCustomerProfile)
-
-	// Customer routes
-	v1.Group("/customers", func(customers lit.Router) {
-		customers.Post("/onboard", v1Ctrl.OnboardCustomer, middleware.HasRoles(constants.UserRoleMember))
+	// User profile
+	v1Route.Group("/profile", func(profile lit.Router) {
+		profile.Get("", v1Ctrl.GetCustomerProfile)
 	})
 
-	// Mileage accrual requests routes
-	v1.Group("/mileage-accrual-requests", func(accrual lit.Router) {
+	// Accrual requests routes
+	v1Route.Group("/accrual-requests", func(accrual lit.Router) {
+		accrual.Use(middleware.HasRoles(constants.UserRoleMember))
+		accrual.Post("/", v1Ctrl.SubmitAccrualRequest)
+		accrual.Get("/", v1Ctrl.GetMyAccrualRequests)
+	})
 
-		accrual.Get("/", v1Ctrl.GetMileageAccrualRequests)
-		accrual.Post("/", v1Ctrl.CreateMileageAccrualRequest)
-		accrual.Put("/:id", v1Ctrl.UpdateMileageAccrualRequest)
-		accrual.Put("/:id/status", v1Ctrl.UpdateMileageStatus)
+	// Admin accrual requests routes
+	v1Route.Group("/admin/accrual-requests", func(admin lit.Router) {
+		admin.Use(middleware.HasRoles(constants.UserRoleAdmin))
+		admin.Get("/", v1Ctrl.GetAccrualRequests)
+		admin.Patch("/:id/approve", v1Ctrl.ApproveRequest)
+		admin.Patch("/:id/reject", v1Ctrl.RejectRequest)
+	})
 
+	// Miles ledger routes
+	v1Route.Group("/miles-ledgers", func(ledger lit.Router) {
+		ledger.Get("/", v1Ctrl.GetMileageLedgers)
+	})
+
+	// Admin miles ledger routes
+	v1Route.Group("/admin/miles-ledgers", func(admin lit.Router) {
+		admin.Use(middleware.HasRoles("admin"))
+		admin.Get("/", v1Ctrl.GetMileageLedgers)
 	})
 
 	return r.Handler()

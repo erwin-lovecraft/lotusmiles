@@ -78,7 +78,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.6.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
-	github.com/pkg/errors v0.9.1
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sagikazarmark/locafero v0.9.0 // indirect
 	github.com/sony/sonyflake v1.3.0 // indirect

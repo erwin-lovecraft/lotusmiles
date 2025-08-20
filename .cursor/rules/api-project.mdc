@@ -1,0 +1,225 @@
+---
+description: LotusMiles - Full-stack mileage management application with Go backend and React frontend
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# LotusMiles Project Rules
+
+## Project Overview
+LotusMiles is a full-stack mileage management application with:
+- **Backend**: Go API with Gin framework, GORM ORM, Auth0 authentication
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS + Radix UI
+- **Admin Panel**: Separate React app for administrative functions
+- **Database**: SQLite/MySQL with GORM migrations
+
+## Backend (Go) Rules
+
+### Architecture & Structure
+- Follow clean architecture principles with clear separation of concerns
+- Use the existing directory structure: `internal/` for business logic, `cmd/` for entry points
+- Maintain the layered architecture: controllers → services → repositories → entities
+- Keep all business logic in the `internal/` package
+- Use dependency injection and interfaces for testability
+
+### Code Style & Conventions
+- Follow Go naming conventions: `camelCase` for variables, `PascalCase` for exported functions/types
+- Use meaningful variable and function names
+- Add comprehensive comments for exported functions and types
+- Keep functions small and focused (max 20-30 lines)
+- Use `context.Context` for request cancellation and timeouts
+- Handle errors explicitly - never ignore errors
+
+### API Design
+- Use RESTful conventions for endpoints
+- Implement proper HTTP status codes (200, 201, 400, 401, 404, 500)
+- Use consistent JSON response formats
+- Implement proper validation using struct tags
+- Add comprehensive API documentation with Swagger/OpenAPI
+- Use middleware for cross-cutting concerns (CORS, auth, logging)
+
+### Database & GORM
+- Use GORM struct tags for database mapping
+- Implement proper table names with `TableName()` method
+- Use migrations for database schema changes
+- Include `CreatedAt` and `UpdatedAt` timestamps
+- Use soft deletes where appropriate
+- Implement proper relationships between entities
+- Use transactions for multi-table operations
+
+### Authentication & Security
+- Use Auth0 for authentication and authorization
+- Implement proper JWT token validation
+- Use middleware for route protection
+- Validate user permissions before sensitive operations
+- Sanitize all user inputs
+- Use environment variables for sensitive configuration
+
+### Error Handling
+- Create custom error types for business logic errors
+- Use proper error wrapping with `fmt.Errorf` and `%w`
+- Log errors with appropriate levels (error, warn, info)
+- Return meaningful error messages to clients
+- Implement proper error responses in controllers
+
+### Testing
+- Write unit tests for all business logic
+- Use table-driven tests for multiple scenarios
+- Mock external dependencies
+- Test both success and error cases
+- Maintain high test coverage (>80%)
+
+## Frontend (React) Rules
+
+### Project Structure
+- Use the existing component structure in `src/components/`
+- Separate pages in `src/page/`
+- Keep utilities in `src/lib/`
+- Use TypeScript for all components and functions
+- Organize components by feature/domain
+
+### Component Design
+- Use functional components with hooks
+- Implement proper TypeScript interfaces for props
+- Use React.memo() for performance optimization when needed
+- Keep components small and focused
+- Use composition over inheritance
+- Implement proper error boundaries
+
+### State Management
+- Use React hooks (useState, useEffect, useContext) for local state
+- Use React Router for navigation state
+- Implement proper loading and error states
+- Use optimistic updates where appropriate
+- Cache API responses when beneficial
+
+### Styling & UI
+- Use Tailwind CSS for styling
+- Follow the existing design system with Radix UI components
+- Use CSS custom properties for theming
+- Implement responsive design patterns
+- Use consistent spacing and typography
+- Ensure accessibility (ARIA labels, keyboard navigation)
+
+### API Integration
+- Use fetch or axios for API calls
+- Implement proper error handling for API requests
+- Use loading states during API calls
+- Handle authentication tokens properly
+- Implement retry logic for failed requests
+- Use proper TypeScript types for API responses
+
+### Form Handling
+- Use react-hook-form for form management
+- Implement proper validation with zod schemas
+- Show validation errors clearly
+- Use proper form accessibility patterns
+- Implement proper form submission handling
+
+### Performance
+- Use React.lazy() for code splitting
+- Optimize bundle size with tree shaking
+- Use proper key props for lists
+- Implement virtual scrolling for large lists
+- Use proper image optimization
+
+## Admin Panel Rules
+
+### Admin-Specific Patterns
+- Implement role-based access control
+- Use admin-specific layouts and navigation
+- Implement bulk operations where appropriate
+- Use data tables for large datasets
+- Implement proper audit logging
+- Use admin-specific error handling
+
+### Data Management
+- Implement proper CRUD operations
+- Use optimistic updates for better UX
+- Implement proper data validation
+- Use proper pagination for large datasets
+- Implement search and filtering capabilities
+
+## General Development Rules
+
+### Code Quality
+- Use ESLint and Prettier for code formatting
+- Follow consistent naming conventions
+- Write self-documenting code
+- Add JSDoc comments for complex functions
+- Use proper TypeScript types throughout
+
+### Git & Version Control
+- Use meaningful commit messages
+- Create feature branches for new development
+- Use conventional commits format
+- Keep commits atomic and focused
+- Write proper PR descriptions
+
+### Environment & Configuration
+- Use environment variables for configuration
+- Never commit sensitive data to version control
+- Use different environments (dev, staging, prod)
+- Implement proper configuration validation
+- Use .env files for local development
+
+### Security Best Practices
+- Validate all user inputs
+- Use HTTPS in production
+- Implement proper CORS policies
+- Use secure authentication methods
+- Sanitize data before database operations
+- Implement rate limiting for APIs
+
+### Performance & Monitoring
+- Implement proper logging throughout the application
+- Use performance monitoring tools
+- Optimize database queries
+- Implement proper caching strategies
+- Monitor application metrics
+
+### Documentation
+- Maintain up-to-date README files
+- Document API endpoints
+- Write setup instructions
+- Document deployment procedures
+- Keep architecture decisions documented
+
+## Technology-Specific Rules
+
+### Go Dependencies
+- Use Go modules for dependency management
+- Keep dependencies up to date
+- Use specific versions in go.mod
+- Avoid unnecessary dependencies
+- Use go mod tidy regularly
+
+### React Dependencies
+- Use npm/yarn for package management
+- Keep dependencies up to date
+- Use specific versions in package.json
+- Avoid unnecessary dependencies
+- Use proper peer dependencies
+
+### Database
+- Use migrations for schema changes
+- Implement proper indexing
+- Use transactions for data consistency
+- Implement proper backup strategies
+- Monitor database performance
+
+## Testing Strategy
+- Write unit tests for all business logic
+- Implement integration tests for APIs
+- Use end-to-end tests for critical user flows
+- Maintain high test coverage
+- Use proper test data and fixtures
+- Implement proper test isolation
+
+## Deployment & DevOps
+- Use containerization (Docker) for consistency
+- Implement proper CI/CD pipelines
+- Use environment-specific configurations
+- Implement proper monitoring and alerting
+- Use proper backup and recovery procedures
+- Implement proper security scanning
