@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 interface ActiveTabContextType  {
   activeTab: string;
@@ -10,7 +11,6 @@ const ActiveTabContext = createContext<undefined|ActiveTabContextType>(undefined
 
 export interface BottomNavigationBarItemProps {
   id: string;
-  index?: boolean;
   label: string;
   icon: React.ReactNode;
   onClick?: (tabID: string) => void;
@@ -24,12 +24,6 @@ export const BottomNavigationBarItem = (props: BottomNavigationBarItemProps) => 
     activeTabCtx?.onTabChange?.(tabID);
     activeTabCtx?.setActiveTab(props.id ?? "")
   }
-
-  useEffect(() => {
-    if (props.index) {
-      activeTabCtx?.setActiveTab(props.id);
-    }
-  }, [props.id])
 
   return (
     <button
@@ -63,6 +57,15 @@ export interface BottomNavigationBarProps {
 
 export default function BottomNavigationBar(props: BottomNavigationBarProps) {
   const [activeTab, setActiveTab] = useState<string>("")
+  const location = useLocation();
+
+  // Update active tab when location changes
+  useEffect(() => {
+    const currentPath = location.pathname;
+    // Extract tab ID from pathname (remove leading slash)
+    const tabId = currentPath === '/' ? 'home' : currentPath.substring(1);
+    setActiveTab(tabId);
+  }, [location.pathname]);
 
   return (
     <ActiveTabContext.Provider value={{activeTab, setActiveTab, onTabChange: props.onTabChange}}>

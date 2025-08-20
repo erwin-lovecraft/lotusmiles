@@ -42,6 +42,7 @@ export function ValidatedForm<TModel extends FieldValues>(props: ValidatedFormPr
   const methods = useForm({
     defaultValues: defaultValues,
     resolver: resolver,
+    reValidateMode: "onChange",
   })
 
   const handleSubmit: SubmitHandler<TModel> = async (data) => {

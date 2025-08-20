@@ -33,7 +33,7 @@ function Layout() {
       <BottomNavigationBar onTabChange={handleSelectTab}>
         <BottomNavigationBarItem id="history" label="History" icon={<History/>}/>
         <BottomNavigationBarItem id="tracking" label="Tracking" icon={<ClipboardList/>}/>
-        <BottomNavigationBarItem id="home" index label="Home" icon={<Home/>}/>
+        <BottomNavigationBarItem id="home" label="Home" icon={<Home/>}/>
         <BottomNavigationBarItem id="request" label="Request" icon={<Plus/>}/>
         <BottomNavigationBarItem id="profile" label="Profile" icon={<User/>}/>
       </BottomNavigationBar>

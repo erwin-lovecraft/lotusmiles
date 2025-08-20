@@ -69,7 +69,7 @@ export default function MileageAccrualRequestPage() {
           defaultValues={{
             ticket_id: "",
             pnr: "",
-            carrier: "",
+            carrier: "VN",
             booking_class: "",
             from_code: "",
             to_code: "",
@@ -82,8 +82,8 @@ export default function MileageAccrualRequestPage() {
           <Card>
             <CardContent className="space-y-4 sm:space-y-6 pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input name="ticket_id" label="Ticket ID" placeholder="e.g., 123-4567890123"/>
-                <Input name="pnr" label="PNR" placeholder="e.g., ABC123"/>
+                <Input name="ticket_id" label="Ticket ID" placeholder="e.g., 1234567890123"/>
+                <Input name="pnr" label="Booking Reference" placeholder="e.g., ABC123"/>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select name="carrier" label="Carrier" placeholder="Select airline" className="w-full">
