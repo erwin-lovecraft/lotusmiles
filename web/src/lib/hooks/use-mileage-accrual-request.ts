@@ -2,13 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import { useApiClient } from '@/lib/api';
 import { createMileageAccrualRequest, type CreateMileageAccrualRequestResponse } from '@/lib/services/mileage-accrual-request';
 import { type MileageAccrualRequestForm } from '@/types/mileage-accrual-request';
+import { ApiError } from '@/lib/types/api-error';
 
 export const useCreateMileageAccrualRequest = () => {
   const apiClient = useApiClient();
 
   return useMutation<
     CreateMileageAccrualRequestResponse,
-    Error,
+    ApiError,
     MileageAccrualRequestForm
   >({
     mutationFn: (data: MileageAccrualRequestForm) =>

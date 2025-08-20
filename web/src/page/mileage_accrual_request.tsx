@@ -8,6 +8,7 @@ import { unsignedUpload } from "@/lib/cloudinary.ts";
 import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/types/mileage-accrual-request.ts";
 import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-request.ts";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/types/api-error";
 
 export default function MileageAccrualRequestPage() {
   const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequestForm>()
@@ -22,8 +23,13 @@ export default function MileageAccrualRequestPage() {
       await createMileageAccrualRequestMutation.mutateAsync(values);
       toast.success('Mileage accrual request submitted successfully!');
     } catch (error) {
-      toast.error('An error occurred while submitting the request. Please try again.');
-      console.error('Submit error:', error);
+      if (error instanceof ApiError) {
+        // Show the error_description from the API response
+        toast.error(error.error_description);
+      } else {
+        // Fallback for internal server errors or network issues
+        toast.error('An error occurred while submitting the request. Please try again.');
+      }
     }
   }
 
