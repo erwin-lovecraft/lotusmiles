@@ -18,6 +18,20 @@ const (
 )
 
 func Authenticate(cfg config.Config) lit.HandlerFunc {
+	// Bỏ qua xác thực trong môi trường phát triển
+	if cfg.Auth0.Domain == "dev-example.auth0.com" {
+		return func(c lit.Context) error {
+			// Tạo một user profile giả lập cho môi trường phát triển
+			profile := iam.NewUserProfile("dev-user-id", []string{"user"}, []string{})
+			ctx := c.Request().Context()
+			ctx = iam.SetUserProfileInContext(ctx, profile)
+			ctx = monitoring.InjectField(ctx, userIDKey, profile.ID())
+			c.SetRequestContext(ctx)
+			c.Next()
+			return nil
+		}
+	}
+
 	validator, err := iam.NewRFC9068Validator("https://"+cfg.Auth0.Domain, cfg.Auth0.Audience, httpclient.NewSharedPool())
 	if err != nil {
 		panic("init auth0 error: " + err.Error())

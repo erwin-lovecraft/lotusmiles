@@ -6,6 +6,7 @@ type Config struct {
 	Cors       CorsConfig     `mapstructure:"CORS"`
 	Database   DatabaseConfig `mapstructure:"DATABASE"`
 	Auth0      Auth0Config    `mapstructure:"AUTH0"`
+	UserAPI    Auth0Config    `mapstructure:"USER_API"`
 	SentryDSN  string         `mapstructure:"SENTRY_DSN"`
 }
 

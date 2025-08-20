@@ -5,15 +5,20 @@ import (
 )
 
 type Customer struct {
-	ID        int64      `json:"id" gorm:"primaryKey"`
-	IdPUserID string     `json:"idp_user_id" gorm:"column:idp_user_id"`
-	FirstName string     `json:"first_name"`
-	LastName  string     `json:"last_name"`
-	Email     string     `json:"email"`
-	Phone     *string    `json:"phone"`
-	Address   string     `json:"address"`
-	Onboarded bool       `json:"onboarded"`
-	CreatedAt time.Time  `json:"created_at" gorm:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at" gorm:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty" gorm:"deleted_at"`
+	ID                   int64     `json:"id" gorm:"primaryKey"`
+	QualifyingMilesTotal float64   `json:"qualifying_miles_total"`
+	BonusMilesTotal      float64   `json:"bonus_miles_total"`
+	MemberTier           string    `json:"member_tier"`
+	Auth0UserID          string    `json:"auth0_user_id"`
+	Email                string    `json:"email"`
+	Phone                string    `json:"phone"`
+	FirstName            string    `json:"first_name"`
+	LastName             string    `json:"last_name"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+}
+
+// TableName specifies the table name for GORM
+func (Customer) TableName() string {
+	return "customers"
 }

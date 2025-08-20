@@ -19,7 +19,8 @@ type client struct {
 	getUserClient *httpclient.Client
 }
 
-func New(clientPool *httpclient.SharedCustomPool, cfg config.Auth0Config) (Client, error) {
+func New(cfg config.Auth0Config) (Client, error) {
+	clientPool := httpclient.NewSharedCustomPool()
 	getUserClient, err := getUserClientFunc(clientPool, cfg)
 	if err != nil {
 		return nil, err
