@@ -1,187 +1,63 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Calendar, FileText, MapPin, Plane, User } from "lucide-react";
-import { Badge } from "@/components/ui/badge.tsx";
-
-
-// Enhanced mock data with email addresses
-const mockRequests = [
-  {
-    // Basic ticket info
-    ticketId: "TK-2024-001",
-    requestDate: "2024-01-15",
-    status: "pending",
-    requestedBy: "Nguyễn Văn A",
-    email: "nguyen.a@email.com",
-    memberId: "LM123456789",
-
-    // Detailed request info
-    requestType: "Manual Miles Accrual",
-    details: "Yêu cầu tích dặm cho chuyến bay VN123 từ HAN đến SGN",
-    reasonFromMember: "Không nhận được dặm sau khi hoàn thành chuyến bay. Đã kiểm tra tài khoản nhiều lần nhưng dặm chưa được cộng.",
-    attachments: [
-      { name: "boarding_pass_VN123.pdf", type: "Boarding Pass" },
-      { name: "e_ticket_VN123.pdf", type: "E-ticket" }
-    ],
-
-    // Flight details
-    flightNumber: "VN123",
-    route: "HAN - SGN",
-    flightDate: "2024-01-10",
-    miles: 1250,
-
-    // Verification checklist
-    verificationChecklist: [
-      { item: "PNR hợp lệ", status: "checked" },
-      { item: "Vé đã sử dụng", status: "checked" },
-      { item: "Hội viên đủ điều kiện", status: "pending" },
-      { item: "Boarding pass hợp lệ", status: "checked" }
-    ],
-
-    // System info
-    auditLog: [
-      { date: "2024-01-15 09:30", action: "Ticket created", by: "System" },
-      { date: "2024-01-15 10:15", action: "Documents uploaded", by: "Nguyễn Văn A" }
-    ],
-    notes: "Khách hàng VIP, ưu tiên xử lý",
-    statusHistory: [
-      { status: "submitted", date: "2024-01-15 09:30", by: "Nguyễn Văn A" },
-      { status: "under_review", date: "2024-01-15 14:20", by: "Admin System" }
-    ]
-  },
-  {
-    // Basic ticket info
-    ticketId: "TK-2024-002",
-    requestDate: "2024-01-14",
-    status: "pending",
-    requestedBy: "Trần Thị B",
-    email: "tran.b@email.com",
-    memberId: "LM987654321",
-
-    // Detailed request info
-    requestType: "Reward Redemption",
-    details: "Yêu cầu đổi 25,000 dặm lấy vé khuyến mãi SGN-DAD",
-    reasonFromMember: "Muốn sử dụng dặm tích lũy để đổi vé máy bay cho kỳ nghỉ gia đình.",
-    attachments: [
-      { name: "redemption_request.pdf", type: "Redemption Form" }
-    ],
-
-    // Flight details
-    flightNumber: "VN456",
-    route: "SGN - DAD",
-    flightDate: "2024-02-15",
-    miles: 25000,
-
-    // Verification checklist
-    verificationChecklist: [
-      { item: "Tài khoản đủ dặm", status: "checked" },
-      { item: "Chuyến bay còn chỗ", status: "pending" },
-      { item: "Thông tin hành khách chính xác", status: "checked" },
-      { item: "Điều kiện đổi thưởng", status: "checked" }
-    ],
-
-    // System info
-    auditLog: [
-      { date: "2024-01-14 14:25", action: "Redemption request created", by: "System" },
-      { date: "2024-01-14 14:30", action: "Miles balance verified", by: "System" }
-    ],
-    notes: "Yêu cầu đổi thưởng trong thời gian cao điểm",
-    statusHistory: [
-      { status: "submitted", date: "2024-01-14 14:25", by: "Trần Thị B" }
-    ]
-  },
-  {
-    // Basic ticket info
-    ticketId: "TK-2024-003",
-    requestDate: "2024-01-13",
-    status: "approved",
-    requestedBy: "Lê Văn C",
-    email: "le.c@email.com",
-    memberId: "LM456789123",
-
-    // Detailed request info
-    requestType: "Manual Miles Accrual",
-    details: "Chuyển dặm từ hãng hàng không đối tác",
-    reasonFromMember: "Đã bay với hãng đối tác nhưng dặm chưa được chuyển tự động.",
-    attachments: [
-      { name: "partner_boarding_pass.pdf", type: "Partner Boarding Pass" },
-      { name: "partner_invoice.pdf", type: "Invoice" }
-    ],
-
-    // Flight details
-    flightNumber: "QF789",
-    route: "SYD - HAN",
-    flightDate: "2024-01-05",
-    miles: 1500,
-
-    // Decision info
-    decisionDate: "2024-01-13 16:45",
-    decisionBy: "Admin Nguyễn Thị D",
-    reasonForDecision: "Đã xác minh thông tin chuyến bay với hãng đối tác. Dặm hợp lệ.",
-
-    // System info
-    auditLog: [
-      { date: "2024-01-13 09:15", action: "Ticket created", by: "System" },
-      { date: "2024-01-13 10:30", action: "Partner verification completed", by: "System" },
-      { date: "2024-01-13 16:45", action: "Approved by admin", by: "Admin Nguyễn Thị D" }
-    ],
-    notes: "Hãng đối tác Qantas - đã xác minh",
-    statusHistory: [
-      { status: "submitted", date: "2024-01-13 09:15", by: "Lê Văn C" },
-      { status: "under_review", date: "2024-01-13 10:00", by: "System" },
-      { status: "approved", date: "2024-01-13 16:45", by: "Admin Nguyễn Thị D" }
-    ]
-  },
-  {
-    // Basic ticket info
-    ticketId: "TK-2024-004",
-    requestDate: "2024-01-12",
-    status: "rejected",
-    requestedBy: "Phạm Thị D",
-    email: "pham.d@email.com",
-    memberId: "LM555666777",
-
-    // Detailed request info
-    requestType: "Manual Miles Accrual",
-    details: "Yêu cầu tích dặm cho chuyến bay đã hủy",
-    reasonFromMember: "Chuyến bay bị hủy nhưng tôi muốn được tích dặm.",
-    attachments: [
-      { name: "cancelled_ticket.pdf", type: "E-ticket" }
-    ],
-
-    // Flight details
-    flightNumber: "VN999",
-    route: "HAN - HCM",
-    flightDate: "2024-01-08",
-    miles: 1000,
-
-    // Decision info
-    decisionDate: "2024-01-12 10:30",
-    decisionBy: "Admin Nguyễn Thị D",
-    reasonForDecision: "Chuyến bay đã hủy, không đủ điều kiện tích dặm.",
-
-    // Verification checklist
-    verificationChecklist: [
-      { item: "PNR hợp lệ", status: "checked" },
-      { item: "Vé đã sử dụng", status: "failed" },
-      { item: "Hội viên đủ điều kiện", status: "failed" }
-    ],
-
-    // System info
-    auditLog: [
-      { date: "2024-01-12 09:15", action: "Ticket created", by: "System" },
-      { date: "2024-01-12 10:30", action: "Rejected by admin", by: "Admin Nguyễn Thị D" }
-    ],
-    notes: "Chuyến bay hủy bỏ",
-    statusHistory: [
-      { status: "submitted", date: "2024-01-12 09:15", by: "Phạm Thị D" },
-      { status: "rejected", date: "2024-01-12 10:30", by: "Admin Nguyễn Thị D" }
-    ]
-  }
-];
+import { useState, useCallback } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FileText, Search, Loader2, Filter } from "lucide-react";
+import { MileageLedgerItem } from "@/components/mileage-ledger-item";
+import { useMileageLedgersInfinite, useIntersectionObserver, useDebounce } from "@/lib/hooks";
+import type { MileageLedgerQueryParams } from "@/types/mileage-ledger";
 
 export default function TransactionsPage() {
+  // Filter states
+  const [customerIdFilter, setCustomerIdFilter] = useState("");
+  const [accrualRequestIdFilter, setAccrualRequestIdFilter] = useState("");
+
+  // Debounce filters to avoid excessive API calls
+  const debouncedCustomerId = useDebounce(customerIdFilter, 700);
+  const debouncedAccrualRequestId = useDebounce(accrualRequestIdFilter, 700);
+
+  // Build query params for API (without page parameter for infinite query)
+  const baseQueryParams: Omit<MileageLedgerQueryParams, 'page'> = {
+    customer_id: debouncedCustomerId || undefined,
+    accrual_request_id: debouncedAccrualRequestId || undefined,
+  };
+
+  // Use React Query for infinite API calls and state management
+  const {
+    data,
+    isLoading: loading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch
+  } = useMileageLedgersInfinite(baseQueryParams);
+
+  // Flatten all pages data into a single array
+  const ledgers = data?.pages.flatMap(page => page.data) || [];
+  const total = data?.pages[0]?.total || 0;
+
+  // Intersection observer for infinite scroll
+  const loadMoreRef = useIntersectionObserver(
+    useCallback(() => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]),
+    {
+      threshold: 0.1,
+      rootMargin: '100px', // Start loading 100px before reaching the bottom
+    }
+  );
+
+  const clearFilters = () => {
+    setCustomerIdFilter("");
+    setAccrualRequestIdFilter("");
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -192,61 +68,143 @@ export default function TransactionsPage() {
             Lịch sử và ghi nhận các giao dịch cộng dặm đã được xử lý
           </CardDescription>
         </CardHeader>
+      </Card>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="w-5 h-5" />
+            <span>Bộ lọc</span>
+          </CardTitle>
+        </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {mockRequests.filter(r => r.status === "approved").map((request) => (
-              <Card key={request.ticketId} className="border-l-4 border-l-green-500">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <div>
-                          <span className="font-medium">{request.requestedBy}</span>
-                          <p className="text-xs text-gray-500">{request.email}</p>
-                        </div>
-                      </div>
-                      <Badge variant="outline">{request.ticketId}</Badge>
-                    </div>
-                    <div className="text-right">
-                      <Badge className="bg-green-100 text-green-800 border-green-300">Đã ghi nhận</Badge>
-                      {request.decisionDate && (
-                        <p className="text-sm text-gray-600 mt-1">Ngày duyệt: {request.decisionDate}</p>
-                      )}
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm">ID Khách hàng</label>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+                <Input
+                  placeholder="Nhập ID khách hàng..."
+                  value={customerIdFilter}
+                  onChange={(e) => setCustomerIdFilter(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {customerIdFilter !== debouncedCustomerId && (
+                <p className="text-xs text-gray-500">Đang tìm kiếm...</p>
+              )}
+            </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Plane className="w-4 h-4 text-gray-500" />
-                      <span>{request.flightNumber}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-gray-500" />
-                      <span>{request.route}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <span>{request.flightDate}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-green-600">+{request.miles.toLocaleString()} dặm</span>
-                    </div>
-                  </div>
+            <div className="space-y-2">
+              <label className="text-sm">ID Yêu cầu tích dặm</label>
+              <Input
+                placeholder="Nhập ID yêu cầu..."
+                value={accrualRequestIdFilter}
+                onChange={(e) => setAccrualRequestIdFilter(e.target.value)}
+              />
+              {accrualRequestIdFilter !== debouncedAccrualRequestId && (
+                <p className="text-xs text-gray-500">Đang tìm kiếm...</p>
+              )}
+            </div>
 
-                  {request.decisionBy && request.reasonForDecision && (
-                    <div className="bg-green-50 p-3 rounded text-sm">
-                      <p className="font-medium text-green-800 mb-1">Quyết định phê duyệt:</p>
-                      <p className="text-green-700">{request.reasonForDecision}</p>
-                      <p className="text-green-600 text-xs mt-2">Được duyệt bởi: {request.decisionBy}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+            <div className="space-y-2">
+              <label className="text-sm invisible">Action</label>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={clearFilters}
+              >
+                Xóa bộ lọc
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Results Summary */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-600">
+          Hiển thị {ledgers.length} trong tổng số {total} giao dịch
+        </p>
+        {loading && (
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Đang tải...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Error Display */}
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <p className="text-red-700 text-sm">
+                Lỗi: {error instanceof Error ? error.message : 'An error occurred'}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => refetch()}
+                className="text-red-700 border-red-300 hover:bg-red-50"
+              >
+                Thử lại
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Ledgers List */}
+      <div className="space-y-4">
+        {ledgers.map((ledger) => (
+          <MileageLedgerItem key={ledger.id.toString()} ledger={ledger} />
+        ))}
+
+        {/* Loading indicator for initial load */}
+        {loading && (
+          <div className="flex justify-center py-4">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
+              <span className="text-sm text-gray-500">Đang tải...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator for next page */}
+        {isFetchingNextPage && (
+          <div className="flex justify-center py-4">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
+              <span className="text-sm text-gray-500">Đang tải thêm...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Intersection observer target for infinite scroll */}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="h-4" />
+        )}
+
+        {/* Empty state */}
+        {!loading && ledgers.length === 0 && !error && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <p className="text-gray-500">Không tìm thấy giao dịch nào</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* End of results indicator */}
+        {!hasNextPage && ledgers.length > 0 && (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Đã hiển thị tất cả kết quả</p>
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }
