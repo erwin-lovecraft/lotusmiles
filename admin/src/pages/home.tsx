@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AccrualRequestTicket } from "@/components/accrual-request-ticket";
-import { useAccrualRequests } from "@/lib/hooks";
+import { useAccrualRequests, useDebounce } from "@/lib/hooks";
 import type { AccrualRequestQueryParams } from "@/types/accrual-request";
 
 export default function HomePage() {
@@ -18,9 +18,12 @@ export default function HomePage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
 
+  // Debounce search query to avoid excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 700);
+
   // Build query params for API
   const queryParams: AccrualRequestQueryParams = {
-    keyword: searchQuery || undefined,
+    keyword: debouncedSearchQuery || undefined,
     status: statusFilter !== "all" ? statusFilter : undefined,
     submitted_date: dateFilter || undefined,
     page: 1,
@@ -67,6 +70,9 @@ export default function HomePage() {
                   className="pl-10"
                 />
               </div>
+              {searchQuery !== debouncedSearchQuery && (
+                <p className="text-xs text-gray-500">Đang tìm kiếm...</p>
+              )}
             </div>
 
             <div className="space-y-2">
