@@ -16,16 +16,16 @@ function Layout() {
   const location = useLocation();
 
   const onChangePage = (page: string) => {
-    navigate("/" +page);
+    navigate("/" + page);
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AppBar />
       <Navbar activePage={location.pathname} onPageChange={onChangePage}>
-        <NavbarItem id="home" index title="Quản lý yêu cầu tích dặm" icon={<Settings className="w-4 h-4"/>}/>
-        <NavbarItem id="transactions"  title="Giao dịch cộng dặm" icon={<FileText className="w-4 h-4"/>}/>
-        <NavbarItem id="analytics"  title="Báo cáo" icon={<BarChart2 className="w-4 h-4"/>}/>
+        <NavbarItem id="home" index title="Quản lý yêu cầu tích dặm" icon={<Settings className="w-4 h-4" />} />
+        <NavbarItem id="transactions" title="Giao dịch cộng dặm" icon={<FileText className="w-4 h-4" />} />
+        <NavbarItem id="analytics" title="Báo cáo" icon={<BarChart2 className="w-4 h-4" />} />
       </Navbar>
 
       <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
@@ -41,13 +41,13 @@ function App() {
   return (
     <Routes>
       <Route index element={<LandingPage />} />
-      <Route path="/callback" element={<CallbackPage/>}/>
-      <Route path="/auth-error" element={<AuthErrorPage/>}/>
+      <Route path="/callback" element={<CallbackPage />} />
+      <Route path="/auth-error" element={<AuthErrorPage />} />
 
-      <Route element={<ProtectedRoute children={<Layout />}/> }>
+      <Route element={<ProtectedRoute children={<Layout />} />}>
         <Route path="/home" element={<HomePage />} />
-        <Route path="/transactions" element={<TransactionsPage/>} />
-        <Route path="/analytics" element={<AnalyticsPage/>} />
+        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </Route>
     </Routes>
   );
