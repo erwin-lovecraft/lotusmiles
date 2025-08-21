@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,7 +12,9 @@ import {
   Paperclip,
   Plane,
   Shield,
-  User
+  User,
+  Image as ImageIcon,
+  ExternalLink
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -20,6 +22,119 @@ import { type AccrualRequest } from "@/types/accrual-request";
 
 interface AccrualRequestTicketProps {
   request: AccrualRequest;
+}
+
+interface ImageDisplayProps {
+  src: string;
+  alt: string;
+  title: string;
+}
+
+function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [isInView, setIsInView] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '50px', // Start loading 50px before the image comes into view
+        threshold: 0.1
+      }
+    );
+
+    if (imageRef.current) {
+      observer.observe(imageRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
+
+  const openImageInNewTab = () => {
+    window.open(src, '_blank');
+  };
+
+  if (imageError) {
+    return (
+      <div className="flex items-center space-x-2 text-sm bg-gray-50 p-2 rounded border border-gray-200">
+        <ImageIcon className="w-4 h-4 text-gray-400" />
+        <span>{title}</span>
+        <Badge variant="outline" className="text-xs text-red-600 border-red-300">Lỗi tải ảnh</Badge>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 w-6 p-0 ml-auto"
+          onClick={openImageInNewTab}
+        >
+          <ExternalLink className="w-3 h-3" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2 text-sm">
+          <ImageIcon className="w-4 h-4 text-gray-400" />
+          <span>{title}</span>
+          <Badge variant="outline" className="text-xs">Image</Badge>
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 w-6 p-0"
+          onClick={openImageInNewTab}
+          title="Mở ảnh trong tab mới"
+        >
+          <ExternalLink className="w-3 h-3" />
+        </Button>
+      </div>
+
+      <div
+        ref={imageRef}
+        className="relative bg-gray-50 rounded-lg overflow-hidden border border-gray-200"
+      >
+        {imageLoading && (
+          <div className="flex items-center justify-center h-32 bg-gray-100">
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              <span>Đang tải ảnh...</span>
+            </div>
+          </div>
+        )}
+
+        {isInView && (
+          <img
+            src={src}
+            alt={alt}
+            className={`w-full h-auto max-h-64 object-contain ${imageLoading ? 'hidden' : 'block'}`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            style={{ display: imageLoading ? 'none' : 'block' }}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
 
 export const getStatusBadge = (status: string) => {
@@ -192,19 +307,24 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                     <Paperclip className="w-4 h-4 mr-2" />
                     Hình ảnh đính kèm
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     {request.ticket_image_url && (
-                      <div className="flex items-center space-x-2 text-sm bg-gray-50 p-2 rounded">
-                        <FileText className="w-4 h-4 text-gray-400" />
-                        <span>Vé máy bay</span>
-                        <Badge variant="outline" className="text-xs">Image</Badge>
-                      </div>
+                      <ImageDisplay
+                        src={request.ticket_image_url}
+                        alt="Vé máy bay"
+                        title="Vé máy bay"
+                      />
                     )}
                     {request.boarding_pass_image_url && (
-                      <div className="flex items-center space-x-2 text-sm bg-gray-50 p-2 rounded">
-                        <FileText className="w-4 h-4 text-gray-400" />
-                        <span>Boarding pass</span>
-                        <Badge variant="outline" className="text-xs">Image</Badge>
+                      <ImageDisplay
+                        src={request.boarding_pass_image_url}
+                        alt="Boarding pass"
+                        title="Boarding pass"
+                      />
+                    )}
+                    {!request.ticket_image_url && !request.boarding_pass_image_url && (
+                      <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded border border-gray-200">
+                        Không có hình ảnh đính kèm
                       </div>
                     )}
                   </div>
@@ -220,10 +340,6 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                       Thông tin đánh giá
                     </h4>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Người đánh giá:</span>
-                        <span className="font-medium">{request.reviewer_id}</span>
-                      </div>
                       {request.reviewed_at && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Ngày đánh giá:</span>
@@ -288,10 +404,6 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                     {request.rejected_reason}
                   </p>
                 )}
-                <p className={`text-xs mt-2 ${request.status === "approved" ? "text-green-600" : "text-red-600"
-                  }`}>
-                  Được {request.status === "approved" ? "duyệt" : "từ chối"} bởi: {request.reviewer_id}
-                </p>
                 {request.reviewed_at && (
                   <p className={`text-xs ${request.status === "approved" ? "text-green-600" : "text-red-600"
                     }`}>

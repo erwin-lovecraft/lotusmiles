@@ -78,12 +78,11 @@ export default function HomePage() {
             <div className="space-y-2">
               <label className="text-sm">Trạng thái</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Chọn trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="pending">Đang chờ</SelectItem>
                   <SelectItem value="inprogress">Đang xử lý</SelectItem>
                   <SelectItem value="approved">Đã duyệt</SelectItem>
                   <SelectItem value="rejected">Từ chối</SelectItem>
