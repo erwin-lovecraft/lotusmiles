@@ -27,6 +27,7 @@ type AccrualRequest struct {
 	RejectedReason        *string    `json:"rejected_reason"`
 	CreatedAt             time.Time  `json:"created_at"`
 	UpdatedAt             time.Time  `json:"updated_at"`
+	Customer              *Customer  `json:"customer,omitempty"`
 }
 
 // TableName specifies the table name for GORM
