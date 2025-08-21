@@ -1,0 +1,27 @@
+{
+  "name": "Lotusmiles Member",
+  "short_name": "Lotusmiles",
+  "description": "Manage your Lotusmiles membership, track mileage accrual requests, and earn reward miles with Apollo Airlines.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/lotusmiles.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lotusmiles.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "business", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+}

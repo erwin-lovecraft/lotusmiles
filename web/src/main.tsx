@@ -19,13 +19,10 @@ createRoot(document.getElementById('root')!).render(
           redirect_uri: window.location.origin + '/callback',
           audience: config.auth0.audience,
         }}
-        useRefreshTokens={true}
-        useRefreshTokensFallback={true}
-        cacheLocation="localstorage"
       >
         <ThemeProvider defaultTheme="light" storageKey="lotusmiles-app-theme">
           <BrowserRouter>
-            <App/>
+            <App />
           </BrowserRouter>
         </ThemeProvider>
       </Auth0Provider>

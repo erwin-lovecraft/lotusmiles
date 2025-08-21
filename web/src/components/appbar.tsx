@@ -57,7 +57,7 @@ export default function AppBar() {
                         alt={user?.name}
                       />
                       <AvatarFallback
-                        className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm grayscale">
+                        className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm">
                         {user?.name?.split(" ").filter(Boolean).map(w => w[0].toUpperCase()).join("") || "ME"}
                       </AvatarFallback>
                     </Avatar>
