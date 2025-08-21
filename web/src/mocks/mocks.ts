@@ -177,44 +177,49 @@ export const MILEAGE_ACCRUAL_REQUESTS: MileageAccrualRequest[] = [
 
 export const MILEAGE_TRANSACTIONS: MileageTransaction[] = [
   {
-    id: 8792349823749234n,
-    member_id: 9238475629384756n,
-    qualifying_miles_delta: 5230,
-    bonus_miles_delta: -1046, // ~20% promo bonus
-    accrual_request_id: 7238492374982374n,
-    created_at: new Date("2025-08-01T10:23:00Z"),
+    id: 245242388946092552n,
+    customer_id: 245241128171864584n,
+    qualifying_miles_delta: 1442,
+    bonus_miles_delta: 1802,
+    accrual_request_id: 245241133272138248n,
+    created_at: "2025-08-20T03:24:14.776354+07:00",
+    updated_at: "2025-08-20T03:24:14.774231+07:00",
   },
   {
-    id: 8792349823749235n,
-    member_id: 9238475629384756n,
+    id: 245242388946092553n,
+    customer_id: 245241128171864584n,
     qualifying_miles_delta: -812,
-    bonus_miles_delta: 0, // short haul, no bonus
-    accrual_request_id: 7238492374982375n,
-    created_at: new Date("2025-08-03T15:45:00Z"),
+    bonus_miles_delta: 0,
+    accrual_request_id: 245241133272138249n,
+    created_at: "2025-08-18T15:45:00.000000+07:00",
+    updated_at: "2025-08-18T15:45:00.000000+07:00",
   },
   {
-    id: 8792349823749236n,
-    member_id: 8123498756234875n,
-    qualifying_miles_delta: 9680, // long haul
-    bonus_miles_delta: 2904, // ~30% promo
-    accrual_request_id: 7238492374982376n,
-    created_at: new Date("2025-08-07T08:10:00Z"),
+    id: 245242388946092554n,
+    customer_id: 245241128171864584n,
+    qualifying_miles_delta: 9680,
+    bonus_miles_delta: 2904,
+    accrual_request_id: 245241133272138250n,
+    created_at: "2025-08-15T08:10:00.000000+07:00",
+    updated_at: "2025-08-15T08:10:00.000000+07:00",
   },
   {
-    id: 8792349823749237n,
-    member_id: 8123498756234875n,
+    id: 245242388946092555n,
+    customer_id: 245241128171864584n,
     qualifying_miles_delta: -1520,
-    bonus_miles_delta: 152, // ~10% elite bonus
-    accrual_request_id: 7238492374982377n,
-    created_at: new Date("2025-08-12T12:00:00Z"),
+    bonus_miles_delta: 152,
+    accrual_request_id: 245241133272138251n,
+    created_at: "2025-08-12T12:00:00.000000+07:00",
+    updated_at: "2025-08-12T12:00:00.000000+07:00",
   },
   {
-    id: 8792349823749238n,
-    member_id: 7001234987562398n,
+    id: 245242388946092556n,
+    customer_id: 245241128171864584n,
     qualifying_miles_delta: 3420,
     bonus_miles_delta: 0,
-    accrual_request_id: 7238492374982378n,
-    created_at: new Date("2025-08-15T18:30:00Z"),
+    accrual_request_id: 245241133272138252n,
+    created_at: "2025-08-10T18:30:00.000000+07:00",
+    updated_at: "2025-08-10T18:30:00.000000+07:00",
   },
 ];
 

@@ -1,106 +1,121 @@
 import type { MileageTransaction } from "@/types/mileage-ledgers.ts";
-import { Clock, CreditCard, Eye, Gift, Hash, Hotel, Plane } from "lucide-react";
+import { CreditCard, Eye, Gift, Hash, Hotel, Plane, TrendingUp, TrendingDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { Badge } from "@/components/ui/badge.tsx";
 import { format } from "date-fns";
 
 export type TransactionPreviewProps = {
   id: string;
-  data: MileageTransaction
+  data: MileageTransaction;
 }
 
 const getTypeColor = (type: string) => {
   switch (type) {
     case 'flight':
-      return 'from-blue-500 to-purple-600';
+      return 'from-blue-500 to-blue-600';
     case 'hotel':
-      return 'from-green-500 to-blue-500';
-    case 'credit':
-      return 'from-orange-500 to-red-500';
-    case 'redeem':
-      return 'from-pink-500 to-purple-500';
+      return 'from-green-500 to-green-600';
+    case 'credit_card':
+      return 'from-purple-500 to-purple-600';
+    case 'gift':
+      return 'from-pink-500 to-pink-600';
     default:
       return 'from-gray-500 to-gray-600';
   }
-}
-
-// const getStatusBadge = (status: string) => {
-//   return status === 'completed'
-//     ? <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100">Hoàn thành</Badge>
-//     : <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">Đang xử lý</Badge>;
-// };
+};
 
 const getTypeIcon = (type: string) => {
   switch (type) {
     case 'flight':
-      return <Plane className="w-5 h-5"/>;
+      return <Plane className="w-6 h-6" />;
     case 'hotel':
-      return <Hotel className="w-5 h-5"/>;
-    case 'credit':
-      return <CreditCard className="w-5 h-5"/>;
-    case 'redeem':
-      return <Gift className="w-5 h-5"/>;
+      return <Hotel className="w-6 h-6" />;
+    case 'credit_card':
+      return <CreditCard className="w-6 h-6" />;
+    case 'gift':
+      return <Gift className="w-6 h-6" />;
     default:
-      return <Gift className="w-5 h-5"/>;
+      return <Hash className="w-6 h-6" />;
+  }
+};
+
+const getTransactionType = (data: MileageTransaction) => {
+  // Determine transaction type based on the data
+  if (data.qualifying_miles_delta > 0 && data.bonus_miles_delta > 0) {
+    return 'flight';
+  } else if (data.qualifying_miles_delta < 0) {
+    return 'credit_card';
+  } else {
+    return 'gift';
   }
 };
 
 export default function TransactionPreview(props: TransactionPreviewProps) {
   const { data } = props;
+  const transactionType = getTransactionType(data);
+  const isPositive = data.qualifying_miles_delta > 0 || data.bonus_miles_delta > 0;
 
   return (
-    <div
-      key={props.id}
-      className="relative overflow-hidden rounded-2xl bg-white border-2 border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-lg group"
-    >
-      {/* Gradient Border */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-r ${getTypeColor('flight')} opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
-        style={{background: 'linear-gradient(90deg, transparent 0%, transparent 20%, rgba(147, 51, 234, 0.1) 50%, transparent 80%, transparent 100%)'}}/>
+    <div className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out overflow-hidden">
+      {/* Status indicator bar */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${isPositive ? 'bg-green-500' : 'bg-red-500'}`} />
 
-      {/* Ticket perforated edges */}
-      <div
-        className="absolute left-0 top-1/2 w-6 h-6 bg-gray-50 rounded-full transform -translate-y-1/2 -translate-x-3 border-2 border-gray-100"/>
-      <div
-        className="absolute right-0 top-1/2 w-6 h-6 bg-gray-50 rounded-full transform -translate-y-1/2 translate-x-3 border-2 border-gray-100"/>
-
-      {/* Main content */}
-      <div className="relative p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-4 flex-1 min-w-0">
-            {/* Icon with gradient background */}
-            <div
-              className={`w-12 h-12 bg-gradient-to-br ${getTypeColor('flight')} rounded-xl flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
-              {getTypeIcon('flight')}
+      <div className="p-4 sm:p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                Transaction #{data.id}
+              </h3>
+              <Badge variant="outline" className={`${isPositive ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                {isPositive ? 'Credit' : 'Debit'}
+              </Badge>
             </div>
 
-            {/* Transaction details */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center space-x-2 mb-1">
-                <h4 className="font-semibold text-gray-900 truncate">Mileage Accural Request Manual</h4>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-1">
-                  <Hash className="w-3 h-3"/>
-                  <span>{data.id}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-3 h-3"/>
-                  <span>{format(data.created_at, 'dd/MM/yyyy')}</span>
-                </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-1">
+                {isPositive ? <TrendingUp className="w-4 h-4 text-green-600" /> : <TrendingDown className="w-4 h-4 text-red-600" />}
+                <span>Mileage {isPositive ? 'Accrual' : 'Redemption'}</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Miles and action */}
-          <div className="flex items-center space-x-4 ml-4">
-            <div className="text-right">
-              <div
-                className={`font-bold text-lg ${data.qualifying_miles_delta.toString().startsWith('-') ? 'text-red-500' : 'text-emerald-600'}`}>
-                {data.qualifying_miles_delta}
+        {/* Content */}
+        <div className="space-y-4">
+          {/* Key metrics */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                Qualifying Miles
+              </p>
+              <p className={`text-lg sm:text-xl font-bold ${data.qualifying_miles_delta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {data.qualifying_miles_delta >= 0 ? '+' : ''}{data.qualifying_miles_delta.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                Bonus Miles
+              </p>
+              <p className={`text-lg sm:text-xl font-bold ${data.bonus_miles_delta >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                {data.bonus_miles_delta >= 0 ? '+' : ''}{data.bonus_miles_delta.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {/* Additional info */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">📅</span>
+                <span className="truncate">{format(new Date(data.created_at), "MMM dd, yyyy")}</span>
               </div>
-              <div className="text-xs text-muted-foreground">miles</div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">🆔</span>
+                <span className="truncate">Request #{data.accrual_request_id}</span>
+              </div>
             </div>
 
             <Dialog>
@@ -108,124 +123,83 @@ export default function TransactionPreview(props: TransactionPreviewProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1"
+                  className="group-hover:bg-purple-50 group-hover:border-purple-200 group-hover:text-purple-700 transition-colors w-full sm:w-auto"
                 >
-                  <Eye className="w-4 h-4"/>
-                  <span className="hidden sm:inline">Chi tiết</span>
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Details
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center space-x-2">
-                    <div
-                      className={`w-8 h-8 bg-gradient-to-br ${getTypeColor('flight')} rounded-lg flex items-center justify-center text-white`}>
-                      {getTypeIcon('flight')}
+                  <DialogTitle className="flex items-center gap-2">
+                    <div className={`p-2 rounded-lg ${getTypeColor(transactionType).replace('from-', 'bg-').replace(' to-', '')}`}>
+                      {getTypeIcon(transactionType)}
                     </div>
-                    <span>Detail</span>
+                    <span>Transaction Detail</span>
                   </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-6">
+                  {/* Basic Information */}
+                  <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <span className="text-muted-foreground">ID</span>
-                        <p className="font-medium">{data.id}</p>
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Transaction ID</p>
+                        <p className="text-lg font-semibold text-gray-900 break-all">{data.id}</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Change Date</span>
-                        <p className="font-medium">{format(data.created_at, 'dd/MM/yyyy')}</p>
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Customer ID</p>
+                        <p className="text-lg font-semibold text-gray-900 break-all">{data.customer_id}</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Qualifying Miles</span>
-                        <p
-                          className={`font-semibold ${data.qualifying_miles_delta.toString().startsWith('-') ? 'text-red-500' : 'text-emerald-600'}`}>
-                          {data.qualifying_miles_delta} miles
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Accrual Request ID</p>
+                        <p className="text-lg font-semibold text-gray-900 break-all">{data.accrual_request_id}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Transaction Date</p>
+                        <p className="text-lg font-semibold text-gray-900">{format(new Date(data.created_at), "MMM dd, yyyy 'at' HH:mm")}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Miles Information */}
+                  <div className="bg-purple-50 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Miles Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Qualifying Miles</p>
+                        <p className={`text-2xl font-bold ${data.qualifying_miles_delta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {data.qualifying_miles_delta >= 0 ? '+' : ''}{data.qualifying_miles_delta.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Bonus Miles</p>
+                        <p className={`text-2xl font-bold ${data.bonus_miles_delta >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                          {data.bonus_miles_delta >= 0 ? '+' : ''}{data.bonus_miles_delta.toLocaleString()}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  {/*{data.details && (*/}
-                  {/*  <div className="space-y-3">*/}
-                  {/*    <h4 className="font-medium">Thông tin chi tiết</h4>*/}
-                  {/*    <div className="space-y-2 text-sm">*/}
-                  {/*      {transaction.details.flightNumber && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Số hiệu chuyến bay:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.flightNumber}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.route && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Tuyến đường:</span>*/}
-                  {/*          <span className="font-medium text-right">{transaction.details.route}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.hotelName && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Khách sạn:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.hotelName}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.nights && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Số đêm:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.nights} đêm</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.location && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Địa điểm:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.location}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.cardType && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Loại thẻ:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.cardType}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.merchantName && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Merchant:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.merchantName}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.rewardType && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Loại thưởng:</span>*/}
-                  {/*          <span className="font-medium">{transaction.details.rewardType}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.validUntil && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Có hiệu lực đến:</span>*/}
-                  {/*          <span*/}
-                  {/*            className="font-medium text-amber-600">{transaction.details.validUntil}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*      {transaction.details.bookingRef && (*/}
-                  {/*        <div className="flex justify-between">*/}
-                  {/*          <span className="text-muted-foreground">Mã đặt chỗ:</span>*/}
-                  {/*          <span*/}
-                  {/*            className="font-mono text-sm font-medium bg-gray-100 px-2 py-1 rounded">{transaction.details.bookingRef}</span>*/}
-                  {/*        </div>*/}
-                  {/*      )}*/}
-                  {/*    </div>*/}
-                  {/*  </div>*/}
-                  {/*)}*/}
+                  {/* Transaction Summary */}
+                  <div className="bg-blue-50 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Summary</h3>
+                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-500">Total Miles Change</span>
+                        <span className={`text-lg font-bold ${(data.qualifying_miles_delta + data.bonus_miles_delta) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {(data.qualifying_miles_delta + data.bonus_miles_delta) >= 0 ? '+' : ''}{(data.qualifying_miles_delta + data.bonus_miles_delta).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
         </div>
       </div>
-
-      {/* Decorative dashed line */}
-      <div
-        className="absolute top-1/2 left-8 right-8 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent transform -translate-y-1/2 opacity-20"
-        style={{backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 5px, #9ca3af 5px, #9ca3af 10px)'}}/>
     </div>
-  )
+  );
 }
