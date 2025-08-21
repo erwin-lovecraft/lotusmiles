@@ -1,6 +1,8 @@
+import Big from 'big.js';
+
 export interface AccrualRequest {
-  id: number;
-  customer_id: number;
+  id: Big;
+  customer_id: Big;
   status: 'pending' | 'inprogress' | 'approved' | 'rejected';
   ticket_id: string;
   pnr: string;
@@ -16,7 +18,7 @@ export interface AccrualRequest {
   qualifying_miles: number;
   bonus_accrual_rate: number;
   bonus_miles: number;
-  reviewer_id: number | null;
+  reviewer_id: string | null;
   reviewed_at: string | null;
   rejected_reason: string | null;
   created_at: string;

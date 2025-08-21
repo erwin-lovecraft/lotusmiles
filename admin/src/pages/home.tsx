@@ -38,7 +38,8 @@ export default function HomePage() {
     refetch
   } = useAccrualRequests(queryParams);
 
-  const requests = response?.data || [];
+  // Ensure requests is always an array
+  const requests = Array.isArray(response?.data) ? response.data : [];
   const total = response?.total || 0;
 
   const clearFilters = () => {
@@ -150,7 +151,7 @@ export default function HomePage() {
       {/* Requests List */}
       <div className="space-y-4">
         {requests.map((request) => (
-          <AccrualRequestTicket key={request.id} request={request} />
+          <AccrualRequestTicket key={request.id.toString()} request={request} />
         ))}
 
         {/* Loading indicator */}
