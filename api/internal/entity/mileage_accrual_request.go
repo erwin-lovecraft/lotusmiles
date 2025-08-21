@@ -5,8 +5,8 @@ import (
 )
 
 type AccrualRequest struct {
-	ID                    int64      `json:"id" gorm:"primaryKey"`
-	CustomerID            int64      `json:"customer_id"`
+	ID                    int64      `json:"id,string" gorm:"primaryKey"`
+	CustomerID            int64      `json:"customer_id,string"`
 	Status                string     `json:"status"`
 	TicketID              string     `json:"ticket_id"`
 	PNR                   string     `json:"pnr"`
