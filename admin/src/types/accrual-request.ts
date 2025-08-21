@@ -1,5 +1,19 @@
 import Big from 'big.js';
 
+export interface Customer {
+  id: Big;
+  qualifying_miles_total: number;
+  bonus_miles_total: number;
+  member_tier: string;
+  auth0_user_id: string;
+  email: string;
+  phone: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AccrualRequest {
   id: Big;
   customer_id: Big;
@@ -23,6 +37,7 @@ export interface AccrualRequest {
   rejected_reason: string | null;
   created_at: string;
   updated_at: string;
+  customer: Customer;
 }
 
 export interface AccrualRequestResponse {
@@ -34,6 +49,8 @@ export interface AccrualRequestQueryParams {
   keyword?: string;
   status?: string;
   submitted_date?: string;
+  customer_email?: string;
+  member_tier?: string;
   page?: number;
   size?: number;
 }

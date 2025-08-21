@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { type AccrualRequest } from "@/types/accrual-request";
 import { RejectDialog } from "./reject-dialog";
 import { useApproveAccrualRequest, useRejectAccrualRequest } from "@/lib/hooks";
+import { getStatusBadge } from "@/lib/utils/status-badge";
 import Big from 'big.js';
 
 interface AccrualRequestTicketProps {
@@ -138,24 +139,11 @@ function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
   );
 }
 
-export const getStatusBadge = (status: string) => {
-  switch (status) {
-    case "pending":
-      return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">Đang chờ</Badge>;
-    case "inprogress":
-      return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">Đang xử lý</Badge>;
-    case "approved":
-      return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Đã duyệt</Badge>;
-    case "rejected":
-      return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Từ chối</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
-  }
-};
-
 export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [copiedRequestId, setCopiedRequestId] = useState(false);
+  const [copiedTicketId, setCopiedTicketId] = useState(false);
 
   const approveMutation = useApproveAccrualRequest();
   const rejectMutation = useRejectAccrualRequest();
@@ -181,7 +169,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
   const handleApprove = async () => {
     try {
       await approveMutation.mutateAsync(request.id);
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation
     }
   };
@@ -189,8 +177,28 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
   const handleReject = async (rejectReason: string) => {
     try {
       await rejectMutation.mutateAsync({ id: request.id, rejectReason });
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation
+    }
+  };
+
+  const handleCopyRequestId = async () => {
+    try {
+      await navigator.clipboard.writeText(formatBigId(request.id));
+      setCopiedRequestId(true);
+      setTimeout(() => setCopiedRequestId(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy Request ID:', error);
+    }
+  };
+
+  const handleCopyTicketId = async () => {
+    try {
+      await navigator.clipboard.writeText(request.ticket_id);
+      setCopiedTicketId(true);
+      setTimeout(() => setCopiedTicketId(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy Ticket ID:', error);
     }
   };
 
@@ -206,11 +214,41 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
               <div className="flex items-center space-x-2">
                 <User className="w-4 h-4 text-gray-500" />
                 <div>
-                  <span className="font-medium">Request ID: {formatBigId(request.id)}</span>
-                  <p className="text-xs text-gray-500">Customer ID: {formatBigId(request.customer_id)}</p>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Request ID:</span>
+                    <button
+                      onClick={handleCopyRequestId}
+                      className={`font-mono text-sm px-2 py-1 rounded border transition-all duration-200 ${copiedRequestId
+                        ? 'bg-green-50 text-green-700 border-green-300 scale-105'
+                        : 'text-gray-600 hover:text-gray-800 bg-gray-50 border-gray-200 hover:bg-gray-100'
+                        }`}
+                      title={copiedRequestId ? "Copied!" : "Click to copy Request ID"}
+                    >
+                      {copiedRequestId ? "✓ Copied!" : formatBigId(request.id)}
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
+                    <div className="flex items-center space-x-2">
+                      <span>Ticket ID:</span>
+                      <button
+                        onClick={handleCopyTicketId}
+                        className={`font-mono px-2 py-1 rounded border transition-all duration-200 ${copiedTicketId
+                          ? 'bg-green-50 text-green-700 border-green-300 scale-105'
+                          : 'text-gray-600 hover:text-gray-800 bg-gray-50 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        title={copiedTicketId ? "Copied!" : "Click to copy Ticket ID"}
+                      >
+                        {copiedTicketId ? "✓ Copied!" : request.ticket_id}
+                      </button>
+                    </div>
+                    {request.customer && (
+                      <span className="text-blue-600 font-medium">
+                        {request.customer.first_name} {request.customer.last_name}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-              <Badge variant="outline">{request.ticket_id}</Badge>
             </div>
             <div className="flex items-center space-x-3">
               {getStatusBadge(request.status)}
@@ -236,7 +274,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
           </div>
 
           {/* Basic flight info */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <Plane className="w-4 h-4 text-gray-500" />
               <span>{request.carrier}</span>
@@ -250,7 +288,14 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
               <span>{formatDate(request.departure_date)}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-medium text-purple-600">{totalMiles.toLocaleString()} dặm</span>
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                Q-miles: {request.qualifying_miles.toLocaleString()}
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                B-miles: {request.bonus_miles.toLocaleString()}
+              </Badge>
             </div>
           </div>
 
@@ -273,6 +318,61 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                   <p className="text-sm text-gray-600 mt-1">Ngày tạo: {formatDate(request.created_at)}</p>
                 </div>
               </div>
+
+              {/* Customer Information */}
+              {request.customer && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Thông tin khách hàng
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Họ và tên:</span>
+                        <span className="font-medium text-blue-700">
+                          {request.customer.first_name} {request.customer.last_name}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Email:</span>
+                        <span className="font-medium">{request.customer.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Số điện thoại:</span>
+                        <span className="font-medium">{request.customer.phone || 'N/A'}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Hạng thành viên:</span>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs capitalize ${request.customer.member_tier === 'platinum' ? 'bg-purple-100 text-purple-800 border-purple-300' :
+                            request.customer.member_tier === 'gold' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                              request.customer.member_tier === 'silver' ? 'bg-gray-100 text-gray-800 border-gray-300' :
+                                'bg-orange-100 text-orange-800 border-orange-300'
+                            }`}
+                        >
+                          {request.customer.member_tier}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng dặm hợp lệ:</span>
+                        <span className="font-medium text-purple-600">
+                          {request.customer.qualifying_miles_total.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tổng dặm thưởng:</span>
+                        <span className="font-medium text-purple-600">
+                          {request.customer.bonus_miles_total.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Request Details */}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -302,7 +402,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Dặm hợp lệ:</span>
-                        <span className="font-medium text-purple-600">{request.qualifying_miles.toLocaleString()}</span>
+                        <span className="font-medium text-blue-600">{request.qualifying_miles.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Tỷ lệ thưởng:</span>
@@ -310,11 +410,11 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Dặm thưởng:</span>
-                        <span className="font-medium text-purple-600">{request.bonus_miles.toLocaleString()}</span>
+                        <span className="font-medium text-green-600">{request.bonus_miles.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Tổng dặm:</span>
-                        <span className="font-medium text-purple-600 font-bold">{totalMiles.toLocaleString()}</span>
+                      <div className="flex justify-between pt-2 border-t border-gray-200">
+                        <span className="text-gray-600 font-medium">Tổng dặm:</span>
+                        <span className="font-bold text-gray-800">{totalMiles.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
