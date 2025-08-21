@@ -50,7 +50,7 @@ func (s Controller) GetMyAccrualRequests(c lit.Context) error {
 		return err
 	}
 
-	data, total, err := s.mileage.GetAccrualRequests(c, req)
+	data, total, err := s.mileage.GetMyAccrualRequests(c, req)
 	if err != nil {
 		return convertErr(err)
 	}

@@ -71,6 +71,8 @@ func (r repository) GetAccrualRequests(ctx context.Context, keyword string, cust
 		return nil, 0, err
 	}
 
+	qb = qb.Order("created_at DESC")
+
 	offset, limit := pagination.ToSQLOffsetLimit(pagination.Pagination{Page: page, Size: size})
 	if offset > 0 {
 		qb = qb.Offset(offset)
@@ -78,6 +80,8 @@ func (r repository) GetAccrualRequests(ctx context.Context, keyword string, cust
 	if limit > 0 {
 		qb = qb.Limit(limit)
 	}
+
+	qb = qb.Preload("Customer")
 
 	var accrualRequests []entity.AccrualRequest
 	if err := qb.Find(&accrualRequests).Error; err != nil {
