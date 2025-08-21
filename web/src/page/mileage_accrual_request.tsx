@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createValidatedForm } from "@/components/validated-form-factory.ts";
@@ -10,9 +10,10 @@ import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-
 import { toast } from "sonner";
 import { ApiError } from "@/lib/types/api-error";
 import { useNavigate } from "react-router";
+import { Plane, Upload, Calendar, CreditCard } from "lucide-react";
 
 export default function MileageAccrualRequestPage() {
-  const {Form, Input, Select, DatePicker, FileUpload} = createValidatedForm<MileageAccrualRequestForm>()
+  const { Form, Input, Select, DatePicker, FileUpload } = createValidatedForm<MileageAccrualRequestForm>()
 
   const bookingClasses = BOOKING_CLASSES;
   const iatas = LOCATIONS;
@@ -24,7 +25,7 @@ export default function MileageAccrualRequestPage() {
     try {
       await createMileageAccrualRequestMutation.mutateAsync(values);
       toast.success('Mileage accrual request submitted successfully!');
-      
+
       // Navigate to tracking page after successful submission
       navigate('/tracking');
     } catch (error) {
@@ -52,132 +53,278 @@ export default function MileageAccrualRequestPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 mb-20">
-      {/*<Alert>*/}
-      {/*  <AlertCircle className="h-4 w-4"/>*/}
-      {/*  <AlertDescription className="text-sm">*/}
-      {/*    Yêu cầu tích dặm thủ công sẽ được xử lý trong vòng 5-7 ngày làm việc. Vui lòng cung cấp đầy đủ thông tin và*/}
-      {/*    tài liệu chứng minh.*/}
-      {/*  </AlertDescription>*/}
-      {/*</Alert>*/}
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8 sm:mb-12">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-purple-100 rounded-xl">
+              <Plane className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Mileage Request
+              </h1>
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mt-1">
+                Submit flight details to earn miles
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <Form 
-          resolver={zodResolver(MileageAccrualRequestSchema)} 
-          onSubmit={handleSubmit} 
-          className="lg:col-span-2"
-          defaultValues={{
-            ticket_id: "",
-            pnr: "",
-            carrier: "VN",
-            booking_class: "",
-            from_code: "",
-            to_code: "",
-            departure_date: new Date(),
-            ticket_image_url: "",
-            boarding_pass_image_url: "",
-          }}
-          resetOnSuccess={true}
-        >
-          <Card>
-            <CardContent className="space-y-4 sm:space-y-6 pt-0">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input name="ticket_id" label="Ticket ID" placeholder="e.g., 1234567890123"/>
-                <Input name="pnr" label="Booking Reference" placeholder="e.g., ABC123"/>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select name="carrier" label="Carrier" placeholder="Select airline" className="w-full">
-                  <SelectItem value="VN">Vietnam Airlines - VN</SelectItem>
-                </Select>
-                <Select name="booking_class" label="Booking Class" placeholder="Select booking class" className="w-full h-1/4VH">
-                  {bookingClasses.map((bookingClass) => (
-                    <SelectItem key={`booking-class-${bookingClass}`} value={bookingClass}>{bookingClass}</SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select name="from_code" label="From" placeholder="Select departure airport" className="w-full">
-                  {iatas.map((iata) => (
-                    <SelectItem key={`from-${iata.code}`} value={iata.code}>{iata.name} - {iata.code}</SelectItem>
-                  ))}
-                </Select>
-                <Select name="to_code" label="To" placeholder="Select arrival airport" className="w-full">
-                  {iatas.map((iata) => (
-                    <SelectItem key={`to-${iata.code}`} value={iata.code}>{iata.name} - {iata.code}</SelectItem>
-                  ))}
-                </Select>
-              </div>
+        {/* Main Form Container */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+          {/* Form Section */}
+          <div className="xl:col-span-2">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl">
+                  <CreditCard className="w-5 h-5 text-purple-600" />
+                  Flight Information
+                </CardTitle>
+              </CardHeader>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DatePicker name="departure_date" label="Departure Date" placeholder="Select departure date"/>
-              </div>
+              <CardContent className="space-y-6 sm:space-y-8">
+                <Form
+                  resolver={zodResolver(MileageAccrualRequestSchema)}
+                  onSubmit={handleSubmit}
+                  defaultValues={{
+                    ticket_id: "",
+                    pnr: "",
+                    carrier: "VN",
+                    booking_class: "",
+                    from_code: "",
+                    to_code: "",
+                    departure_date: new Date(),
+                    ticket_image_url: "",
+                    boarding_pass_image_url: "",
+                  }}
+                  resetOnSuccess={true}
+                >
+                  {/* Ticket Information Section */}
+                  <div className="space-y-6 sm:space-y-8">
+                    <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Input
+                          name="ticket_id"
+                          label="Ticket ID"
+                          placeholder="e.g., 1234567890123"
+                          className="h-12 text-base"
+                        />
+                        <Input
+                          name="pnr"
+                          label="Booking Reference"
+                          placeholder="e.g., ABC123"
+                          className="h-12 text-base"
+                        />
+                      </div>
+                    </div>
 
-              <FileUpload
-                name="ticket_image_url"
-                label="Ticket Image"
-                placeholder="Upload your flight ticket (JPG, PNG, PDF)"
-                maxFiles={1}
-                accept="image/*,.pdf"
-                onUpload={handleUploadToCloud}
-              />
+                    {/* Flight Details Section */}
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <Select
+                          name="carrier"
+                          label="Carrier"
+                          placeholder="Select airline"
+                          className="w-full h-12 text-base"
+                        >
+                          <SelectItem value="VN">Vietnam Airlines - VN</SelectItem>
+                        </Select>
+                        <Select
+                          name="booking_class"
+                          label="Booking Class"
+                          placeholder="Select class"
+                          className="w-full h-12 text-base"
+                        >
+                          {bookingClasses.map((bookingClass) => (
+                            <SelectItem key={`booking-class-${bookingClass}`} value={bookingClass}>
+                              {bookingClass}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        <Select
+                          name="from_code"
+                          label="From"
+                          placeholder="Departure airport"
+                          className="w-full h-12 text-base"
+                        >
+                          {iatas.map((iata) => (
+                            <SelectItem key={`from-${iata.code}`} value={iata.code}>
+                              {iata.name} - {iata.code}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        <Select
+                          name="to_code"
+                          label="To"
+                          placeholder="Arrival airport"
+                          className="w-full h-12 text-base"
+                        >
+                          {iatas.map((iata) => (
+                            <SelectItem key={`to-${iata.code}`} value={iata.code}>
+                              {iata.name} - {iata.code}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                    </div>
 
-              <FileUpload
-                name="boarding_pass_image_url"
-                label="Boarding Pass Image"
-                placeholder="Upload your boarding pass (JPG, PNG, PDF)"
-                maxFiles={1}
-                accept="image/*,.pdf"
-                onUpload={handleUploadToCloud}
-              />
+                    {/* Date Section */}
+                    <div>
+                      <div className="w-full">
+                        <DatePicker
+                          name="departure_date"
+                          label="Departure Date"
+                          placeholder="Select departure date"
+                          className="h-12 text-base w-full"
+                        />
+                      </div>
+                    </div>
 
-              <div className="pt-4 border-t">
-                <Button
-                  type="submit"
-                  disabled={createMileageAccrualRequestMutation.isPending}
-                  className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 w-full sm:w-auto text-sm sm:text-base">
-                  {createMileageAccrualRequestMutation.isPending ? 'Submitting...' : 'Submit Request'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Form>
+                    {/* Document Upload Section */}
+                    <div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                          <FileUpload
+                            name="ticket_image_url"
+                            label="Flight Ticket"
+                            placeholder="Upload ticket (JPG, PNG, PDF)"
+                            maxFiles={1}
+                            accept="image/*,.pdf"
+                            onUpload={handleUploadToCloud}
+                            className="min-h-[200px] sm:min-h-[240px]"
+                          />
+                        </div>
+                        <div>
+                          <FileUpload
+                            name="boarding_pass_image_url"
+                            label="Boarding Pass"
+                            placeholder="Upload boarding pass (JPG, PNG, PDF)"
+                            maxFiles={1}
+                            accept="image/*,.pdf"
+                            onUpload={handleUploadToCloud}
+                            className="min-h-[200px] sm:min-h-[240px]"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-        {/*<div>*/}
-        {/*  <Card>*/}
-        {/*    <CardHeader className="pb-3 sm:pb-6">*/}
-        {/*      <CardTitle className="text-lg sm:text-xl">Hướng dẫn</CardTitle>*/}
-        {/*    </CardHeader>*/}
-        {/*    <CardContent className="space-y-4 pt-0">*/}
-        {/*      <div>*/}
-        {/*        <h4 className="font-medium mb-2 text-sm sm:text-base">Tài liệu cần thiết:</h4>*/}
-        {/*        <ul className="text-xs sm:text-sm text-gray-600 space-y-1">*/}
-        {/*          <li>• Boarding pass (chuyến bay)</li>*/}
-        {/*          <li>• Hóa đơn thanh toán</li>*/}
-        {/*          <li>• Xác nhận đặt chỗ</li>*/}
-        {/*          <li>• Biên lai giao dịch</li>*/}
-        {/*        </ul>*/}
-        {/*      </div>*/}
+                    {/* Submit Button */}
+                    <div className="pt-6 sm:pt-8 border-t border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="text-sm text-gray-600">
+                          <p>Processed within 5-7 business days</p>
+                        </div>
+                        <Button
+                          type="submit"
+                          disabled={createMileageAccrualRequestMutation.isPending}
+                          className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white px-8 py-3 h-12 text-base font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
+                        >
+                          {createMileageAccrualRequestMutation.isPending ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>Submitting...</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Upload className="w-4 h-4" />
+                              <span>Submit Request</span>
+                            </div>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
 
-        {/*      <div>*/}
-        {/*        <h4 className="font-medium mb-2 text-sm sm:text-base">Thời gian xử lý:</h4>*/}
-        {/*        <ul className="text-xs sm:text-sm text-gray-600 space-y-1">*/}
-        {/*          <li>• Chuyến bay: 3-5 ngày</li>*/}
-        {/*          <li>• Khách sạn: 5-7 ngày</li>*/}
-        {/*          <li>• Đối tác khác: 7-10 ngày</li>*/}
-        {/*        </ul>*/}
-        {/*      </div>*/}
+          {/* Information Sidebar */}
+          <div className="xl:col-span-1">
+            <div className="space-y-6 lg:space-y-8">
+              {/* Processing Time Card */}
+              <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    Processing Time
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Flight requests</span>
+                      <span className="text-sm font-medium text-gray-900">3-5 days</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Hotel requests</span>
+                      <span className="text-sm font-medium text-gray-900">5-7 days</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Other partners</span>
+                      <span className="text-sm font-medium text-gray-900">7-10 days</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/*      <div>*/}
-        {/*        <h4 className="font-medium mb-2 text-sm sm:text-base">Lưu ý quan trọng:</h4>*/}
-        {/*        <ul className="text-xs sm:text-sm text-gray-600 space-y-1">*/}
-        {/*          <li>• Yêu cầu phải gửi trong 90 ngày</li>*/}
-        {/*          <li>• Cung cấp đầy đủ thông tin</li>*/}
-        {/*          <li>• Chỉ tích dặm cho hoạt động hợp lệ</li>*/}
-        {/*        </ul>*/}
-        {/*      </div>*/}
-        {/*    </CardContent>*/}
-        {/*  </Card>*/}
-        {/*</div>*/}
+              {/* Required Documents Card */}
+              <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Upload className="w-5 h-5 text-green-600" />
+                    Required Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Flight ticket or e-ticket</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Boarding pass</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Payment receipt</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Booking confirmation</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Important Notes Card */}
+              <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg text-amber-700">Important Notes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Submit within 90 days of travel</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Provide complete information</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span>Only valid activities qualify</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

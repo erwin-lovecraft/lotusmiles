@@ -10,14 +10,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
 
 export default function AppBar() {
-  const {user, isAuthenticated, loginWithRedirect, logout} = useAuth0();
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
   const handleLogin = async () => {
     await loginWithRedirect();
   }
 
   const handleLogout = async () => {
-    await logout({logoutParams: {returnTo: window.location.origin}});
+    await logout({ logoutParams: { returnTo: window.location.origin } });
   }
 
   return (
@@ -41,7 +41,7 @@ export default function AppBar() {
               variant="ghost"
               className="rounded-lg"
             >
-              <User/>
+              <User />
               <span className="hidden sm:inline">Login</span>
               <span className="sm:hidden">Login</span>
             </Button>
@@ -51,14 +51,14 @@ export default function AppBar() {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <div className="flex items-center space-x-2 sm:space-x-3 text-gray-700">
-                    <Avatar className="w-8 h-8 sm:w-8 sm:h-8 rounded-lg grayscale">
+                    <Avatar className="w-8 h-8 sm:w-8 sm:h-8 rounded-lg">
                       <AvatarImage
                         src={user?.picture}
                         alt={user?.name}
                       />
                       <AvatarFallback
-                        className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm">
-                        {user?.name?.split(" ").filter(Boolean).map(w => w[0].toUpperCase()).join("")  || "ME"}
+                        className="bg-gradient-to-br from-purple-600 to-pink-500 text-white text-xs sm:text-sm grayscale">
+                        {user?.name?.split(" ").filter(Boolean).map(w => w[0].toUpperCase()).join("") || "ME"}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm sm:text-base">{user?.name}</span>
@@ -87,7 +87,7 @@ export default function AppBar() {
                       Notifications
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
-                  <DropdownMenuSeparator/>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
                     Log out
