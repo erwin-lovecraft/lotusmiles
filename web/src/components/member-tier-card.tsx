@@ -5,36 +5,36 @@ export interface MemberTierCardProps {
   name: string,
   memberId: string,
   memberSince: Date,
-  validThrough: Date,
+  validThrough?: Date,
   issuer: string,
   tier: Tier,
 }
 
 export default function MemberTierCard(props: MemberTierCardProps) {
   const memberSince = formatCardDate(props.memberSince)
-  const validThrough = formatCardDate(props.validThrough)
+  const validThrough = props.validThrough ? formatCardDate(props.validThrough) : ""
   const tierTheme = MemberTier[props.tier];
 
   return (
     <Card name={props.name}
-          memberId={props.memberId}
-          memberSince={memberSince}
-          validThrough={validThrough}
-          issuer={props.issuer}
-          theme={tierTheme}
+      memberId={props.memberId}
+      memberSince={memberSince}
+      validThrough={validThrough}
+      issuer={props.issuer}
+      theme={tierTheme}
     />
   )
 }
 
 function Card({
-                name,
-                memberId,
-                memberSince,
-                validThrough,
-                issuer,
-                theme,
-                small,
-              }: {
+  name,
+  memberId,
+  memberSince,
+  validThrough,
+  issuer,
+  theme,
+  small,
+}: {
   name: string;
   memberId: string;
   memberSince: string;
@@ -74,7 +74,7 @@ function Card({
           <div className={["text-lg font-semibold tracking-tight uppercase", theme.text].join(" ")}>LOTUSMILES</div>
           <div className={["text-xs", theme.subtext].join(" ")}>{theme.label}</div>
         </div>
-        <RfidIcon className={["h-5 w-5", theme.rfid].join(" ")}/>
+        <RfidIcon className={["h-5 w-5", theme.rfid].join(" ")} />
       </div>
 
       {/* Card number */}
@@ -108,7 +108,7 @@ function Card({
   );
 }
 
-function RfidIcon({className = ""}: { className?: string }) {
+function RfidIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +118,7 @@ function RfidIcon({className = ""}: { className?: string }) {
       aria-hidden
     >
       <path
-        d="M2 12a10 10 0 0 1 10-10v2A8 8 0 0 0 4 12a8 8 0 0 0 8 8v2A10 10 0 0 1 2 12Zm5 0a5 5 0 0 1 5-5v2a3 3 0 0 0-3 3 3 3 0 0 0 3 3v2a5 5 0 0 1-5-5Z"/>
+        d="M2 12a10 10 0 0 1 10-10v2A8 8 0 0 0 4 12a8 8 0 0 0 8 8v2A10 10 0 0 1 2 12Zm5 0a5 5 0 0 1 5-5v2a3 3 0 0 0-3 3 3 3 0 0 0 3 3v2a5 5 0 0 1-5-5Z" />
     </svg>
   );
 }

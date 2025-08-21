@@ -227,7 +227,7 @@ export const MILEAGE_TRANSACTIONS: MileageTransaction[] = [
 export const MEMBER_DATA= {
   name: "Nguyễn Văn An",
   memberId: "LM123456789",
-  currentTier: "register" as Tier,
+  currentTier: "silver" as Tier,
   memberSince: new Date(2019, 12, 5, 0, 0, 0, 0),
   validThrough: new Date(2025, 31, 12, 0, 0, 0, 0),
   currentMiles: 15420,
