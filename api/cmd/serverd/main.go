@@ -157,27 +157,27 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 	// Accrual requests routes
 	v1Route.Group("/accrual-requests", func(accrual lit.Router) {
 		accrual.Use(middleware.HasRoles(constants.UserRoleMember))
-		accrual.Post("/", v1Ctrl.SubmitAccrualRequest)
-		accrual.Get("/", v1Ctrl.GetMyAccrualRequests)
+		accrual.Post("", v1Ctrl.SubmitAccrualRequest)
+		accrual.Get("", v1Ctrl.GetMyAccrualRequests)
 	})
 
 	// Admin accrual requests routes
 	v1Route.Group("/admin/accrual-requests", func(admin lit.Router) {
 		admin.Use(middleware.HasRoles(constants.UserRoleAdmin))
-		admin.Get("/", v1Ctrl.GetAccrualRequests)
-		admin.Patch("/:id/approve", v1Ctrl.ApproveRequest)
-		admin.Patch("/:id/reject", v1Ctrl.RejectRequest)
+		admin.Get("", v1Ctrl.GetAccrualRequests)
+		admin.Patch(":id/approve", v1Ctrl.ApproveRequest)
+		admin.Patch(":id/reject", v1Ctrl.RejectRequest)
 	})
 
 	// Miles ledger routes
 	v1Route.Group("/miles-ledgers", func(ledger lit.Router) {
-		ledger.Get("/", v1Ctrl.GetMileageLedgers)
+		ledger.Get("", v1Ctrl.GetMileageLedgers)
 	})
 
 	// Admin miles ledger routes
 	v1Route.Group("/admin/miles-ledgers", func(admin lit.Router) {
 		admin.Use(middleware.HasRoles("admin"))
-		admin.Get("/", v1Ctrl.GetMileageLedgers)
+		admin.Get("", v1Ctrl.GetMileageLedgers)
 	})
 
 	return r.Handler()
