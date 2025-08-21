@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AccrualRequestTicket } from "@/components/accrual-request-ticket";
-import { useAccrualRequests, useDebounce } from "@/lib/hooks";
+import { useAccrualRequestsInfinite, useIntersectionObserver, useDebounce } from "@/lib/hooks";
 import type { AccrualRequestQueryParams } from "@/types/accrual-request";
 
 export default function HomePage() {
@@ -21,26 +21,40 @@ export default function HomePage() {
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 700);
 
-  // Build query params for API
-  const queryParams: AccrualRequestQueryParams = {
+  // Build query params for API (without page parameter for infinite query)
+  const baseQueryParams: Omit<AccrualRequestQueryParams, 'page'> = {
     keyword: debouncedSearchQuery || undefined,
     status: statusFilter !== "all" ? statusFilter : undefined,
     submitted_date: dateFilter || undefined,
-    page: 1,
-    size: 50, // Load more items per page
   };
 
-  // Use React Query for API call and state management
+  // Use React Query for infinite API calls and state management
   const {
-    data: response,
+    data,
     isLoading: loading,
     error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     refetch
-  } = useAccrualRequests(queryParams);
+  } = useAccrualRequestsInfinite(baseQueryParams);
 
-  // Ensure requests is always an array
-  const requests = Array.isArray(response?.data) ? response.data : [];
-  const total = response?.total || 0;
+  // Flatten all pages data into a single array
+  const requests = data?.pages.flatMap(page => page.data) || [];
+  const total = data?.pages[0]?.total || 0;
+
+  // Intersection observer for infinite scroll
+  const loadMoreRef = useIntersectionObserver(
+    useCallback(() => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]),
+    {
+      threshold: 0.1,
+      rootMargin: '100px', // Start loading 100px before reaching the bottom
+    }
+  );
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -154,7 +168,7 @@ export default function HomePage() {
           <AccrualRequestTicket key={request.id.toString()} request={request} />
         ))}
 
-        {/* Loading indicator */}
+        {/* Loading indicator for initial load */}
         {loading && (
           <div className="flex justify-center py-4">
             <div className="flex items-center space-x-2">
@@ -162,6 +176,21 @@ export default function HomePage() {
               <span className="text-sm text-gray-500">Đang tải...</span>
             </div>
           </div>
+        )}
+
+        {/* Loading indicator for next page */}
+        {isFetchingNextPage && (
+          <div className="flex justify-center py-4">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
+              <span className="text-sm text-gray-500">Đang tải thêm...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Intersection observer target for infinite scroll */}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="h-4" />
         )}
 
         {/* Empty state */}
@@ -173,6 +202,13 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* End of results indicator */}
+        {!hasNextPage && requests.length > 0 && (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Đã hiển thị tất cả kết quả</p>
+          </div>
         )}
       </div>
     </div>

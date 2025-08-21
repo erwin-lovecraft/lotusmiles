@@ -26,8 +26,6 @@ export const useAccrualRequestsService = () => {
 
     const response = await apiClient.get<AccrualRequestResponse>(`/api/v1/admin/accrual-requests?${queryParams.toString()}`);
 
-    console.log(response.data)
-
     return response.data;
   };
 
