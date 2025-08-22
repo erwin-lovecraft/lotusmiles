@@ -171,7 +171,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 
 	// Miles ledger routes
 	v1Route.Group("/miles-ledgers", func(ledger lit.Router) {
-		ledger.Get("", v1Ctrl.GetMileageLedgers)
+		ledger.Get("", v1Ctrl.GetMyMileageLedgers)
 	})
 
 	// Admin miles ledger routes
