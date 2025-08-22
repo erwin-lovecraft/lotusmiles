@@ -123,7 +123,7 @@ func (s Controller) GetMyMileageLedgers(c lit.Context) error {
 		return err
 	}
 
-	data, total, err := s.mileage.GetMileageLedgers(c, req)
+	data, total, err := s.mileage.GetMyMileageLedgers(c, req)
 	if err != nil {
 		return convertErr(err)
 	}
