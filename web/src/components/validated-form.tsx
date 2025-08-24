@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button.tsx";
 import { cn } from "@/lib/utils.ts";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, X } from "lucide-react";
+import { CalendarIcon, Upload, X, Eye, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { useCallback, useRef, useState } from "react";
 
@@ -37,7 +37,7 @@ export type ValidatedFormProps<TModel extends FieldValues> = {
 }
 
 export function ValidatedForm<TModel extends FieldValues>(props: ValidatedFormProps<TModel>) {
-  const {defaultValues, resolver, className, onSubmit, children, resetOnSuccess = false} = props;
+  const { defaultValues, resolver, className, onSubmit, children, resetOnSuccess = false } = props;
 
   const methods = useForm({
     defaultValues: defaultValues,
@@ -77,13 +77,13 @@ export function ValidatedInput<
   TModel extends FieldValues = FieldValues,
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValidatedInputProps<TModel, TName>) {
-  const {control} = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <FormField
       control={control}
       name={props.name}
-      render={({field}) => (
+      render={({ field }) => (
         <FormItem className={props.className}>
           {props.label &&
             <FormLabel>{props.label}</FormLabel>}
@@ -95,7 +95,7 @@ export function ValidatedInput<
               {props.description}
             </FormDescription>
           }
-          <FormMessage/>
+          <FormMessage className="mb-4" />
         </FormItem>
       )}
     />
@@ -113,20 +113,20 @@ export function ValidatedSelect<
   TModel extends FieldValues = FieldValues,
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValiatedSelectProps<TModel, TName>) {
-  const {control} = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <FormField
       control={control}
       name={props.name}
-      render={({field}) => (
+      render={({ field }) => (
         <FormItem>
           {props.label &&
             <FormLabel>{props.label}</FormLabel>}
           <Select onValueChange={field.onChange} value={field.value || ""}>
             <FormControl>
               <SelectTrigger className={props.className}>
-                <SelectValue placeholder={props.placeholder}/>
+                <SelectValue placeholder={props.placeholder} />
               </SelectTrigger>
             </FormControl>
             <SelectContent className="h-64">
@@ -138,7 +138,7 @@ export function ValidatedSelect<
               {props.description}
             </FormDescription>
           }
-          <FormMessage/>
+          <FormMessage className="mb-4" />
         </FormItem>
       )}
     />
@@ -154,13 +154,13 @@ export function ValidatedDatePicker<
   TModel extends FieldValues = FieldValues,
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValiatedDatePickerProps<TModel, TName>) {
-  const {control} = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <FormField
       control={control}
       name={props.name}
-      render={({field}) => (
+      render={({ field }) => (
         <FormItem>
           {props.label &&
             <FormLabel>{props.label}</FormLabel>}
@@ -200,7 +200,7 @@ export function ValidatedDatePicker<
               {props.description}
             </FormDescription>
           }
-          <FormMessage/>
+          <FormMessage className="mb-4" />
         </FormItem>
       )}
     />
@@ -300,7 +300,7 @@ export function ValidatedFileUpload<
       try {
         setUploading(true);
         const result = await onUpload(ok);
-        
+
         // Handle both string arrays and object arrays
         let urls: string[];
         if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && 'url' in result[0]) {
@@ -310,7 +310,7 @@ export function ValidatedFileUpload<
           // String array
           urls = result as string[];
         }
-        
+
         // Save URLs to form (single/multiple consistent with prop)
         onChange(multiple ? urls : urls[0] ?? null);
       } catch (e: any) {
@@ -361,16 +361,16 @@ export function ValidatedFileUpload<
     }
   };
 
-  const describeItem = (item: unknown): { name: string; size?: number } => {
+  const describeItem = (item: unknown): { name: string; size?: number; url?: string } => {
     if (typeof item === "string") {
       // URL string - try to extract filename from URL
       try {
         const url = new URL(item);
         const pathname = url.pathname;
         const filename = pathname.split('/').pop() || item;
-        return { name: filename };
+        return { name: filename, url: item };
       } catch {
-        return { name: item };
+        return { name: item, url: item };
       }
     }
     if (item instanceof File) {
@@ -378,9 +378,16 @@ export function ValidatedFileUpload<
     }
     if (typeof item === "object" && item !== null && "display_name" in item) {
       // Object with display_name
-      return { name: (item as { display_name: string }).display_name };
+      const obj = item as { display_name: string; url?: string };
+      return { name: obj.display_name, url: obj.url };
     }
     return { name: String(item ?? "") };
+  };
+
+  const isImageFile = (url: string): boolean => {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    const lowerUrl = url.toLowerCase();
+    return imageExtensions.some(ext => lowerUrl.includes(ext));
   };
 
   return (
@@ -401,45 +408,156 @@ export function ValidatedFileUpload<
             {label && <FormLabel>{label}</FormLabel>}
 
             <FormControl>
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => onDrop(e, field.onChange, value)}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6",
-                  dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/30"
-                )}
-                role="button"
-                aria-label="File dropzone"
-                tabIndex={0}
-                onClick={handlePick}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") handlePick();
-                }}
-              >
-                <Upload className="h-5 w-5 opacity-70" />
-                <div className="text-sm text-muted-foreground text-center">
-                  {placeholder}
-                </div>
-                <div className="flex items-center gap-2">
-                  {accept && <span className="text-xs text-muted-foreground">({accept})</span>}
-                  {maxSizeMB && (
-                    <span className="text-xs text-muted-foreground">Max {maxSizeMB} MB</span>
+              {list.length === 0 ? (
+                <div
+                  onDragOver={(e) => {
+                    if (uploading) return;
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    if (uploading) return;
+                    onDrop(e, field.onChange, value);
+                  }}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6",
+                    dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/30",
+                    uploading && "opacity-50 cursor-not-allowed"
                   )}
-                </div>
+                  role="button"
+                  aria-label="File dropzone"
+                  tabIndex={uploading ? -1 : 0}
+                  onClick={uploading ? undefined : handlePick}
+                  onKeyDown={(e) => {
+                    if (uploading) return;
+                    if (e.key === "Enter" || e.key === " ") handlePick();
+                  }}
+                >
+                  {uploading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      <div className="text-sm text-muted-foreground text-center">
+                        Uploading...
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-5 w-5 opacity-70" />
+                      <div className="text-sm text-muted-foreground text-center">
+                        {placeholder}
+                      </div>
+                    </>
+                  )}
+                  <div className="flex items-center gap-2">
+                    {accept && <span className="text-xs text-muted-foreground">({accept})</span>}
+                    {maxSizeMB && (
+                      <span className="text-xs text-muted-foreground">Max {maxSizeMB} MB</span>
+                    )}
+                  </div>
 
-                <input
-                  ref={inputRef}
-                  type="file"
-                  className="hidden"
-                  accept={accept}
-                  multiple={multiple}
-                  onChange={(e) => onInputChange(e, field.onChange, value)}
-                />
-              </div>
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    className="hidden"
+                    accept={accept}
+                    multiple={multiple}
+                    disabled={uploading}
+                    onChange={(e) => onInputChange(e, field.onChange, value)}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {list.map((item, idx) => {
+                    const d = describeItem(item);
+                    const isImage = d.url && isImageFile(d.url);
+
+                    return (
+                      <div
+                        key={`${d.name}-${idx}`}
+                        className="relative rounded-xl border overflow-hidden"
+                      >
+
+                        <div className="relative">
+                          <img
+                            src={d.url}
+                            alt={d.name}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors duration-200" />
+                          <div className="absolute top-2 right-2 flex gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="icon"
+                              className="h-8 w-8 bg-white/90 hover:bg-white text-gray-700"
+                              onClick={() => {
+                                // Open image in new tab
+                                window.open(d.url, '_blank');
+                              }}
+                              aria-label={`View ${d.name}`}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="h-8 w-8 bg-red-500/90 hover:bg-red-500 text-white"
+                              onClick={() => removeAt(idx, value, field.onChange)}
+                              aria-label={`Remove ${d.name}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                            <div className="text-white text-sm font-medium truncate">{d.name}</div>
+                            {typeof d.size === "number" && (
+                              <div className="text-white/80 text-xs">{formatBytes(d.size)}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Add more button */}
+                  {props.maxFiles && props.maxFiles > 1 &&
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePick}
+                      disabled={uploading}
+                      className={cn(
+                        "w-full h-12 border-dashed",
+                        uploading && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      {uploading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Add More Files
+                        </>
+                      )}
+                    </Button>
+                  }
+
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    className="hidden"
+                    accept={accept}
+                    multiple={multiple}
+                    disabled={uploading}
+                    onChange={(e) => onInputChange(e, field.onChange, value)}
+                  />
+                </div>
+              )}
             </FormControl>
 
             {description && <FormDescription>{description}</FormDescription>}
@@ -451,37 +569,7 @@ export function ValidatedFileUpload<
               </div>
             )}
 
-            {showList && list.length > 0 && (
-              <div className="mt-3 space-y-2">
-                {list.map((item, idx) => {
-                  const d = describeItem(item);
-                  return (
-                    <div
-                      key={`${d.name}-${idx}`}
-                      className="flex items-center justify-between rounded-xl border px-3 py-2"
-                    >
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium">{d.name}</div>
-                        {typeof d.size === "number" && (
-                          <div className="text-xs text-muted-foreground">{formatBytes(d.size)}</div>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeAt(idx, value, field.onChange)}
-                        aria-label={`Remove ${d.name}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            <FormMessage />
+            <FormMessage className="mb-4" />
           </FormItem>
         );
       }}

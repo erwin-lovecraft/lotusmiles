@@ -96,20 +96,20 @@ export default function MileageAccrualRequestPage() {
                     from_code: "",
                     to_code: "",
                     departure_date: new Date(),
-                    ticket_image_url: "",
-                    boarding_pass_image_url: "",
+                    ticket_image_url: undefined,
+                    boarding_pass_image_url: undefined,
                   }}
                   resetOnSuccess={true}
                 >
                   {/* Ticket Information Section */}
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
+                    <div className="mb-12">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Input
                           name="ticket_id"
                           label="Ticket ID"
                           placeholder="e.g., 1234567890123"
-                          className="h-12 text-base"
+                          className="h-12 text-base mb-6"
                         />
                         <Input
                           name="pnr"
@@ -243,33 +243,7 @@ export default function MileageAccrualRequestPage() {
 
           {/* Information Sidebar */}
           <div className="xl:col-span-1">
-            <div className="space-y-6 lg:space-y-8">
-              {/* Processing Time Card */}
-              <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    Processing Time
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Flight requests</span>
-                      <span className="text-sm font-medium text-gray-900">3-5 days</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Hotel requests</span>
-                      <span className="text-sm font-medium text-gray-900">5-7 days</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Other partners</span>
-                      <span className="text-sm font-medium text-gray-900">7-10 days</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
+            <div className="space-y-4 lg:space-y-6">
               {/* Required Documents Card */}
               <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
                 <CardHeader className="pb-4">
@@ -287,14 +261,6 @@ export default function MileageAccrualRequestPage() {
                     <li className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                       <span>Boarding pass</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Payment receipt</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <span>Booking confirmation</span>
                     </li>
                   </ul>
                 </CardContent>

@@ -54,7 +54,6 @@ export default function HomePage() {
     memberId: `LM${profile.id.toString().slice(-9)}`,
     currentTier: profile.member_tier as Tier,
     memberSince: new Date(profile.created_at),
-    validThrough: new Date(new Date().getFullYear() + 1, 11, 31), // End of next year
     currentMiles: profile.qualifying_miles_total + profile.bonus_miles_total,
     expiringMiles: 0, // This would come from a separate API call
     expiringDate: new Date(new Date().getFullYear() + 1, 11, 31),
@@ -85,7 +84,6 @@ export default function HomePage() {
             memberId={memberData.memberId}
             tier={memberData.currentTier as Tier}
             memberSince={memberData.memberSince}
-            validThrough={memberData.validThrough}
             issuer="Apollo Team"
           />
         </div>
