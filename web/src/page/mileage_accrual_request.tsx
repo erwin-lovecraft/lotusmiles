@@ -10,7 +10,7 @@ import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-
 import { toast } from "sonner";
 import { ApiError } from "@/lib/types/api-error";
 import { useNavigate } from "react-router";
-import { Plane, Upload, Calendar, CreditCard } from "lucide-react";
+import { Plane, Upload, CreditCard } from "lucide-react";
 
 export default function MileageAccrualRequestPage() {
   const { Form, Input, Select, DatePicker, FileUpload } = createValidatedForm<MileageAccrualRequestForm>()

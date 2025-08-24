@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button.tsx";
 import { cn } from "@/lib/utils.ts";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, X, Eye, Trash2 } from "lucide-react";
+import { CalendarIcon, Upload, Eye, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { useCallback, useRef, useState } from "react";
 
@@ -257,7 +257,6 @@ export function ValidatedFileUpload<
     maxFiles,
     maxSizeMB,
     onUpload,
-    showList = true,
     placeholder = "Drop files here or click to browse",
   } = props;
 
@@ -384,11 +383,11 @@ export function ValidatedFileUpload<
     return { name: String(item ?? "") };
   };
 
-  const isImageFile = (url: string): boolean => {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-    const lowerUrl = url.toLowerCase();
-    return imageExtensions.some(ext => lowerUrl.includes(ext));
-  };
+  // const isImageFile = (url: string): boolean => {
+  //   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+  //   const lowerUrl = url.toLowerCase();
+  //   return imageExtensions.some(ext => lowerUrl.includes(ext));
+  // };
 
   return (
     <FormField
@@ -470,7 +469,6 @@ export function ValidatedFileUpload<
                 <div className="space-y-3">
                   {list.map((item, idx) => {
                     const d = describeItem(item);
-                    const isImage = d.url && isImageFile(d.url);
 
                     return (
                       <div

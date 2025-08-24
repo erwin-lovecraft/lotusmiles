@@ -1,6 +1,6 @@
-import { Award, Crown, Diamond, Star, Zap } from "lucide-react";
+import { Award, Crown, Diamond, Star, Zap, User } from "lucide-react";
 
-export type Tier = "silver" | "titan" | "gold" | "platinum" | "million_miler";
+export type Tier = "register" | "silver" | "titan" | "gold" | "platinum" | "million_miler";
 
 export const MemberTier: Record<
   Tier,
@@ -19,6 +19,20 @@ export const MemberTier: Record<
     requirements: {miles: number, flights: number}
   }
 > = {
+  register: {
+    label: "Register",
+    gradient: "from-gray-50 to-gray-100",
+    text: "text-gray-800",
+    subtext: "text-gray-600",
+    accentDot: "bg-gray-400",
+    logoFrom: "from-gray-300",
+    logoTo: "to-gray-200",
+    outline: "ring-1 ring-gray-200",
+    shadow: "shadow-gray-200/50",
+    rfid: "text-gray-400",
+    icon: User,
+    requirements: {miles: 0, flights: 0}
+  },
   silver: {
     label: "Silver",
     gradient: "from-slate-100 to-slate-300",
