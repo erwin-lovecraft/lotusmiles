@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -56,13 +59,39 @@ func main() {
 		log.Fatalf("Failed to start cron scheduler: %v", err)
 	}
 
+	// Start health check HTTP server
+	server := &http.Server{
+		Addr:         cfg.Web.Addr(),
+		Handler:      createHealthCheckMux(),
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	// Start HTTP server in a goroutine
+	go func() {
+		log.Printf("Starting health check server on %s", cfg.Web.Addr())
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Printf("Health check server error: %v", err)
+		}
+	}()
+
 	// Setup graceful shutdown
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
 	// Wait for shutdown signal
 	<-shutdown
-	log.Println("Received shutdown signal, stopping cron scheduler...")
+	log.Println("Received shutdown signal, stopping services...")
+
+	// Graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	// Stop HTTP server
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("Error shutting down HTTP server: %v", err)
+	}
 
 	// Stop scheduler
 	scheduler.Stop()
@@ -102,4 +131,16 @@ func initDatabase(dbConfig config.DatabaseConfig) (*gorm.DB, error) {
 	log.Printf("Database connected successfully (max_open_conns: %d, max_idle_conns: %d)", maxOpenConns, maxIdleConns)
 
 	return db, nil
+}
+
+// createHealthCheckMux creates the HTTP mux for health check endpoints
+func createHealthCheckMux() http.Handler {
+	mux := http.NewServeMux()
+
+	// Health check endpoint
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	return mux
 }
