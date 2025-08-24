@@ -7,6 +7,8 @@ type Config struct {
 	Database   DatabaseConfig `mapstructure:"DATABASE"`
 	Auth0      Auth0Config    `mapstructure:"AUTH0"`
 	UserAPI    Auth0Config    `mapstructure:"USER_API"`
+	Cron       CronConfig     `mapstructure:"CRON"`
+	Loyalty    LoyaltyConfig  `mapstructure:"LOYALTY"`
 	SentryDSN  string         `mapstructure:"SENTRY_DSN"`
 }
 
@@ -39,4 +41,17 @@ type Auth0Config struct {
 	ClientSecret string `mapstructure:"CLIENT_SECRET"`
 	Audience     string `mapstructure:"AUDIENCE"`
 	TokenURL     string `mapstructure:"TOKEN_URL"`
+}
+
+type CronConfig struct {
+	ExpireQMCron   string `mapstructure:"EXPIRE_QMILES"`
+	RecalcTierCron string `mapstructure:"RECALC_TIER"`
+}
+
+type LoyaltyConfig struct {
+	ExpirePeriodMinutes        int `mapstructure:"EXPIRE_PERIOD_MINUTES"`
+	RollingWindowPeriodMinutes int `mapstructure:"ROLLING_WINDOW_PERIOD_MINUTES"`
+	BatchSize                  int `mapstructure:"BATCH_SIZE"`
+	JobTimeoutMinutes          int `mapstructure:"JOB_TIMEOUT_MINUTES"`
+	RecalcJobTimeoutMinutes    int `mapstructure:"RECALC_JOB_TIMEOUT_MINUTES"`
 }

@@ -3,12 +3,15 @@ package mileage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
+	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
 	"github.com/viebiz/lit/iam"
 )
 
@@ -26,15 +29,21 @@ type Service interface {
 	GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
 
 	GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
+
+	ExpireQualifyingMilesForMonth(ctx context.Context, monthToExpire time.Time) error
 }
 
 type service struct {
-	repo repository.Repository
+	repo          repository.Repository
+	membershipSvc membership.Service
+	cfg           config.LoyaltyConfig
 }
 
-func New(repo repository.Repository) Service {
+func New(repo repository.Repository, membershipSvc membership.Service, cfg config.LoyaltyConfig) Service {
 	return service{
-		repo: repo,
+		repo:          repo,
+		membershipSvc: membershipSvc,
+		cfg:           cfg,
 	}
 }
 
@@ -130,18 +139,32 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID int64) error {
 		return err
 	}
 
-	// 3. Update related customer
+	// 3. Update related customer miles
 	if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, existedRequest.CustomerID, existedRequest.QualifyingMiles, existedRequest.BonusMiles); err != nil {
 		return err
 	}
 
-	// 4. Update miles ledgers
+	// 4. Update miles ledgers with new fields
+	earningMonth := time.Date(existedRequest.DepartureDate.Year(), existedRequest.DepartureDate.Month(), 1, 0, 0, 0, 0, existedRequest.DepartureDate.Location())
+	expirePeriod := time.Duration(s.cfg.ExpirePeriodMinutes) * time.Minute
+	expiresAt := earningMonth.Add(expirePeriod)
+
 	if err := s.repo.Mileage().SaveMileageLedger(ctx, entity.MilesLedger{
 		CustomerID:           existedRequest.CustomerID,
 		QualifyingMilesDelta: existedRequest.QualifyingMiles,
 		BonusMilesDelta:      existedRequest.BonusMiles,
 		AccrualRequestID:     &existedRequest.ID,
+		Kind:                 constants.LedgerKindAccrual,
+		EarningMonth:         earningMonth,
+		ExpiresAt:            &expiresAt,
+		Note:                 fmt.Sprintf("Accrual for flight %s", existedRequest.TicketID),
 	}); err != nil {
+		return err
+	}
+
+	// 5. Check and update membership tier with current month
+	currentMonth := time.Now().UTC()
+	if _, _, err := s.membershipSvc.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, existedRequest.CustomerID, currentMonth); err != nil {
 		return err
 	}
 
@@ -234,4 +257,68 @@ func (s service) GetMileageLedgers(ctx context.Context, filter dto.MileageLedger
 		filter.Page,
 		filter.Size,
 	)
+}
+
+// ExpireQualifyingMilesForMonth expires qualifying miles for the specified month
+func (s service) ExpireQualifyingMilesForMonth(ctx context.Context, monthToExpire time.Time) error {
+	// Get customers with positive QM deltas for the month
+	customerIDs, err := s.repo.Mileage().GetCustomersWithPositiveQMDeltasForMonth(ctx, monthToExpire)
+	if err != nil {
+		return fmt.Errorf("failed to get customers with positive QM deltas: %w", err)
+	}
+
+	var totalExpired float64
+	var affectedCustomers int
+
+	// Process each customer
+	for _, customerID := range customerIDs {
+		// Check if expire record already exists (idempotency)
+		exists, err := s.repo.Mileage().CheckExpireRecordExists(ctx, customerID, monthToExpire)
+		if err != nil {
+			return fmt.Errorf("failed to check expire record for customer %d: %w", customerID, err)
+		}
+
+		if exists {
+			continue // Skip if already processed
+		}
+
+		// Calculate total QM deltas for the month
+		totalDeltas, err := s.repo.Mileage().GetTotalQMDeltasForCustomerAndMonth(ctx, customerID, monthToExpire)
+		if err != nil {
+			return fmt.Errorf("failed to get total QM deltas for customer %d: %w", customerID, err)
+		}
+
+		if totalDeltas <= 0 {
+			continue // No positive miles to expire
+		}
+
+		// Create expire ledger entry
+		currentMonth := time.Now().UTC()
+		expireLedger := entity.MilesLedger{
+			CustomerID:           customerID,
+			QualifyingMilesDelta: -totalDeltas, // Negative to expire
+			BonusMilesDelta:      0,
+			Kind:                 constants.LedgerKindExpire,
+			EarningMonth:         currentMonth,
+			Note:                 fmt.Sprintf("expire QM for %s", monthToExpire.Format("2006-01")),
+		}
+
+		if err := s.repo.Mileage().SaveMileageLedger(ctx, expireLedger); err != nil {
+			return fmt.Errorf("failed to save expire ledger for customer %d: %w", customerID, err)
+		}
+
+		// Update customer's total qualifying miles
+		if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, customerID, -totalDeltas, 0); err != nil {
+			return fmt.Errorf("failed to update customer miles for customer %d: %w", customerID, err)
+		}
+
+		totalExpired += totalDeltas
+		affectedCustomers++
+	}
+
+	// Log the results
+	fmt.Printf("Expired %.2f qualifying miles for %d customers in month %s\n",
+		totalExpired, affectedCustomers, monthToExpire.Format("2006-01"))
+
+	return nil
 }

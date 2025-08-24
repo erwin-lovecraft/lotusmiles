@@ -26,11 +26,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/config"
-	"github.com/erwin-lovecraft/aegismiles/internal/constants"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
+	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/cors"
+	"github.com/viebiz/lit/env"
+	httpmw "github.com/viebiz/lit/middleware/http"
+	"github.com/viebiz/lit/monitoring"
 	"github.com/viebiz/lit/monitoring/instrumentpg"
 	"github.com/viebiz/lit/postgres"
 	driverpg "gorm.io/driver/postgres"
@@ -38,15 +38,16 @@ import (
 	"gorm.io/gorm/logger"
 
 	_ "github.com/erwin-lovecraft/aegismiles/docs"
+	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
+	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/viebiz/lit"
-	"github.com/viebiz/lit/env"
-	httpmw "github.com/viebiz/lit/middleware/http"
-	"github.com/viebiz/lit/monitoring"
+	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
+	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
 )
 
 func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
@@ -128,8 +129,9 @@ func run(ctx context.Context) error {
 	// Initialize services, repositories, etc. here
 	authGwy, err := auth0.New(cfg.UserAPI)
 
-	repo := repository.New(db)
-	mileageSvc := mileage.New(repo)
+	repo := repository.New(db, cfg.Loyalty)
+	membershipSvc := membership.New(repo, cfg.Loyalty)
+	mileageSvc := mileage.New(repo, membershipSvc, cfg.Loyalty)
 	customerSvc := customer.New(repo, authGwy)
 	v1Ctrl := v1.New(customerSvc, mileageSvc)
 

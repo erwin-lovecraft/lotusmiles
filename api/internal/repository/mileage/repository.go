@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/pagination"
@@ -27,6 +28,12 @@ type Repository interface {
 	SaveMileageLedger(ctx context.Context, e entity.MilesLedger) error
 
 	GetMileageLedgers(ctx context.Context, customerID int64, date time.Time, page int, size int) ([]entity.MilesLedger, int64, error)
+
+	GetCustomersWithPositiveQMDeltasForMonth(ctx context.Context, monthToExpire time.Time) ([]int64, error)
+
+	GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, customerID int64, monthToExpire time.Time) (float64, error)
+
+	CheckExpireRecordExists(ctx context.Context, customerID int64, monthToExpire time.Time) (bool, error)
 }
 
 type repository struct {
@@ -193,4 +200,52 @@ func (r repository) GetMileageLedgers(ctx context.Context, customerID int64, dat
 		return nil, 0, err
 	}
 	return accrualRequests, total, nil
+}
+
+func (r repository) GetCustomersWithPositiveQMDeltasForMonth(ctx context.Context, monthToExpire time.Time) ([]int64, error) {
+	var customerIDs []int64
+
+	// Get first day of the month
+	monthStart := time.Date(monthToExpire.Year(), monthToExpire.Month(), 1, 0, 0, 0, 0, monthToExpire.Location())
+	monthEnd := monthStart.AddDate(0, 1, 0)
+
+	err := r.db.WithContext(ctx).
+		Model(&entity.MilesLedger{}).
+		Where("earning_month >= ? AND earning_month < ? AND qualifying_miles_delta > 0", monthStart, monthEnd).
+		Distinct("customer_id").
+		Pluck("customer_id", &customerIDs).Error
+
+	return customerIDs, err
+}
+
+func (r repository) GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, customerID int64, monthToExpire time.Time) (float64, error) {
+	var total float64
+
+	// Get first day of the month
+	monthStart := time.Date(monthToExpire.Year(), monthToExpire.Month(), 1, 0, 0, 0, 0, monthToExpire.Location())
+	monthEnd := monthStart.AddDate(0, 1, 0)
+
+	err := r.db.WithContext(ctx).
+		Model(&entity.MilesLedger{}).
+		Where("customer_id = ? AND earning_month >= ? AND earning_month < ?", customerID, monthStart, monthEnd).
+		Select("COALESCE(SUM(qualifying_miles_delta), 0)").
+		Scan(&total).Error
+
+	return total, err
+}
+
+func (r repository) CheckExpireRecordExists(ctx context.Context, customerID int64, monthToExpire time.Time) (bool, error) {
+	var count int64
+
+	// Get first day of the month
+	monthStart := time.Date(monthToExpire.Year(), monthToExpire.Month(), 1, 0, 0, 0, 0, monthToExpire.Location())
+	monthEnd := monthStart.AddDate(0, 1, 0)
+
+	err := r.db.WithContext(ctx).
+		Model(&entity.MilesLedger{}).
+		Where("customer_id = ? AND earning_month >= ? AND earning_month < ? AND kind = ?",
+			customerID, monthStart, monthEnd, constants.LedgerKindExpire).
+		Count(&count).Error
+
+	return count > 0, err
 }

@@ -39,7 +39,7 @@ func (s service) GetCustomer(ctx context.Context, userID string) (entity.Custome
 
 		customer.QualifyingMilesTotal = 0
 		customer.BonusMilesTotal = 0
-		customer.MemberTier = constants.MemberTierSilver
+		customer.MemberTier = constants.MemberTierRegister
 		customer.Auth0UserID = userID
 		customer.Email = data.Email
 		customer.Phone = data.PhoneNumber

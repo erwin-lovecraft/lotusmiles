@@ -13,6 +13,8 @@ type Repository interface {
 	Save(ctx context.Context, customer entity.Customer) error
 
 	GetByUserID(ctx context.Context, userID string) (entity.Customer, error)
+
+	GetByID(ctx context.Context, customerID int64) (entity.Customer, error)
 }
 
 type repository struct {
@@ -38,6 +40,17 @@ func (r repository) Save(ctx context.Context, customer entity.Customer) error {
 func (r repository) GetByUserID(ctx context.Context, userID string) (entity.Customer, error) {
 	var customer entity.Customer
 	if err := r.db.WithContext(ctx).Where("auth0_user_id = ?", userID).First(&customer).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return entity.Customer{}, nil
+		}
+		return entity.Customer{}, err
+	}
+	return customer, nil
+}
+
+func (r repository) GetByID(ctx context.Context, customerID int64) (entity.Customer, error) {
+	var customer entity.Customer
+	if err := r.db.WithContext(ctx).Where("id = ?", customerID).First(&customer).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return entity.Customer{}, nil
 		}

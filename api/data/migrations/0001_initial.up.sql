@@ -54,11 +54,26 @@ CREATE TABLE accrual_requests
 -- Miles Ledger
 CREATE TABLE miles_ledgers
 (
-    id                     BIGINT PRIMARY KEY,
-    customer_id            BIGINT NOT NULL REFERENCES customers (id),
-    qualifying_miles_delta INT         DEFAULT 0,
-    bonus_miles_delta      INT         DEFAULT 0,
-    accrual_request_id     BIGINT REFERENCES accrual_requests (id),
-    created_at             TIMESTAMPTZ DEFAULT NOW(),
-    updated_at             TIMESTAMPTZ DEFAULT NOW()
+    id                      BIGINT PRIMARY KEY,
+    customer_id             BIGINT NOT NULL REFERENCES customers (id),
+    qualifying_miles_delta  INT         DEFAULT 0,
+    bonus_miles_delta       INT         DEFAULT 0,
+    kind                    TEXT NOT NULL DEFAULT 'accrual',
+    earning_month           DATE NOT NULL DEFAULT CURRENT_DATE,
+    expires_at              DATE,
+    note                    TEXT,
+    accrual_request_id      BIGINT REFERENCES accrual_requests (id),
+    created_at              TIMESTAMPTZ DEFAULT NOW(),
+    updated_at              TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create membership_histories table
+CREATE TABLE membership_histories (
+    id BIGINT PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers (id),
+    old_tier TEXT NOT NULL,
+    new_tier TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

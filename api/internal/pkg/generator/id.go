@@ -5,9 +5,10 @@ import (
 )
 
 var (
-	CustomerID       *snowflake.Generator
-	AccrualRequestID *snowflake.Generator
-	MilesLedgerID    *snowflake.Generator
+	CustomerID          *snowflake.Generator
+	AccrualRequestID    *snowflake.Generator
+	MilesLedgerID       *snowflake.Generator
+	MembershipHistoryID *snowflake.Generator
 	// Create ID generator for each entity
 )
 
@@ -17,13 +18,18 @@ func Setup() error {
 	if err != nil {
 		return err
 	}
-	
+
 	AccrualRequestID, err = snowflake.New()
 	if err != nil {
 		return err
 	}
 
 	MilesLedgerID, err = snowflake.New()
+	if err != nil {
+		return err
+	}
+
+	MembershipHistoryID, err = snowflake.New()
 	if err != nil {
 		return err
 	}

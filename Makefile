@@ -3,7 +3,7 @@ DOCKER_BUILD_BIN := docker
 COMPOSE_BIN := docker compose --file build/docker-compose.yml --project-directory . -p aegismiles
 
 # Run cmd
-.PHONY: run web admin
+.PHONY: run web admin cron
 run:
 	@$(COMPOSE_BIN) run --rm --service-ports api
 
@@ -12,6 +12,9 @@ web:
 
 admin:
 	@$(COMPOSE_BIN) run --rm --service-ports admin
+
+cron:
+	@cd api && go run cmd/cronrunner/main.go
 
 # Setup cmd
 .PHONY: build-dev-image build-web-image
