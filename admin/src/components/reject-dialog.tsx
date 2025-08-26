@@ -11,6 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Big from 'big.js';
 
 interface RejectDialogProps {
@@ -21,6 +22,7 @@ interface RejectDialogProps {
 }
 
 export function RejectDialog({ isOpen, onClose, onConfirm, ticketId }: RejectDialogProps) {
+  const { t } = useTranslation();
   const [rejectReason, setRejectReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,17 +54,17 @@ export function RejectDialog({ isOpen, onClose, onConfirm, ticketId }: RejectDia
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Từ chối yêu cầu</DialogTitle>
+          <DialogTitle>{t('rejectDialog.title')}</DialogTitle>
           <DialogDescription>
-            Vui lòng nhập lý do từ chối cho yêu cầu <strong>{ticketId.toString()}</strong>
+            {t('rejectDialog.description', { requestId: ticketId.toString() })}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="reject-reason">Lý do từ chối *</Label>
+            <Label htmlFor="reject-reason">{t('rejectDialog.rejectionReason')} *</Label>
             <Textarea
               id="reject-reason"
-              placeholder="Nhập lý do từ chối yêu cầu..."
+              placeholder={t('rejectDialog.rejectionReasonPlaceholder')}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={4}
@@ -77,7 +79,7 @@ export function RejectDialog({ isOpen, onClose, onConfirm, ticketId }: RejectDia
             onClick={handleClose}
             disabled={isSubmitting}
           >
-            Hủy
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
@@ -88,10 +90,10 @@ export function RejectDialog({ isOpen, onClose, onConfirm, ticketId }: RejectDia
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Đang xử lý...
+                {t('common.processing')}
               </>
             ) : (
-              "Từ chối"
+              t('requestTicket.reject')
             )}
           </Button>
         </DialogFooter>

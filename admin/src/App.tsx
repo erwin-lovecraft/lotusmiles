@@ -10,10 +10,12 @@ import TransactionsPage from "@/pages/transactions.tsx";
 import CallbackPage from "@/pages/auth0-callback.tsx";
 import AuthErrorPage from "@/pages/auth-error.tsx";
 import ProtectedRoute from "@/components/protected-route.tsx";
+import { useTranslation } from "react-i18next";
 
 function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const onChangePage = (page: string) => {
     navigate("/" + page);
@@ -23,9 +25,9 @@ function Layout() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AppBar />
       <Navbar activePage={location.pathname} onPageChange={onChangePage}>
-        <NavbarItem id="home" index title="Quản lý yêu cầu tích dặm" icon={<Settings className="w-4 h-4" />} />
-        <NavbarItem id="transactions" title="Giao dịch cộng dặm" icon={<FileText className="w-4 h-4" />} />
-        <NavbarItem id="analytics" title="Báo cáo" icon={<BarChart2 className="w-4 h-4" />} />
+        <NavbarItem id="home" index title={t('navigation.milesAccrualRequests')} icon={<Settings className="w-4 h-4" />} />
+        <NavbarItem id="transactions" title={t('navigation.milesTransactions')} icon={<FileText className="w-4 h-4" />} />
+        <NavbarItem id="analytics" title={t('navigation.reports')} icon={<BarChart2 className="w-4 h-4" />} />
       </Navbar>
 
       <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full">

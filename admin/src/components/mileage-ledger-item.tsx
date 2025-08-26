@@ -2,12 +2,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Plus, User } from "lucide-react";
 import type { MileageLedger } from "@/types/mileage-ledger";
+import { useTranslation } from "react-i18next";
 
 interface MileageLedgerItemProps {
   ledger: MileageLedger;
 }
 
 export function MileageLedgerItem({ ledger }: MileageLedgerItemProps) {
+  const { t } = useTranslation();
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
       year: 'numeric',
@@ -45,17 +48,17 @@ export function MileageLedgerItem({ ledger }: MileageLedgerItemProps) {
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-500" />
               <div>
-                <span className="font-medium">Khách hàng #{ledger.customer_id.toString()}</span>
+                <span className="font-medium">{t('ledgerItem.customer')} #{ledger.customer_id.toString()}</span>
                 <p className="text-xs text-gray-500">ID: {ledger.customer_id.toString()}</p>
               </div>
             </div>
           </div>
           <div className="text-right">
             <Badge className={themeColors.badge}>
-              {isPositive ? 'Đã ghi nhận' : 'Đã trừ'}
+              {isPositive ? t('ledgerItem.recorded') : t('ledgerItem.deducted')}
             </Badge>
             <p className="text-sm text-gray-600 mt-1">
-              Ngày: {formatDate(ledger.created_at)}
+              {t('ledgerItem.date')}: {formatDate(ledger.created_at)}
             </p>
           </div>
         </div>
@@ -67,34 +70,34 @@ export function MileageLedgerItem({ ledger }: MileageLedgerItemProps) {
           </div>
           <div className="flex items-center space-x-2">
             <span className={`font-medium ${themeColors.qualifyingMiles}`}>
-              {isPositive ? '+' : ''}{ledger.qualifying_miles_delta.toLocaleString()} dặm cơ bản
+              {isPositive ? '+' : ''}{ledger.qualifying_miles_delta.toLocaleString()} {t('ledgerItem.qualifyingMiles')}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <span className={`font-medium ${themeColors.bonusMiles}`}>
-              +{ledger.bonus_miles_delta.toLocaleString()} dặm thưởng
+              +{ledger.bonus_miles_delta.toLocaleString()} {t('ledgerItem.bonusMiles')}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <Plus className={`w-4 h-4 ${themeColors.totalIcon}`} />
             <span className={`font-bold ${themeColors.totalMiles}`}>
-              {totalMiles >= 0 ? '+' : ''}{totalMiles.toLocaleString()} dặm tổng
+              {totalMiles >= 0 ? '+' : ''}{totalMiles.toLocaleString()} {t('ledgerItem.totalMiles')}
             </span>
           </div>
         </div>
 
         <div className={`${themeColors.detailBg} p-3 rounded text-sm`}>
-          <p className={`font-medium ${themeColors.detailTitle} mb-1`}>Chi tiết giao dịch:</p>
+          <p className={`font-medium ${themeColors.detailTitle} mb-1`}>{t('ledgerItem.transactionDetails')}</p>
           <div className={`grid grid-cols-2 gap-4 ${themeColors.detailText}`}>
             <div>
-              <span className="font-medium">Dặm cơ bản:</span> {ledger.qualifying_miles_delta.toLocaleString()}
+              <span className="font-medium">{t('ledgerItem.qualifyingMiles')}:</span> {ledger.qualifying_miles_delta.toLocaleString()}
             </div>
             <div>
-              <span className="font-medium">Dặm thưởng:</span> {ledger.bonus_miles_delta.toLocaleString()}
+              <span className="font-medium">{t('ledgerItem.bonusMiles')}:</span> {ledger.bonus_miles_delta.toLocaleString()}
             </div>
           </div>
           <p className={`${themeColors.detailFooter} text-xs mt-2`}>
-            {ledger.accrual_request_id ? `Yêu cầu tích dặm: #${ledger.accrual_request_id.toString()}` : "Hết hạn sử dụng"}
+            {ledger.accrual_request_id ? `${t('ledgerItem.accrualRequest')} #${ledger.accrual_request_id.toString()}` : t('ledgerItem.usageExpiration')}
           </p>
         </div>
       </CardContent>

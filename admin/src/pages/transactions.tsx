@@ -6,8 +6,11 @@ import { FileText, Search, Loader2, Filter } from "lucide-react";
 import { MileageLedgerItem } from "@/components/mileage-ledger-item";
 import { useMileageLedgersInfinite, useIntersectionObserver, useDebounce } from "@/lib/hooks";
 import type { MileageLedgerQueryParams } from "@/types/mileage-ledger";
+import { useTranslation } from "react-i18next";
 
 export default function TransactionsPage() {
+  const { t } = useTranslation();
+
   // Filter states
   const [customerIdFilter, setCustomerIdFilter] = useState("");
   const [accrualRequestIdFilter, setAccrualRequestIdFilter] = useState("");
@@ -62,10 +65,10 @@ export default function TransactionsPage() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <FileText className="w-5 h-5" />
-            <span>Ghi nhận giao dịch cộng dặm</span>
+            <span>{t('transactions.title')}</span>
           </CardTitle>
           <CardDescription>
-            Lịch sử và ghi nhận các giao dịch cộng dặm đã được xử lý
+            {t('transactions.description')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -75,36 +78,36 @@ export default function TransactionsPage() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Filter className="w-5 h-5" />
-            <span>Bộ lọc</span>
+            <span>{t('home.filters')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm">ID Khách hàng</label>
+              <label className="text-sm">{t('transactions.customerId')}</label>
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                 <Input
-                  placeholder="Nhập ID khách hàng..."
+                  placeholder={t('transactions.customerIdPlaceholder')}
                   value={customerIdFilter}
                   onChange={(e) => setCustomerIdFilter(e.target.value)}
                   className="pl-10"
                 />
               </div>
               {customerIdFilter !== debouncedCustomerId && (
-                <p className="text-xs text-gray-500">Đang tìm kiếm...</p>
+                <p className="text-xs text-gray-500">{t('home.searching')}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm">ID Yêu cầu tích dặm</label>
+              <label className="text-sm">{t('transactions.accrualRequestId')}</label>
               <Input
-                placeholder="Nhập ID yêu cầu..."
+                placeholder={t('transactions.accrualRequestIdPlaceholder')}
                 value={accrualRequestIdFilter}
                 onChange={(e) => setAccrualRequestIdFilter(e.target.value)}
               />
               {accrualRequestIdFilter !== debouncedAccrualRequestId && (
-                <p className="text-xs text-gray-500">Đang tìm kiếm...</p>
+                <p className="text-xs text-gray-500">{t('home.searching')}</p>
               )}
             </div>
 
@@ -115,7 +118,7 @@ export default function TransactionsPage() {
                 className="w-full"
                 onClick={clearFilters}
               >
-                Xóa bộ lọc
+                {t('home.clearFilters')}
               </Button>
             </div>
           </div>
@@ -125,12 +128,12 @@ export default function TransactionsPage() {
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Hiển thị {ledgers.length} trong tổng số {total} giao dịch
+          {t('transactions.showingResults', { count: ledgers.length, total })}
         </p>
         {loading && (
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Đang tải...</span>
+            <span>{t('common.loading')}</span>
           </div>
         )}
       </div>
@@ -141,7 +144,7 @@ export default function TransactionsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-red-700 text-sm">
-                Lỗi: {error instanceof Error ? error.message : 'An error occurred'}
+                {t('common.error')}: {error instanceof Error ? error.message : 'An error occurred'}
               </p>
               <Button
                 size="sm"
@@ -149,7 +152,7 @@ export default function TransactionsPage() {
                 onClick={() => refetch()}
                 className="text-red-700 border-red-300 hover:bg-red-50"
               >
-                Thử lại
+                {t('common.tryAgain')}
               </Button>
             </div>
           </CardContent>
@@ -167,7 +170,7 @@ export default function TransactionsPage() {
           <div className="flex justify-center py-4">
             <div className="flex items-center space-x-2">
               <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
-              <span className="text-sm text-gray-500">Đang tải...</span>
+              <span className="text-sm text-gray-500">{t('common.loading')}</span>
             </div>
           </div>
         )}
@@ -177,7 +180,7 @@ export default function TransactionsPage() {
           <div className="flex justify-center py-4">
             <div className="flex items-center space-x-2">
               <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
-              <span className="text-sm text-gray-500">Đang tải thêm...</span>
+              <span className="text-sm text-gray-500">{t('common.loadingMore')}</span>
             </div>
           </div>
         )}
@@ -192,7 +195,7 @@ export default function TransactionsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center py-8">
-                <p className="text-gray-500">Không tìm thấy giao dịch nào</p>
+                <p className="text-gray-500">{t('transactions.noTransactionsFound')}</p>
               </div>
             </CardContent>
           </Card>
@@ -201,7 +204,7 @@ export default function TransactionsPage() {
         {/* End of results indicator */}
         {!hasNextPage && ledgers.length > 0 && (
           <div className="text-center py-4">
-            <p className="text-sm text-gray-500">Đã hiển thị tất cả kết quả</p>
+            <p className="text-sm text-gray-500">{t('common.allResults')}</p>
           </div>
         )}
       </div>

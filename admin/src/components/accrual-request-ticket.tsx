@@ -21,6 +21,7 @@ import { RejectDialog } from "./reject-dialog";
 import { useApproveAccrualRequest, useRejectAccrualRequest } from "@/lib/hooks";
 import { getStatusBadge } from "@/lib/utils/status-badge";
 import Big from 'big.js';
+import { useTranslation } from "react-i18next";
 
 interface AccrualRequestTicketProps {
   request: AccrualRequest;
@@ -33,6 +34,7 @@ interface ImageDisplayProps {
 }
 
 function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
+  const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [isInView, setIsInView] = useState(false);
@@ -79,7 +81,7 @@ function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
       <div className="flex items-center space-x-2 text-sm bg-gray-50 p-2 rounded border border-gray-200">
         <ImageIcon className="w-4 h-4 text-gray-400" />
         <span>{title}</span>
-        <Badge variant="outline" className="text-xs text-red-600 border-red-300">Lỗi tải ảnh</Badge>
+        <Badge variant="outline" className="text-xs text-red-600 border-red-300">{t('requestTicket.imageLoadError')}</Badge>
         <Button
           size="sm"
           variant="ghost"
@@ -105,7 +107,7 @@ function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
           variant="ghost"
           className="h-6 w-6 p-0"
           onClick={openImageInNewTab}
-          title="Mở ảnh trong tab mới"
+          title={t('requestTicket.openImageInNewTab')}
         >
           <ExternalLink className="w-3 h-3" />
         </Button>
@@ -119,7 +121,7 @@ function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
           <div className="flex items-center justify-center h-32 bg-gray-100">
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-              <span>Đang tải ảnh...</span>
+              <span>{t('requestTicket.loadingImage')}</span>
             </div>
           </div>
         )}
@@ -140,6 +142,7 @@ function ImageDisplay({ src, alt, title }: ImageDisplayProps) {
 }
 
 export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [copiedRequestId, setCopiedRequestId] = useState(false);
@@ -215,30 +218,30 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                 <User className="w-4 h-4 text-gray-500" />
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-medium">Request ID:</span>
+                    <span className="font-medium">{t('requestTicket.requestId')}:</span>
                     <button
                       onClick={handleCopyRequestId}
                       className={`font-mono text-sm px-2 py-1 rounded border transition-all duration-200 ${copiedRequestId
                         ? 'bg-green-50 text-green-700 border-green-300 scale-105'
                         : 'text-gray-600 hover:text-gray-800 bg-gray-50 border-gray-200 hover:bg-gray-100'
                         }`}
-                      title={copiedRequestId ? "Copied!" : "Click to copy Request ID"}
+                      title={copiedRequestId ? t('requestTicket.copied') : t('requestTicket.copyRequestId')}
                     >
-                      {copiedRequestId ? "✓ Copied!" : formatBigId(request.id)}
+                      {copiedRequestId ? `✓ ${t('requestTicket.copied')}!` : formatBigId(request.id)}
                     </button>
                   </div>
                   <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
                     <div className="flex items-center space-x-2">
-                      <span>Ticket ID:</span>
+                      <span>{t('requestTicket.ticketId')}:</span>
                       <button
                         onClick={handleCopyTicketId}
                         className={`font-mono px-2 py-1 rounded border transition-all duration-200 ${copiedTicketId
                           ? 'bg-green-50 text-green-700 border-green-300 scale-105'
                           : 'text-gray-600 hover:text-gray-800 bg-gray-50 border-gray-200 hover:bg-gray-100'
                           }`}
-                        title={copiedTicketId ? "Copied!" : "Click to copy Ticket ID"}
+                        title={copiedTicketId ? t('requestTicket.copied') : t('requestTicket.copyTicketId')}
                       >
-                        {copiedTicketId ? "✓ Copied!" : request.ticket_id}
+                        {copiedTicketId ? `✓ ${t('requestTicket.copied')}!` : request.ticket_id}
                       </button>
                     </div>
                     {request.customer && (
@@ -251,7 +254,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              {getStatusBadge(request.status)}
+              {getStatusBadge(request.status, t)}
               <Button
                 size="sm"
                 variant="outline"
@@ -261,12 +264,12 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                 {isExpanded ? (
                   <>
                     <EyeOff className="w-4 h-4" />
-                    <span>Thu gọn</span>
+                    <span>{t('requestTicket.collapse')}</span>
                   </>
                 ) : (
                   <>
                     <Eye className="w-4 h-4" />
-                    <span>Chi tiết</span>
+                    <span>{t('requestTicket.details')}</span>
                   </>
                 )}
               </Button>
@@ -289,12 +292,12 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
             </div>
             <div className="flex items-center space-x-2">
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
-                Q-miles: {request.qualifying_miles.toLocaleString()}
+                {t('requestTicket.qualifyingMiles')}: {request.qualifying_miles.toLocaleString()}
               </Badge>
             </div>
             <div className="flex items-center space-x-2">
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
-                B-miles: {request.bonus_miles.toLocaleString()}
+                {t('requestTicket.bonusMiles')}: {request.bonus_miles.toLocaleString()}
               </Badge>
             </div>
           </div>
@@ -307,15 +310,15 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                 <div className="flex items-center space-x-4">
                   <Badge variant="outline" className="text-lg px-3 py-1">{request.ticket_id}</Badge>
                   <div>
-                    <p className="font-medium text-lg">Request ID: {formatBigId(request.id)}</p>
+                    <p className="font-medium text-lg">{t('requestTicket.requestId')}: {formatBigId(request.id)}</p>
                     <p className="text-sm text-gray-600">Customer ID: {formatBigId(request.customer_id)}</p>
                     <p className="text-sm text-gray-600">PNR: {request.pnr}</p>
                     <p className="text-sm text-gray-600">Booking Class: {request.booking_class}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  {getStatusBadge(request.status)}
-                  <p className="text-sm text-gray-600 mt-1">Ngày tạo: {formatDate(request.created_at)}</p>
+                  {getStatusBadge(request.status, t)}
+                  <p className="text-sm text-gray-600 mt-1">{t('requestTicket.created')}: {formatDate(request.created_at)}</p>
                 </div>
               </div>
 
@@ -324,28 +327,28 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                     <User className="w-4 h-4 mr-2" />
-                    Thông tin khách hàng
+                    {t('requestTicket.customerInfo')}
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Họ và tên:</span>
+                        <span className="text-gray-600">{t('requestTicket.fullName')}:</span>
                         <span className="font-medium text-blue-700">
                           {request.customer.first_name} {request.customer.last_name}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Email:</span>
+                        <span className="text-gray-600">{t('requestTicket.email')}:</span>
                         <span className="font-medium">{request.customer.email}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Số điện thoại:</span>
+                        <span className="text-gray-600">{t('requestTicket.phone')}:</span>
                         <span className="font-medium">{request.customer.phone || 'N/A'}</span>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Hạng thành viên:</span>
+                        <span className="text-gray-600">{t('requestTicket.membershipTier')}:</span>
                         <Badge
                           variant="outline"
                           className={`text-xs capitalize ${request.customer.member_tier === 'platinum' ? 'bg-purple-100 text-purple-800 border-purple-300' :
@@ -358,13 +361,13 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                         </Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tổng dặm hợp lệ:</span>
+                        <span className="text-gray-600">{t('requestTicket.totalQualifyingMiles')}:</span>
                         <span className="font-medium text-purple-600">
                           {request.customer.qualifying_miles_total.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tổng dặm thưởng:</span>
+                        <span className="text-gray-600">{t('requestTicket.totalBonusMiles')}:</span>
                         <span className="font-medium text-purple-600">
                           {request.customer.bonus_miles_total.toLocaleString()}
                         </span>
@@ -378,42 +381,42 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Thông tin chuyến bay</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">{t('requestTicket.flightInfo')}</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Hãng bay:</span>
+                        <span className="text-gray-600">{t('requestTicket.carrier')}:</span>
                         <span className="font-medium">{request.carrier}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tuyến bay:</span>
+                        <span className="text-gray-600">{t('requestTicket.route')}:</span>
                         <span className="font-medium">{request.from_code} - {request.to_code}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Ngày bay:</span>
+                        <span className="text-gray-600">{t('requestTicket.flightDate')}:</span>
                         <span className="font-medium">{formatDate(request.departure_date)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Khoảng cách:</span>
-                        <span className="font-medium">{request.distance_miles.toLocaleString()} dặm</span>
+                        <span className="text-gray-600">{t('requestTicket.distance')}:</span>
+                        <span className="font-medium">{request.distance_miles.toLocaleString()} miles</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tỷ lệ tích dặm:</span>
+                        <span className="text-gray-600">{t('requestTicket.qualifyingAccrualRate')}:</span>
                         <span className="font-medium">{request.qualifying_accrual_rate}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Dặm hợp lệ:</span>
+                        <span className="text-gray-600">{t('requestTicket.qualifyingMiles')}:</span>
                         <span className="font-medium text-blue-600">{request.qualifying_miles.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tỷ lệ thưởng:</span>
+                        <span className="text-gray-600">{t('requestTicket.bonusAccrualRate')}:</span>
                         <span className="font-medium">{request.bonus_accrual_rate}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Dặm thưởng:</span>
+                        <span className="text-gray-600">{t('requestTicket.bonusMiles')}:</span>
                         <span className="font-medium text-green-600">{request.bonus_miles.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between pt-2 border-t border-gray-200">
-                        <span className="text-gray-600 font-medium">Tổng dặm:</span>
+                        <span className="text-gray-600 font-medium">{t('requestTicket.totalMiles')}:</span>
                         <span className="font-bold text-gray-800">{totalMiles.toLocaleString()}</span>
                       </div>
                     </div>
@@ -423,26 +426,26 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2 flex items-center">
                       <Paperclip className="w-4 h-4 mr-2" />
-                      Hình ảnh đính kèm
+                      {t('requestTicket.attachedImages')}
                     </h4>
                     <div className="space-y-4">
                       {request.ticket_image_url && (
                         <ImageDisplay
                           src={request.ticket_image_url}
-                          alt="Vé máy bay"
-                          title="Vé máy bay"
+                          alt={t('requestTicket.flightTicket')}
+                          title={t('requestTicket.flightTicket')}
                         />
                       )}
                       {request.boarding_pass_image_url && (
                         <ImageDisplay
                           src={request.boarding_pass_image_url}
-                          alt="Boarding pass"
-                          title="Boarding pass"
+                          alt={t('requestTicket.boardingPass')}
+                          title={t('requestTicket.boardingPass')}
                         />
                       )}
                       {!request.ticket_image_url && !request.boarding_pass_image_url && (
                         <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded border border-gray-200">
-                          Không có hình ảnh đính kèm
+                          {t('requestTicket.noImagesAttached')}
                         </div>
                       )}
                     </div>
@@ -455,18 +458,18 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                     <div>
                       <h4 className="font-medium text-gray-900 mb-2 flex items-center">
                         <Shield className="w-4 h-4 mr-2" />
-                        Thông tin đánh giá
+                        {t('requestTicket.reviewInfo')}
                       </h4>
                       <div className="space-y-2 text-sm">
                         {request.reviewed_at && (
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Ngày đánh giá:</span>
+                            <span className="text-gray-600">{t('requestTicket.reviewDate')}:</span>
                             <span className="font-medium">{formatDate(request.reviewed_at)}</span>
                           </div>
                         )}
                         {request.rejected_reason && (
                           <div className="mt-2 p-2 bg-red-50 rounded">
-                            <span className="text-red-700 text-sm">Lý do từ chối: {request.rejected_reason}</span>
+                            <span className="text-red-700 text-sm">{t('requestTicket.rejectionReason')}: {request.rejected_reason}</span>
                           </div>
                         )}
                       </div>
@@ -475,14 +478,14 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
 
                   {/* System Information */}
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Thông tin hệ thống</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">{t('requestTicket.systemInfo')}</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Ngày tạo:</span>
+                        <span className="text-gray-600">{t('requestTicket.created')}:</span>
                         <span className="font-medium">{formatDate(request.created_at)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Cập nhật lần cuối:</span>
+                        <span className="text-gray-600">{t('requestTicket.lastUpdated')}:</span>
                         <span className="font-medium">{formatDate(request.updated_at)}</span>
                       </div>
                     </div>
@@ -496,7 +499,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
               {(request.status === "pending" || request.status === "inprogress") && (
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-500">
-                    <p>Cần quyết định: Approve hoặc Reject</p>
+                    <p>{t('requestTicket.decisionRequired')}</p>
                   </div>
                   <div className="flex space-x-3">
                     <Button
@@ -509,10 +512,10 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                       {rejectMutation.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang xử lý...
+                          {t('common.processing')}
                         </>
                       ) : (
-                        "Từ chối"
+                        t('requestTicket.reject')
                       )}
                     </Button>
                     <Button
@@ -524,10 +527,10 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                       {approveMutation.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang xử lý...
+                          {t('common.processing')}
                         </>
                       ) : (
-                        "Phê duyệt"
+                        t('requestTicket.approve')
                       )}
                     </Button>
                   </div>
@@ -540,7 +543,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                   }`}>
                   <p className={`font-medium mb-1 ${request.status === "approved" ? "text-green-800" : "text-red-800"
                     }`}>
-                    Quyết định {request.status === "approved" ? "phê duyệt" : "từ chối"}:
+                    {request.status === "approved" ? t('requestTicket.decisionToApprove') : t('requestTicket.decisionToReject')}
                   </p>
                   {request.rejected_reason && (
                     <p className={request.status === "approved" ? "text-green-700" : "text-red-700"}>
@@ -550,7 +553,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                   {request.reviewed_at && (
                     <p className={`text-xs ${request.status === "approved" ? "text-green-600" : "text-red-600"
                       }`}>
-                      Ngày quyết định: {formatDate(request.reviewed_at)}
+                      {t('requestTicket.decisionDate')}: {formatDate(request.reviewed_at)}
                     </p>
                   )}
                 </div>

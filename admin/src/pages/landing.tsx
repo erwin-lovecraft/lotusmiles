@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plane, Settings, CheckCircle, FileText } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useTranslation } from "react-i18next";
 
 export function LandingPage() {
   const { loginWithRedirect } = useAuth0();
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
     await loginWithRedirect();
@@ -27,7 +29,7 @@ export function LandingPage() {
             className="text-white hover:bg-white/10 border border-white/30"
             onClick={handleLogin}
           >
-            Login
+            {t('auth.login')}
           </Button>
         </div>
       </header>
@@ -36,17 +38,17 @@ export function LandingPage() {
       <section className="px-6 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold text-white mb-6">
-            Admin Portal Lotusmile
+            {t('landing.title')}
           </h1>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Manage loyalty program operations with ease
+            {t('landing.subtitle')}
           </p>
           <Button
             size="lg"
             className="bg-white text-purple-600 hover:bg-gray-100 rounded-lg px-8 py-3 text-lg"
             onClick={handleLogin}
           >
-            Login now
+            {t('auth.loginNow')}
           </Button>
         </div>
       </section>
@@ -55,7 +57,7 @@ export function LandingPage() {
       <section className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Key Administrative Features
+            {t('landing.features')}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -66,11 +68,11 @@ export function LandingPage() {
                     <Settings className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-white">Manage Manual Miles Accrual Requests</CardTitle>
+                <CardTitle className="text-white">{t('landing.manageRequests')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-white/80 text-center">
-                  Handle customer requests for manual miles accrual with comprehensive tracking and processing tools.
+                  {t('landing.manageRequestsDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -82,11 +84,11 @@ export function LandingPage() {
                     <CheckCircle className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-white">Approve / Reject Requests</CardTitle>
+                <CardTitle className="text-white">{t('landing.approveReject')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-white/80 text-center">
-                  Review and process pending requests with detailed approval workflows and audit trails.
+                  {t('landing.approveRejectDesc')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -98,11 +100,11 @@ export function LandingPage() {
                     <FileText className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-white">Record Miles Accrual Transactions</CardTitle>
+                <CardTitle className="text-white">{t('landing.recordTransactions')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-white/80 text-center">
-                  Document and track all miles accrual transactions with complete transaction history.
+                  {t('landing.recordTransactionsDesc')}
                 </CardDescription>
               </CardContent>
             </Card>

@@ -2,11 +2,13 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useTranslation } from "react-i18next";
 
 export default function CallbackPage() {
   const { handleRedirectCallback } = useAuth0();
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const error = params.get("error");
@@ -27,7 +29,7 @@ export default function CallbackPage() {
         navigate("/home", { replace: true });
       } catch (e: unknown) {
         navigate(
-          `/auth-error?code=callback_error&message=${encodeURIComponent((e as Error).message|| "Unknown error")}`,
+          `/auth-error?code=callback_error&message=${encodeURIComponent((e as Error).message || "Unknown error")}`,
           { replace: true }
         );
       }
@@ -36,7 +38,7 @@ export default function CallbackPage() {
 
   return (
     <div className="flex items-center justify-center h-72">
-      <div className="animate-pulse text-sm text-gray-500">Signing you in…</div>
+      <div className="animate-pulse text-sm text-gray-500">{t('auth.signingIn')}</div>
     </div>
   );
 }
