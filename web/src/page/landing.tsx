@@ -5,29 +5,30 @@ import AppBar from "@/components/appbar.tsx";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-
-const benefits = [
-  {
-    icon: TrendingUp,
-    title: "Accumulate Miles",
-    description: "Earn points on every flight and linked activities."
-  },
-  {
-    icon: Calendar,
-    title: "Redeem Exciting Rewards",
-    description: "Use points to redeem flight tickets, hotels, and many valuable gifts."
-  },
-  {
-    icon: Shield,
-    title: "Absolute Security",
-    description: "Personal information is encrypted and comprehensively protected."
-  }
-];
-
+import { useTranslations } from '@/lib/hooks';
 
 export default function LandingPage() {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
+  const { landing } = useTranslations();
+
+  const benefits = [
+    {
+      icon: TrendingUp,
+      title: landing.benefits.accumulateMiles.title,
+      description: landing.benefits.accumulateMiles.description
+    },
+    {
+      icon: Calendar,
+      title: landing.benefits.redeemRewards.title,
+      description: landing.benefits.redeemRewards.description
+    },
+    {
+      icon: Shield,
+      title: landing.benefits.security.title,
+      description: landing.benefits.security.description
+    }
+  ];
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -47,11 +48,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
           <div className="text-center space-y-6 sm:space-y-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              Lotusmile Loyalty Program
+              {landing.title}
             </h1>
 
             <p className="text-lg sm:text-xl md:text-2xl text-purple-100 max-w-3xl mx-auto px-2">
-              Earn Points – Redeem Rewards – Enjoy Amazing Journeys
+              {landing.subtitle}
             </p>
 
             <div className="pt-2 sm:pt-4">
@@ -60,7 +61,7 @@ export default function LandingPage() {
                 className="bg-white text-purple-600 hover:bg-purple-50 px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                 onClick={handleClickGetStarted}
               >
-                Get Started Now
+                {landing.getStarted}
               </Button>
             </div>
           </div>
@@ -74,7 +75,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 px-2">
-              Join Now to Receive Special Offers
+              {landing.joinNow}
             </h2>
           </div>
 

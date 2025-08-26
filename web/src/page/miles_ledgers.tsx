@@ -6,6 +6,7 @@ import TransactionPreview from "@/components/transaction-preview.tsx";
 import { useMilesLedgers } from "@/lib/services/miles-ledgers";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useState } from "react";
+import { useTranslations } from '@/lib/hooks';
 
 export default function MilesLedgers() {
   const [page, setPage] = useState(1);
@@ -14,6 +15,7 @@ export default function MilesLedgers() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [dateRange, setDateRange] = useState("all");
+  const { ledgers } = useTranslations();
 
   // Debounce search term with 500ms delay
   const debouncedTransactionId = useDebounce(transactionId, 500);
@@ -100,8 +102,8 @@ export default function MilesLedgers() {
               <TrendingUp className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mileage Ledgers</h1>
-              <p className="text-sm sm:text-base text-gray-500">Track your mileage transactions and balance</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{ledgers.title}</h1>
+              <p className="text-sm sm:text-base text-gray-500">{ledgers.subtitle}</p>
             </div>
           </div>
         </div>
@@ -113,7 +115,7 @@ export default function MilesLedgers() {
               <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
               <div className="absolute inset-0 rounded-full border-2 border-purple-200 animate-ping"></div>
             </div>
-            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">Loading your transactions...</p>
+            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">{ledgers.loading}</p>
             <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your data</p>
           </div>
         </div>
@@ -131,8 +133,8 @@ export default function MilesLedgers() {
               <TrendingUp className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mileage Ledgers</h1>
-              <p className="text-sm sm:text-base text-gray-500">Track your mileage transactions and balance</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{ledgers.title}</h1>
+              <p className="text-sm sm:text-base text-gray-500">{ledgers.subtitle}</p>
             </div>
           </div>
         </div>
@@ -164,8 +166,8 @@ export default function MilesLedgers() {
             <TrendingUp className="w-5 h-5 text-purple-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Mileage Ledgers</h1>
-            <p className="text-sm sm:text-base text-gray-500">Track your mileage transactions and balance</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{ledgers.title}</h1>
+            <p className="text-sm sm:text-base text-gray-500">{ledgers.subtitle}</p>
           </div>
 
         </div>

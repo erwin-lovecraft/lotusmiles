@@ -6,11 +6,13 @@ import { useInfiniteAccrualRequests } from "@/lib/hooks/use-infinite-accrual-req
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useState, useRef, useCallback } from "react";
 import type { MileageAccrualRequest } from "@/types/mileage-accrual-request";
+import { useTranslations } from '@/lib/hooks';
 
 export default function MileageAccrualTrackingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<MileageAccrualRequest | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const { tracking, common } = useTranslations();
 
   // Debounce search term with 500ms delay
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -66,15 +68,15 @@ export default function MileageAccrualTrackingPage() {
               <Search className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mileage Accrual Requests</h1>
-              <p className="text-sm sm:text-base text-gray-500">Track and manage your mileage requests</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{tracking.title}</h1>
+              <p className="text-sm sm:text-base text-gray-500">{tracking.subtitle}</p>
             </div>
           </div>
 
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="Search by ticket ID or PNR..."
+              placeholder={tracking.searchPlaceholder}
               className="pl-12 h-12 text-base border-gray-200 focus:border-purple-500 focus:ring-purple-500"
               disabled
             />
@@ -88,8 +90,8 @@ export default function MileageAccrualTrackingPage() {
               <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
               <div className="absolute inset-0 rounded-full border-2 border-purple-200 animate-ping"></div>
             </div>
-            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">Loading your requests...</p>
-            <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your data</p>
+            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">{tracking.loadingRequests}</p>
+            <p className="mt-2 text-sm text-gray-500">{common.loading}</p>
           </div>
         </div>
       </div>

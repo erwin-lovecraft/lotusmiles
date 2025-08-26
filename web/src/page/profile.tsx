@@ -6,10 +6,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useProfile } from "@/lib/services/profile";
 import { format } from "date-fns";
 import { MemberTier, type Tier } from "@/lib/member-tier";
+import { useTranslations } from '@/lib/hooks';
 
 export default function Profile() {
   const { user } = useAuth0();
   const { data: profile, isLoading, error } = useProfile();
+  const { profile: profileT, common, errors } = useTranslations();
 
   if (isLoading) {
     return (
@@ -21,7 +23,7 @@ export default function Profile() {
               <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
               <div className="absolute inset-0 rounded-full border-2 border-purple-200 animate-ping"></div>
             </div>
-            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">Loading your profile...</p>
+            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">{common.loading}</p>
             <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your data</p>
           </div>
         </div>
@@ -40,7 +42,7 @@ export default function Profile() {
                 <span className="text-white font-bold">!</span>
               </div>
             </div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Failed to load profile</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{errors.somethingWentWrong}</h3>
             <p className="text-sm text-gray-500 text-center max-w-md">
               We encountered an error while loading your profile. Please try refreshing the page or contact support if the problem persists.
             </p>
@@ -91,7 +93,7 @@ export default function Profile() {
               <div className="p-2 bg-purple-100 rounded-lg">
                 <User className="w-4 h-4 text-purple-600" />
               </div>
-              <span>Personal Information</span>
+              <span>{profileT.personalInfo}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">

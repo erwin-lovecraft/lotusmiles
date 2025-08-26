@@ -5,9 +5,11 @@ import { MemberTier, type Tier } from "@/lib/member-tier.ts";
 import MemberTierCard from "@/components/member-tier-card.tsx";
 import { useProfile } from "@/lib/services/profile";
 import { format } from "date-fns";
+import { useTranslation } from 'react-i18next';
 
 export default function HomePage() {
   const { data: profile, isLoading, error } = useProfile();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -19,7 +21,7 @@ export default function HomePage() {
               <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
               <div className="absolute inset-0 rounded-full border-2 border-purple-200 animate-ping"></div>
             </div>
-            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">Loading your profile...</p>
+            <p className="mt-4 text-base sm:text-lg font-medium text-gray-700">{t('common.loading')}</p>
             <p className="mt-2 text-sm text-gray-500">Please wait while we fetch your data</p>
           </div>
         </div>
@@ -38,7 +40,7 @@ export default function HomePage() {
                 <span className="text-white font-bold">!</span>
               </div>
             </div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Failed to load profile</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{t('errors.somethingWentWrong')}</h3>
             <p className="text-sm text-gray-500 text-center max-w-md">
               We encountered an error while loading your profile. Please try refreshing the page or contact support if the problem persists.
             </p>

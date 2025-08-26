@@ -8,9 +8,12 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './language-switcher';
 
 export default function AppBar() {
   const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
     await loginWithRedirect();
@@ -34,6 +37,7 @@ export default function AppBar() {
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
+          <LanguageSwitcher />
           {!isAuthenticated ? (
             <Button
               onClick={handleLogin}
@@ -42,8 +46,8 @@ export default function AppBar() {
               className="rounded-lg"
             >
               <User />
-              <span className="hidden sm:inline">Login</span>
-              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">{t('auth.login')}</span>
+              <span className="sm:hidden">{t('auth.login')}</span>
             </Button>
           ) : (
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -84,13 +88,13 @@ export default function AppBar() {
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
                       <Bell />
-                      Notifications
+                      {t('profile.notifications')}
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
-                    Log out
+                    {t('auth.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

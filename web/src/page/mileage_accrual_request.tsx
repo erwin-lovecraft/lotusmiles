@@ -5,12 +5,14 @@ import { createValidatedForm } from "@/components/validated-form-factory.ts";
 import { SelectItem } from "@/components/ui/select.tsx";
 import { BOOKING_CLASSES, LOCATIONS } from "@/mocks/mocks.ts";
 import { unsignedUpload } from "@/lib/cloudinary.ts";
-import { type MileageAccrualRequestForm, MileageAccrualRequestSchema } from "@/types/mileage-accrual-request.ts";
+import { type MileageAccrualRequestForm, createMileageAccrualRequestSchema } from "@/types/mileage-accrual-request.ts";
 import { useCreateMileageAccrualRequest } from "@/lib/hooks/use-mileage-accrual-request.ts";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/types/api-error";
 import { useNavigate } from "react-router";
 import { Plane, Upload, CreditCard } from "lucide-react";
+import { useTranslations } from '@/lib/hooks';
+import { useTranslation } from 'react-i18next';
 
 export default function MileageAccrualRequestPage() {
   const { Form, Input, Select, DatePicker, FileUpload } = createValidatedForm<MileageAccrualRequestForm>()
@@ -20,11 +22,16 @@ export default function MileageAccrualRequestPage() {
 
   const createMileageAccrualRequestMutation = useCreateMileageAccrualRequest();
   const navigate = useNavigate();
+  const { mileageRequest } = useTranslations();
+  const { t } = useTranslation();
+
+  // Create schema with translated error messages
+  const MileageAccrualRequestSchema = createMileageAccrualRequestSchema(t);
 
   const handleSubmit = async (values: MileageAccrualRequestForm) => {
     try {
       await createMileageAccrualRequestMutation.mutateAsync(values);
-      toast.success('Mileage accrual request submitted successfully!');
+      toast.success(mileageRequest.submitSuccess);
 
       // Navigate to tracking page after successful submission
       navigate('/tracking');
@@ -34,7 +41,7 @@ export default function MileageAccrualRequestPage() {
         toast.error(error.error_description);
       } else {
         // Fallback for internal server errors or network issues
-        toast.error('An error occurred while submitting the request. Please try again.');
+        toast.error(mileageRequest.submitError);
       }
     }
   }
@@ -46,7 +53,7 @@ export default function MileageAccrualRequestPage() {
         const res = await unsignedUpload(file)
         results.push({ url: res.secure_url, display_name: res.display_name })
       } catch (e) {
-        throw new Error(`Upload failed: ${e}`);
+        throw new Error(`${mileageRequest.uploadFailed}: ${e}`);
       }
     }
     return results; // array of objects with url and display_name
@@ -63,10 +70,10 @@ export default function MileageAccrualRequestPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                Mileage Request
+                {mileageRequest.title}
               </h1>
               <p className="text-sm sm:text-base lg:text-lg text-gray-600 mt-1">
-                Submit flight details to earn miles
+                {mileageRequest.subtitle}
               </p>
             </div>
           </div>
@@ -80,7 +87,7 @@ export default function MileageAccrualRequestPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl">
                   <CreditCard className="w-5 h-5 text-purple-600" />
-                  Flight Information
+                  {mileageRequest.flightInformation}
                 </CardTitle>
               </CardHeader>
 

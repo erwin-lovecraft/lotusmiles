@@ -25,6 +25,7 @@ import { format } from "date-fns";
 import { CalendarIcon, Upload, Eye, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export type ValidatedFormProps<TModel extends FieldValues> = {
   defaultValues?: DefaultValues<TModel>;
@@ -78,6 +79,7 @@ export function ValidatedInput<
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValidatedInputProps<TModel, TName>) {
   const { control } = useFormContext();
+  const { t } = useTranslation();
 
   return (
     <FormField
@@ -92,7 +94,7 @@ export function ValidatedInput<
           </FormControl>
           {props.description &&
             <FormDescription>
-              {props.description}
+              {t(props.description)}
             </FormDescription>
           }
           <FormMessage className="mb-4" />
@@ -114,6 +116,7 @@ export function ValidatedSelect<
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValiatedSelectProps<TModel, TName>) {
   const { control } = useFormContext();
+  const { t } = useTranslation();
 
   return (
     <FormField
@@ -135,7 +138,7 @@ export function ValidatedSelect<
           </Select>
           {props.description &&
             <FormDescription>
-              {props.description}
+              {t(props.description)}
             </FormDescription>
           }
           <FormMessage className="mb-4" />
@@ -155,6 +158,7 @@ export function ValidatedDatePicker<
   TName extends FieldPath<TModel> = FieldPath<TModel>
 >(props: ValiatedDatePickerProps<TModel, TName>) {
   const { control } = useFormContext();
+  const { t } = useTranslation();
 
   return (
     <FormField
@@ -197,7 +201,7 @@ export function ValidatedDatePicker<
           </Popover>
           {props.description &&
             <FormDescription>
-              {props.description}
+              {t(props.description)}
             </FormDescription>
           }
           <FormMessage className="mb-4" />
@@ -261,6 +265,7 @@ export function ValidatedFileUpload<
   } = props;
 
   const { control } = useFormContext<TModel>();
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -558,7 +563,7 @@ export function ValidatedFileUpload<
               )}
             </FormControl>
 
-            {description && <FormDescription>{description}</FormDescription>}
+            {description && <FormDescription>{t(description)}</FormDescription>}
 
             {(error || uploading) && (
               <div className="mt-2 text-sm">

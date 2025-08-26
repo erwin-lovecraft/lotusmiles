@@ -1,0 +1,225 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "submit": "Gửi",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "OK",
+    "retry": "Thử lại",
+    "refresh": "Làm mới",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "view": "Xem",
+    "details": "Chi tiết",
+    "more": "Thêm",
+    "less": "Ít hơn"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "history": "Lịch sử",
+    "tracking": "Theo dõi",
+    "request": "Yêu cầu",
+    "profile": "Hồ sơ"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "signup": "Đăng ký",
+    "welcome": "Chào mừng",
+    "unauthorized": "Không được phép",
+    "accessDenied": "Truy cập bị từ chối",
+    "sessionExpired": "Phiên đăng nhập đã hết hạn"
+  },
+  "home": {
+    "title": "Chào mừng đến với LotusMiles",
+    "subtitle": "Quản lý phần thưởng dặm bay của bạn",
+    "totalMiles": "Tổng dặm",
+    "availableMiles": "Dặm khả dụng",
+    "expiringMiles": "Dặm sắp hết hạn",
+    "recentActivity": "Hoạt động gần đây",
+    "quickActions": "Thao tác nhanh",
+    "requestMiles": "Yêu cầu dặm",
+    "viewHistory": "Xem lịch sử",
+    "trackRequest": "Theo dõi yêu cầu"
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "personalInfo": "Thông tin cá nhân",
+    "membershipInfo": "Thông tin thành viên",
+    "settings": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "notifications": "Thông báo",
+    "privacy": "Quyền riêng tư",
+    "help": "Trợ giúp & Hỗ trợ",
+    "about": "Giới thiệu",
+    "version": "Phiên bản"
+  },
+  "mileage": {
+    "request": {
+      "title": "Yêu cầu tích lũy dặm bay",
+      "subtitle": "Gửi yêu cầu tích lũy dặm bay mới",
+      "form": {
+        "ticketNumber": "Số vé",
+        "ticketNumberPlaceholder": "Nhập số vé của bạn",
+        "flightDate": "Ngày bay",
+        "flightDatePlaceholder": "Chọn ngày bay",
+        "origin": "Điểm đi",
+        "originPlaceholder": "Nhập thành phố khởi hành",
+        "destination": "Điểm đến",
+        "destinationPlaceholder": "Nhập thành phố đến",
+        "airline": "Hãng bay",
+        "airlinePlaceholder": "Chọn hãng bay",
+        "fareClass": "Hạng vé",
+        "fareClassPlaceholder": "Chọn hạng vé",
+        "submitRequest": "Gửi yêu cầu",
+        "requestSubmitted": "Yêu cầu đã được gửi thành công",
+        "requestFailed": "Gửi yêu cầu thất bại"
+      }
+    },
+    "history": {
+      "title": "Lịch sử dặm bay",
+      "subtitle": "Xem lịch sử giao dịch dặm bay của bạn",
+      "noTransactions": "Không tìm thấy giao dịch nào",
+      "filterByDate": "Lọc theo ngày",
+      "filterByType": "Lọc theo loại",
+      "all": "Tất cả",
+      "earned": "Đã tích lũy",
+      "redeemed": "Đã sử dụng",
+      "expired": "Đã hết hạn"
+    },
+    "tracking": {
+      "title": "Theo dõi yêu cầu",
+      "subtitle": "Theo dõi yêu cầu tích lũy dặm bay của bạn",
+      "status": {
+        "pending": "Chờ xử lý",
+        "approved": "Đã phê duyệt",
+        "rejected": "Đã từ chối",
+        "processing": "Đang xử lý"
+      },
+      "noRequests": "Không tìm thấy yêu cầu nào",
+      "requestId": "Mã yêu cầu",
+      "submittedDate": "Ngày gửi",
+      "lastUpdated": "Cập nhật lần cuối"
+    }
+  },
+  "errors": {
+    "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "validationError": "Vui lòng kiểm tra thông tin nhập và thử lại.",
+    "notFound": "Không tìm thấy trang",
+    "unauthorized": "Bạn không được phép truy cập trang này",
+    "somethingWentWrong": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "validation": {
+      "ticketIdRequired": "Mã vé phải có đúng 13 chữ số",
+      "pnrRequired": "PNR phải có đúng 6 ký tự chữ và số",
+      "carrierRequired": "Hãng bay là bắt buộc",
+      "bookingClassRequired": "Hạng vé là bắt buộc",
+      "fromCodeRequired": "Mã điểm đi là bắt buộc",
+      "toCodeRequired": "Mã điểm đến là bắt buộc",
+      "fromToCodeDifferent": "Mã điểm đi và điểm đến phải khác nhau",
+      "invalidUrl": "Vui lòng nhập URL hợp lệ",
+      "invalidDate": "Vui lòng chọn ngày hợp lệ"
+    }
+  },
+  "languages": {
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "landing": {
+    "title": "Chương trình Khách hàng Thân thiết Lotusmile",
+    "subtitle": "Tích điểm – Đổi thưởng – Tận hưởng những hành trình tuyệt vời",
+    "getStarted": "Bắt đầu ngay",
+    "joinNow": "Tham gia ngay để nhận ưu đãi đặc biệt",
+    "benefits": {
+      "accumulateMiles": {
+        "title": "Tích lũy dặm bay",
+        "description": "Kiếm điểm từ mỗi chuyến bay và các hoạt động liên kết."
+      },
+      "redeemRewards": {
+        "title": "Đổi thưởng hấp dẫn",
+        "description": "Sử dụng điểm để đổi vé máy bay, khách sạn và nhiều phần quà giá trị."
+      },
+      "security": {
+        "title": "Bảo mật tuyệt đối",
+        "description": "Thông tin cá nhân được mã hóa và bảo vệ toàn diện."
+      }
+    }
+  },
+  "mileageRequest": {
+    "title": "Yêu cầu dặm bay",
+    "subtitle": "Gửi thông tin chuyến bay để tích dặm",
+    "flightInformation": "Thông tin chuyến bay",
+    "submitSuccess": "Yêu cầu tích lũy dặm bay đã được gửi thành công!",
+    "submitError": "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.",
+    "uploadFailed": "Tải lên thất bại"
+  },
+  "tracking": {
+    "title": "Yêu cầu tích lũy dặm bay",
+    "subtitle": "Theo dõi và quản lý yêu cầu dặm bay của bạn",
+    "searchPlaceholder": "Tìm kiếm theo mã vé hoặc PNR...",
+    "loadingRequests": "Đang tải yêu cầu của bạn...",
+    "noRequests": "Không tìm thấy yêu cầu nào",
+    "totalRequests": "Tổng số yêu cầu",
+    "viewDetails": "Xem chi tiết",
+    "status": {
+      "pending": "Chờ xử lý",
+      "approved": "Đã phê duyệt",
+      "rejected": "Đã từ chối",
+      "processing": "Đang xử lý"
+    }
+  },
+  "ledgers": {
+    "title": "Sổ dặm bay",
+    "subtitle": "Xem lịch sử giao dịch dặm bay của bạn",
+    "searchPlaceholder": "Tìm kiếm theo mã giao dịch...",
+    "filterByDate": "Lọc theo ngày",
+    "dateRanges": {
+      "all": "Tất cả thời gian",
+      "today": "Hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này",
+      "lastMonth": "Tháng trước"
+    },
+    "clearFilters": "Xóa bộ lọc",
+    "noTransactions": "Không tìm thấy giao dịch nào",
+    "totalTransactions": "Tổng số giao dịch",
+    "itemsPerPage": "Số mục mỗi trang",
+    "page": "Trang",
+    "of": "trên",
+    "loading": "Đang tải giao dịch...",
+    "transactionTypes": {
+      "all": "Tất cả",
+      "earned": "Đã tích lũy",
+      "redeemed": "Đã sử dụng",
+      "expired": "Đã hết hạn"
+    }
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "subtitle": "Trang bạn đang tìm kiếm không tồn tại.",
+    "backHome": "Về trang chủ"
+  },
+  "authError": {
+    "title": "Lỗi xác thực",
+    "subtitle": "Có vấn đề với việc xác thực của bạn.",
+    "tryAgain": "Thử lại",
+    "contactSupport": "Liên hệ hỗ trợ"
+  },
+  "contributor": {
+    "title": "Đóng góp",
+    "subtitle": "Gặp gỡ đội ngũ đứng sau LotusMiles",
+    "description": "Chúng tôi đam mê tạo ra trải nghiệm quản lý dặm bay tốt nhất cho người dùng."
+  }
+}

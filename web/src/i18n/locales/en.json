@@ -1,0 +1,225 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "details": "Details",
+    "more": "More",
+    "less": "Less"
+  },
+  "navigation": {
+    "home": "Home",
+    "history": "History",
+    "tracking": "Tracking",
+    "request": "Request",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "welcome": "Welcome",
+    "unauthorized": "Unauthorized",
+    "accessDenied": "Access Denied",
+    "sessionExpired": "Session Expired"
+  },
+  "home": {
+    "title": "Welcome to LotusMiles",
+    "subtitle": "Manage your mileage rewards",
+    "totalMiles": "Total Miles",
+    "availableMiles": "Available Miles",
+    "expiringMiles": "Expiring Miles",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "requestMiles": "Request Miles",
+    "viewHistory": "View History",
+    "trackRequest": "Track Request"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "membershipInfo": "Membership Information",
+    "settings": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "help": "Help & Support",
+    "about": "About",
+    "version": "Version"
+  },
+  "mileage": {
+    "request": {
+      "title": "Mileage Accrual Request",
+      "subtitle": "Submit a new mileage accrual request",
+      "form": {
+        "ticketNumber": "Ticket Number",
+        "ticketNumberPlaceholder": "Enter your ticket number",
+        "flightDate": "Flight Date",
+        "flightDatePlaceholder": "Select flight date",
+        "origin": "Origin",
+        "originPlaceholder": "Enter departure city",
+        "destination": "Destination",
+        "destinationPlaceholder": "Enter arrival city",
+        "airline": "Airline",
+        "airlinePlaceholder": "Select airline",
+        "fareClass": "Fare Class",
+        "fareClassPlaceholder": "Select fare class",
+        "submitRequest": "Submit Request",
+        "requestSubmitted": "Request submitted successfully",
+        "requestFailed": "Failed to submit request"
+      }
+    },
+    "history": {
+      "title": "Mileage History",
+      "subtitle": "View your mileage transaction history",
+      "noTransactions": "No transactions found",
+      "filterByDate": "Filter by date",
+      "filterByType": "Filter by type",
+      "all": "All",
+      "earned": "Earned",
+      "redeemed": "Redeemed",
+      "expired": "Expired"
+    },
+    "tracking": {
+      "title": "Request Tracking",
+      "subtitle": "Track your mileage accrual requests",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "processing": "Processing"
+      },
+      "noRequests": "No requests found",
+      "requestId": "Request ID",
+      "submittedDate": "Submitted Date",
+      "lastUpdated": "Last Updated"
+    }
+  },
+  "errors": {
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "validationError": "Please check your input and try again.",
+    "notFound": "Page not found",
+    "unauthorized": "You are not authorized to access this page",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "validation": {
+      "ticketIdRequired": "Ticket ID must be exactly 13 digits",
+      "pnrRequired": "PNR must be exactly 6 alphanumeric characters",
+      "carrierRequired": "Carrier is required",
+      "bookingClassRequired": "Booking class is required",
+      "fromCodeRequired": "From code is required",
+      "toCodeRequired": "To code is required",
+      "fromToCodeDifferent": "From and to code must be different",
+      "invalidUrl": "Please enter a valid URL",
+      "invalidDate": "Please select a valid date"
+    }
+  },
+  "languages": {
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "landing": {
+    "title": "Lotusmile Loyalty Program",
+    "subtitle": "Earn Points – Redeem Rewards – Enjoy Amazing Journeys",
+    "getStarted": "Get Started Now",
+    "joinNow": "Join Now to Receive Special Offers",
+    "benefits": {
+      "accumulateMiles": {
+        "title": "Accumulate Miles",
+        "description": "Earn points on every flight and linked activities."
+      },
+      "redeemRewards": {
+        "title": "Redeem Exciting Rewards",
+        "description": "Use points to redeem flight tickets, hotels, and many valuable gifts."
+      },
+      "security": {
+        "title": "Absolute Security",
+        "description": "Personal information is encrypted and comprehensively protected."
+      }
+    }
+  },
+  "mileageRequest": {
+    "title": "Mileage Request",
+    "subtitle": "Submit flight details to earn miles",
+    "flightInformation": "Flight Information",
+    "submitSuccess": "Mileage accrual request submitted successfully!",
+    "submitError": "An error occurred while submitting the request. Please try again.",
+    "uploadFailed": "Upload failed"
+  },
+  "tracking": {
+    "title": "Mileage Accrual Requests",
+    "subtitle": "Track and manage your mileage requests",
+    "searchPlaceholder": "Search by ticket ID or PNR...",
+    "loadingRequests": "Loading your requests...",
+    "noRequests": "No requests found",
+    "totalRequests": "Total requests",
+    "viewDetails": "View Details",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "processing": "Processing"
+    }
+  },
+  "ledgers": {
+    "title": "Mileage Ledgers",
+    "subtitle": "View your mileage transaction history",
+    "searchPlaceholder": "Search by transaction ID...",
+    "filterByDate": "Filter by date",
+    "dateRanges": {
+      "all": "All time",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "lastMonth": "Last month"
+    },
+    "clearFilters": "Clear filters",
+    "noTransactions": "No transactions found",
+    "totalTransactions": "Total transactions",
+    "itemsPerPage": "Items per page",
+    "page": "Page",
+    "of": "of",
+    "loading": "Loading transactions...",
+    "transactionTypes": {
+      "all": "All",
+      "earned": "Earned",
+      "redeemed": "Redeemed",
+      "expired": "Expired"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "subtitle": "The page you're looking for doesn't exist.",
+    "backHome": "Back to Home"
+  },
+  "authError": {
+    "title": "Authentication Error",
+    "subtitle": "There was a problem with your authentication.",
+    "tryAgain": "Try Again",
+    "contactSupport": "Contact Support"
+  },
+  "contributor": {
+    "title": "Contributors",
+    "subtitle": "Meet the team behind LotusMiles",
+    "description": "We are passionate about creating the best mileage management experience for our users."
+  }
+}
