@@ -8,7 +8,7 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ['profile'],
     queryFn: async (): Promise<Profile> => {
-      const response = await apiClient.get('/api/v1/profile');
+      const response = await apiClient.get('/api/v2/profile');
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

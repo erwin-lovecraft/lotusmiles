@@ -14,7 +14,7 @@ export const createMileageAccrualRequest = async (
 ): Promise<CreateMileageAccrualRequestResponse> => {
   try {
     const response = await apiClient.post<CreateMileageAccrualRequestResponse>(
-      '/api/v1/accrual-requests',
+      '/api/v2/accrual-requests',
       data,
     );
     return response.data;
