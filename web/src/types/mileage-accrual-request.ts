@@ -39,8 +39,8 @@ export const MileageAccrualRequestSchema = z.object({
 export type MileageAccrualRequestForm = z.infer<typeof MileageAccrualRequestSchema>;
 
 export type MileageAccrualRequest = {
-  id: bigint;
-  customer_id: bigint;
+  id: string;
+  customer_id: string;
   status: string;
   ticket_id: string;
   pnr: string;

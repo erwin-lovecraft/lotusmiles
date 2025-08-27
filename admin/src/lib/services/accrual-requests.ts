@@ -1,6 +1,5 @@
 import { useApiClient } from '@/lib/api';
 import type { AccrualRequestResponse, AccrualRequestQueryParams } from '@/types/accrual-request';
-import Big from 'big.js';
 
 export const useAccrualRequestsService = () => {
   const apiClient = useApiClient();
@@ -29,14 +28,14 @@ export const useAccrualRequestsService = () => {
     return response.data;
   };
 
-  const approveAccrualRequest = async (id: Big): Promise<void> => {
-    console.log('Approving request with ID:', id.toString());
-    await apiClient.patch(`/api/v1/admin/accrual-requests/${id.toString()}/approve`);
+  const approveAccrualRequest = async (id: string): Promise<void> => {
+    console.log('Approving request with ID:', id);
+    await apiClient.patch(`/api/v1/admin/accrual-requests/${id}/approve`);
   };
 
-  const rejectAccrualRequest = async (id: Big, rejectReason: string): Promise<void> => {
-    console.log('Rejecting request with ID:', id.toString());
-    await apiClient.patch(`/api/v1/admin/accrual-requests/${id.toString()}/reject`, {
+  const rejectAccrualRequest = async (id: string, rejectReason: string): Promise<void> => {
+    console.log('Rejecting request with ID:', id);
+    await apiClient.patch(`/api/v1/admin/accrual-requests/${id}/reject`, {
       rejected_reason: rejectReason
     });
   };

@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: envConfig.api.baseUrl,
-  timeout: 10000,
+  timeout: 100_000,
   headers: {
     'Content-Type': 'application/json',
   },

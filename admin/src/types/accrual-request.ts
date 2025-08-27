@@ -1,7 +1,5 @@
-import Big from 'big.js';
-
 export interface Customer {
-  id: Big;
+  id: string;
   qualifying_miles_total: number;
   bonus_miles_total: number;
   member_tier: string;
@@ -15,8 +13,8 @@ export interface Customer {
 }
 
 export interface AccrualRequest {
-  id: Big;
-  customer_id: Big;
+  id: string;
+  customer_id: string;
   status: 'pending' | 'inprogress' | 'approved' | 'rejected';
   ticket_id: string;
   pnr: string;

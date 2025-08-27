@@ -20,7 +20,6 @@ import { type AccrualRequest } from "@/types/accrual-request";
 import { RejectDialog } from "./reject-dialog";
 import { useApproveAccrualRequest, useRejectAccrualRequest } from "@/lib/hooks";
 import { getStatusBadge } from "@/lib/utils/status-badge";
-import Big from 'big.js';
 import { useTranslation } from "react-i18next";
 
 interface AccrualRequestTicketProps {
@@ -163,12 +162,6 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
   // Calculate total miles
   const totalMiles = request.qualifying_miles + request.bonus_miles;
 
-  // Convert Big.js to string for display
-  const formatBigId = (value: Big | null): string => {
-    if (value === null || value === undefined) return 'N/A';
-    return value.toString();
-  };
-
   const handleApprove = async () => {
     try {
       await approveMutation.mutateAsync(request.id);
@@ -187,7 +180,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
 
   const handleCopyRequestId = async () => {
     try {
-      await navigator.clipboard.writeText(formatBigId(request.id));
+      await navigator.clipboard.writeText(request.id);
       setCopiedRequestId(true);
       setTimeout(() => setCopiedRequestId(false), 2000);
     } catch (error) {
@@ -227,7 +220,7 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                         }`}
                       title={copiedRequestId ? t('requestTicket.copied') : t('requestTicket.copyRequestId')}
                     >
-                      {copiedRequestId ? `✓ ${t('requestTicket.copied')}!` : formatBigId(request.id)}
+                      {copiedRequestId ? `✓ ${t('requestTicket.copied')}!` : request.id}
                     </button>
                   </div>
                   <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
@@ -310,8 +303,8 @@ export function AccrualRequestTicket({ request }: AccrualRequestTicketProps) {
                 <div className="flex items-center space-x-4">
                   <Badge variant="outline" className="text-lg px-3 py-1">{request.ticket_id}</Badge>
                   <div>
-                    <p className="font-medium text-lg">{t('requestTicket.requestId')}: {formatBigId(request.id)}</p>
-                    <p className="text-sm text-gray-600">Customer ID: {formatBigId(request.customer_id)}</p>
+                    <p className="font-medium text-lg">{t('requestTicket.requestId')}: {request.id}</p>
+                    <p className="text-sm text-gray-600">Customer ID: {request.customer_id}</p>
                     <p className="text-sm text-gray-600">PNR: {request.pnr}</p>
                     <p className="text-sm text-gray-600">Booking Class: {request.booking_class}</p>
                   </div>

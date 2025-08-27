@@ -1,5 +1,5 @@
 export type Profile = {
-  id: bigint;
+  id: string;
   qualifying_miles_total: number;
   bonus_miles_total: number;
   member_tier: string;

@@ -12,13 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import Big from 'big.js';
 
 interface RejectDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => Promise<void>;
-  ticketId: Big;
+  ticketId: string;
 }
 
 export function RejectDialog({ isOpen, onClose, onConfirm, ticketId }: RejectDialogProps) {

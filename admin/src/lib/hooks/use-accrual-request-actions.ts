@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAccrualRequestsService } from '@/lib/services';
 import { toast } from 'sonner';
-import Big from 'big.js';
 import type { AccrualRequest } from '@/types/accrual-request';
 
 export const useApproveAccrualRequest = () => {
@@ -9,7 +8,7 @@ export const useApproveAccrualRequest = () => {
   const { approveAccrualRequest } = useAccrualRequestsService();
 
   return useMutation({
-    mutationFn: (id: Big) => approveAccrualRequest(id),
+    mutationFn: (id: string) => approveAccrualRequest(id),
     onMutate: async (id) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: ['accrual-requests'] });
@@ -88,7 +87,7 @@ export const useRejectAccrualRequest = () => {
   const { rejectAccrualRequest } = useAccrualRequestsService();
 
   return useMutation({
-    mutationFn: ({ id, rejectReason }: { id: Big; rejectReason: string }) =>
+    mutationFn: ({ id, rejectReason }: { id: string; rejectReason: string }) =>
       rejectAccrualRequest(id, rejectReason),
     onMutate: async ({ id, rejectReason }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)

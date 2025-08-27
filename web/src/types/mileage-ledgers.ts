@@ -1,9 +1,9 @@
 export type MileageTransaction = {
-  id: bigint;
-  customer_id: bigint;
+  id: string;
+  customer_id: string;
   qualifying_miles_delta: number;
   bonus_miles_delta: number;
-  accrual_request_id: bigint;
+  accrual_request_id: string;
   created_at: string;
   updated_at: string;
 }
