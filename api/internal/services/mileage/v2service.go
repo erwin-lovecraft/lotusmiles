@@ -2,189 +2,100 @@ package mileage
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
+	"github.com/google/uuid"
+	"github.com/viebiz/lit/iam"
 )
 
-type V2Service interface {
-	ApproveAccrualRequest(ctx context.Context, requestID int64) error
-	GetAccrualRequests(ctx context.Context, customerID int64) ([]entity.AccrualRequest, error)
-	CreateAccrualRequest(ctx context.Context, req entity.AccrualRequest) (entity.AccrualRequest, error)
-}
+type serviceV2 struct {
+	service
 
-type v2service struct {
-	repo        repository.Repository
+	cfg         config.SessionMConfig
 	sessionmSvc sessionm.Client
-	cfg         Config
 }
 
-func NewV2(repo repository.Repository, sessionmGwy sessionm.Client, cfg Config) V2Service {
-	return v2service{
-		repo:        repo,
-		sessionmSvc: sessionmGwy,
+func NewV2(cfg config.SessionMConfig, sessionmGwy sessionm.Client, repo repository.Repository) Service {
+	return serviceV2{
 		cfg:         cfg,
-	}
-}
-
-func (s v2service) GetAccrualRequests(ctx context.Context, customerID int64) ([]entity.AccrualRequest, error) {
-	// Gọi repository với các tham số phù hợp
-	// Chỉ lọc theo customerID, không lọc theo các tiêu chí khác
-	requests, _, err := s.repo.Mileage().GetAccrualRequests(
-		ctx,
-		"", // keyword
-		customerID,
-		"", // status
-		time.Time{}, // submittedDate
-		1,  // page
-		100, // size
-	)
-	return requests, err
-}
-
-func (s v2service) CreateAccrualRequest(ctx context.Context, req entity.AccrualRequest) (entity.AccrualRequest, error) {
-	// Sử dụng generator.AccrualRequestID thay vì generator.NewID
-	id, err := generator.AccrualRequestID.Generate()
-	if err != nil {
-		return entity.AccrualRequest{}, err
-	}
-	req.ID = id
-	req.Status = "pending"
-	req.CreatedAt = time.Now()
-	req.UpdatedAt = time.Now()
-
-	err = s.repo.Mileage().SaveAccrualRequest(ctx, req)
-	return req, err
-}
-
-func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) error {
-	// Lấy thông tin yêu cầu tích lũy dặm
-	request, err := s.repo.Mileage().GetAccrualRequest(ctx, requestID)
-	if err != nil {
-		return err
-	}
-
-	// Kiểm tra yêu cầu có tồn tại không
-	if request.ID == 0 {
-		return fmt.Errorf("accrual request does not exists")
-	}
-
-	// Kiểm tra trạng thái yêu cầu
-	if request.Status != "pending" {
-		return fmt.Errorf("invalid status")
-	}
-
-	// Lấy thông tin khách hàng
-	customer, err := s.repo.Customer().GetByID(ctx, request.CustomerID)
-	if err != nil {
-		return err
-	}
-
-	if customer.SessionMUserID == "" {
-		return fmt.Errorf("customer not found in SessionM")
-	}
-
-	// Tính toán dặm dựa trên khoảng cách và loại vé
-	distances, err := s.repo.Mileage().GetTravelDistance(ctx, request.FromCode, request.ToCode)
-	if err != nil {
-		return fmt.Errorf("failed to get travel distance: %w", err)
-	}
-
-	// Cập nhật số dặm cho yêu cầu
-	request.DistanceMiles = distances.Miles
-
-	// Tính toán dặm tích lũy dựa trên loại vé và khoảng cách
-	accrualRate, ok := s.cfg.AccrualRates[request.BookingClass]
-	if !ok {
-		return fmt.Errorf("invalid booking class: %s", request.BookingClass)
-	}
-
-	request.QualifyingAccrualRate = accrualRate.QualifyingRate
-	request.QualifyingMiles = accrualRate.QualifyingRate * float64(distances.Miles)
-
-	request.BonusAccrualRate = accrualRate.BonusRate
-	request.BonusMiles = accrualRate.BonusRate * float64(distances.Miles)
-
-	// Cập nhật điểm trong SessionM
-	pointsRequest := dto.SessionMDepositPointsRequest{
-		RetailerID: s.cfg.SessionM.RetailerID,
-		UserID:     customer.SessionMUserID,
-		DepositDetails: []dto.SessionMDepositDetail{
-			{
-				PointSourceID:  s.cfg.SessionM.PointSourceID,
-				Amount:         request.QualifyingMiles + request.BonusMiles,
-				PointAccountID: s.cfg.SessionM.PointAccountID,
-				ReferenceID:    fmt.Sprintf("REQ-%d", request.ID),
-				ReferenceType:  "ACCRUAL-REQUEST",
-				Rank:           0,
-			},
+		sessionmSvc: sessionmGwy,
+		service: service{
+			repo: repo,
 		},
+	}
+}
+
+func (s serviceV2) ApproveAccrualRequest(ctx context.Context, reqID string) error {
+	// 1. Get existed accrual request
+	existedRequest, err := s.repo.Mileage().GetAccrualRequest(ctx, reqID)
+	if err != nil {
+		return err
+	}
+
+	if existedRequest.ID == uuid.Nil {
+		return errors.New("accrual request does not exists")
+	}
+
+	if existedRequest.Status != constants.RequestStatusInProgress {
+		return errors.New("invalid status")
+	}
+
+	userProfile := iam.GetUserProfileFromContext(ctx)
+	userID := userProfile.ID()
+
+	// 2. Do approve logic and save data
+	existedRequest.Status = constants.RequestStatusApproved
+	existedRequest.ReviewerID = &userID
+	now := time.Now().UTC()
+	existedRequest.ReviewedAt = &now
+
+	if err := s.repo.Mileage().SaveAccrualRequest(ctx, existedRequest); err != nil {
+		return err
+	}
+
+	// 3. Deposit points to sessionm
+	if _, err := s.sessionmSvc.DepositPoints(ctx, dto.SessionMDepositPointsRequest{
+		RetailerID:             s.cfg.RetailerID,
+		UserID:                 existedRequest.CustomerID.String(),
 		AllowPartialSuccess:    false,
 		DisableEventPublishing: false,
 		Culture:                "en-US",
-	}
-
-	// Gọi API SessionM để cập nhật điểm
-	sessionMResp, err := s.sessionmSvc.DepositPoints(ctx, pointsRequest)
-	if err != nil {
+		DepositDetails: []dto.SessionMDepositDetail{
+			{
+				PointSourceID:  s.cfg.PointSourceID,
+				PointAccountID: s.cfg.PointAccountID,
+				Amount:         existedRequest.QualifyingMiles,
+				ReferenceID:    existedRequest.ID.String(),
+				ReferenceType:  "accrual_request",
+			},
+			// TODO: Bonus miles
+		},
+	}); err != nil {
 		return err
 	}
 
-	if !sessionMResp.Success {
-		return fmt.Errorf("failed to deposit points in SessionM: %s", sessionMResp.Message)
-	}
+	// 4. Update miles ledgers with new fields
+	earningMonth := time.Date(existedRequest.DepartureDate.Year(), existedRequest.DepartureDate.Month(), 1, 0, 0, 0, 0, existedRequest.DepartureDate.Location())
+	expiresAt := earningMonth.AddDate(0, 13, 0)
 
-	// Cập nhật trạng thái yêu cầu
-	request.Status = "approved"
-	request.UpdatedAt = time.Now()
-
-	if err := s.repo.Mileage().SaveAccrualRequest(ctx, request); err != nil {
-		return err
-	}
-
-	// Cập nhật số dặm của khách hàng trong DB
-	var qualifyingMiles, bonusMiles float64
-	qualifyingMiles = request.QualifyingMiles
-	bonusMiles = request.BonusMiles
-
-	if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, request.CustomerID, qualifyingMiles, bonusMiles); err != nil {
-		log.Printf("Failed to increase customer miles in DB: %v", err)
-		return err
-	}
-
-	// Lưu lịch sử giao dịch
-	ledgerID, err := generator.MilesLedgerID.Generate()
-	if err != nil {
-		log.Printf("Failed to generate miles ledger ID: %v", err)
-		return err
-	}
-	
-	earningMonth := time.Date(request.DepartureDate.Year(), request.DepartureDate.Month(), 1, 0, 0, 0, 0, request.DepartureDate.Location())
-	expirePeriod := time.Duration(s.cfg.ExpirePeriodMinutes) * time.Minute
-	expiresAt := earningMonth.Add(expirePeriod)
-	
-	ledger := entity.MilesLedger{
-		ID:                   ledgerID,
-		CustomerID:          request.CustomerID,
-		QualifyingMilesDelta: qualifyingMiles,
-		BonusMilesDelta:     bonusMiles,
-		AccrualRequestID:    &request.ID,
-		Kind:               "accrual",
-		EarningMonth:       earningMonth,
-		ExpiresAt:          &expiresAt,
-		Note:               fmt.Sprintf("Accrual for flight %s", request.TicketID),
-		CreatedAt:          time.Now(),
-		UpdatedAt:          time.Now(),
-	}
-
-	if err := s.repo.Mileage().SaveMileageLedger(ctx, ledger); err != nil {
-		log.Printf("Failed to save mileage ledger: %v", err)
+	if err := s.repo.Mileage().SaveMileageLedger(ctx, entity.MilesLedger{
+		CustomerID:           existedRequest.CustomerID,
+		QualifyingMilesDelta: existedRequest.QualifyingMiles,
+		BonusMilesDelta:      existedRequest.BonusMiles,
+		AccrualRequestID:     &existedRequest.ID,
+		Kind:                 "accrual",
+		EarningMonth:         earningMonth,
+		ExpiresAt:            &expiresAt,
+		Note:                 fmt.Sprintf("Accrual for flight %s", existedRequest.TicketID),
+	}); err != nil {
 		return err
 	}
 

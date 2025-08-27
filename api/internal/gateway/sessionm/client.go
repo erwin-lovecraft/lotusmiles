@@ -13,15 +13,17 @@ import (
 )
 
 type Client interface {
-	GetUser(ctx context.Context, userID string) (dto.SessionMUserProfileResponse, error)
-	CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMCreateUserResponse, error)
+	GetUser(ctx context.Context, userID string) (dto.SessionMUserProfile, error)
+
+	CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMUserProfile, error)
+
 	DepositPoints(ctx context.Context, request dto.SessionMDepositPointsRequest) (dto.SessionMDepositPointsResponse, error)
 }
 
 type client struct {
-	getUserClient      *httpclient.Client
-	createUserClient   *httpclient.Client
-	depositPointClient *httpclient.Client
+	getUserClient      HTTPClient
+	createUserClient   HTTPClient
+	depositPointClient HTTPClient
 	cfg                config.SessionMConfig
 }
 
@@ -51,57 +53,51 @@ func New(cfg config.SessionMConfig) (Client, error) {
 	}, nil
 }
 
-func (c client) GetUser(ctx context.Context, userID string) (dto.SessionMUserProfileResponse, error) {
+func (c client) GetUser(ctx context.Context, userID string) (dto.SessionMUserProfile, error) {
 	// Tạo url.Values cho query params
-	queryParams := url.Values{}
-	queryParams.Add("show_identifiers", "true")
-	queryParams.Add("user[user_profile]", "true")
+	queryParams := make(url.Values)
+	queryParams.Add("external_id", userID)
 	queryParams.Add("expand_incentives", "true")
+	//queryParams.Add("show_identifiers", "true")
+	//queryParams.Add("user[user_profile]", "true")
 
 	resp, err := c.getUserClient.Send(ctx, httpclient.Payload{
-		PathVars: map[string]string{
-			"user_id": userID,
-		},
 		QueryParams: queryParams,
 	})
 	if err != nil {
-		return dto.SessionMUserProfileResponse{}, err
+		return dto.SessionMUserProfile{}, err
 	}
 
-	if resp.Status != http.StatusOK {
-		return dto.SessionMUserProfileResponse{}, fmt.Errorf("[sessionm] failed to retrieve user profile: %d", resp.Status)
+	parsedResp, err := parseResp[dto.SessionMUserProfileResponse](resp)
+	if err != nil {
+		if sessionMErr, ok := err.(Error); ok && sessionMErr.Errors.Code == "user_not_found" {
+			return dto.SessionMUserProfile{}, nil
+		}
+
+		return dto.SessionMUserProfile{}, err
 	}
 
-	var profile dto.SessionMUserProfileResponse
-	if err := json.Unmarshal(resp.Body, &profile); err != nil {
-		return dto.SessionMUserProfileResponse{}, err
-	}
-
-	return profile, nil
+	return parsedResp.User, nil
 }
 
-func (c client) CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMCreateUserResponse, error) {
+func (c client) CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMUserProfile, error) {
 	body, err := json.Marshal(request)
 	if err != nil {
-		return dto.SessionMCreateUserResponse{}, err
+		return dto.SessionMUserProfile{}, err
 	}
 	resp, err := c.createUserClient.Send(ctx, httpclient.Payload{
 		Body: body,
 	})
 	if err != nil {
-		return dto.SessionMCreateUserResponse{}, err
+		return dto.SessionMUserProfile{}, err
 	}
 
-	if resp.Status != http.StatusOK && resp.Status != http.StatusCreated {
-		return dto.SessionMCreateUserResponse{}, fmt.Errorf("[sessionm] failed to create user: %d", resp.Status)
+	parsedResp, err := parseResp[dto.SessionMCreateUserResponse](resp)
+	if err != nil {
+		return dto.SessionMUserProfile{}, err
 	}
 
-	var response dto.SessionMCreateUserResponse
-	if err := json.Unmarshal(resp.Body, &response); err != nil {
-		return dto.SessionMCreateUserResponse{}, err
-	}
-
-	return response, nil
+	return parsedResp.User, nil
 }
 
 func (c client) DepositPoints(ctx context.Context, request dto.SessionMDepositPointsRequest) (dto.SessionMDepositPointsResponse, error) {
@@ -127,4 +123,38 @@ func (c client) DepositPoints(ctx context.Context, request dto.SessionMDepositPo
 	}
 
 	return response, nil
+}
+
+type Error struct {
+	Status string `json:"status"`
+	Errors struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	} `json:"errors"`
+}
+
+func (e Error) Error() string {
+	return fmt.Sprintf("%s: %s", e.Errors.Code, e.Errors.Message)
+}
+
+func parseResp[T any](resp httpclient.Response) (T, error) {
+	if resp.Status >= http.StatusOK && resp.Status < http.StatusMultipleChoices {
+		var model T
+		if err := json.Unmarshal(resp.Body, &model); err != nil {
+			return *new(T), fmt.Errorf("parse error: %w", err)
+		}
+
+		return model, nil
+	}
+
+	if resp.Status >= http.StatusBadRequest && resp.Status < http.StatusInternalServerError {
+		var errModel Error
+		if err := json.Unmarshal(resp.Body, &errModel); err != nil {
+			return *new(T), fmt.Errorf("parse error: %w", err)
+		}
+
+		return *new(T), errModel
+	}
+
+	return *new(T), fmt.Errorf("session m internal error: status %d", resp.Status)
 }

@@ -7,8 +7,6 @@ type Config struct {
 	Database   DatabaseConfig `mapstructure:"DATABASE"`
 	Auth0      Auth0Config    `mapstructure:"AUTH0"`
 	UserAPI    Auth0Config    `mapstructure:"USER_API"`
-	Cron       CronConfig     `mapstructure:"CRON"`
-	Loyalty    LoyaltyConfig  `mapstructure:"LOYALTY"`
 	SessionM   SessionMConfig `mapstructure:"SESSION_M"`
 	SentryDSN  string         `mapstructure:"SENTRY_DSN"`
 }
@@ -44,19 +42,6 @@ type Auth0Config struct {
 	TokenURL     string `mapstructure:"TOKEN_URL"`
 }
 
-type CronConfig struct {
-	ExpireQMCron   string `mapstructure:"EXPIRE_QMILES"`
-	RecalcTierCron string `mapstructure:"RECALC_TIER"`
-}
-
-type LoyaltyConfig struct {
-	ExpirePeriodMinutes        int `mapstructure:"EXPIRE_PERIOD_MINUTES"`
-	RollingWindowPeriodMinutes int `mapstructure:"ROLLING_WINDOW_PERIOD_MINUTES"`
-	BatchSize                  int `mapstructure:"BATCH_SIZE"`
-	JobTimeoutMinutes          int `mapstructure:"JOB_TIMEOUT_MINUTES"`
-	RecalcJobTimeoutMinutes    int `mapstructure:"RECALC_JOB_TIMEOUT_MINUTES"`
-}
-
 type SessionMConfig struct {
 	APIBaseURL       string `mapstructure:"API_BASE_URL"`
 	AppKey           string `mapstructure:"APP_KEY"`
@@ -64,6 +49,8 @@ type SessionMConfig struct {
 	RetailerID       string `mapstructure:"RETAILER_ID"`
 	PointSourceID    string `mapstructure:"POINT_SOURCE_ID"`
 	PointAccountID   string `mapstructure:"POINT_ACCOUNT_ID"`
+	TierSystemID     string `mapstructure:"TIER_SYSTEM_ID"`
 	IncentivesAPIURL string `mapstructure:"INCENTIVES_API_URL"`
-	IncentivesAuth   string `mapstructure:"INCENTIVES_AUTH"`
+	IncentivesAppKey string `mapstructure:"INCENTIVES_APP_KEY"`
+	IncentivesSecret string `mapstructure:"INCENTIVES_SECRET"`
 }

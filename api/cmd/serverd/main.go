@@ -48,7 +48,6 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
 	"github.com/viebiz/lit/httpclient"
 )
@@ -141,15 +140,14 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	repo := repository.New(db, cfg.Loyalty)
-	membershipSvc := membership.New(repo, cfg.Loyalty)
-	mileageSvc := mileage.New(repo, membershipSvc, cfg.Loyalty)
+	repo := repository.New(db)
+	mileageSvc := mileage.New(repo)
 	customerSvc := customer.New(repo, authGwy)
 	v1Ctrl := v1.New(customerSvc, mileageSvc)
 
 	// Initialize v2 services
-	customerV2Svc := customer.NewV2(repo, authGwy, sessionmGwy)
-	mileageV2Svc := mileage.NewV2(repo, sessionmGwy, mileage.NewConfig(cfg))
+	customerV2Svc := customer.NewV2(cfg.SessionM, repo, authGwy, sessionmGwy)
+	mileageV2Svc := mileage.NewV2(cfg.SessionM, sessionmGwy, repo)
 	v2Ctrl := v2.New(customerV2Svc, mileageV2Svc)
 
 	// Initialize the server with the handler
@@ -208,7 +206,6 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl
 	// User profile
 	v2Route.Group("/profile", func(profile lit.Router) {
 		profile.Get("", v2Ctrl.GetCustomerProfile)
-		profile.Get("/sessionm", v2Ctrl.GetSessionMProfile)
 	})
 
 	// Accrual requests routes
@@ -222,6 +219,17 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl
 	v2Route.Group("/admin/accrual-requests", func(admin lit.Router) {
 		admin.Use(middleware.HasRoles(constants.UserRoleAdmin))
 		admin.Patch(":id/approve", v2Ctrl.ApproveRequest)
+	})
+
+	// Miles ledger routes
+	v2Route.Group("/miles-ledgers", func(ledger lit.Router) {
+		ledger.Get("", v1Ctrl.GetMyMileageLedgers)
+	})
+
+	// Admin miles ledger routes
+	v2Route.Group("/admin/miles-ledgers", func(admin lit.Router) {
+		admin.Use(middleware.HasRoles("admin"))
+		admin.Get("", v1Ctrl.GetMileageLedgers)
 	})
 
 	return r.Handler()
