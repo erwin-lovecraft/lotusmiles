@@ -16,6 +16,8 @@ type Customer struct {
 	Phone                string    `json:"phone"`
 	FirstName            string    `json:"first_name"`
 	LastName             string    `json:"last_name"`
+	SessionMUserID       string    `json:"sessionm_user_id" gorm:"column:sessionm_user_id"`
+	SessionMExternalID   string    `json:"sessionm_external_id" gorm:"column:sessionm_external_id"`
 	CreatedAt            time.Time `json:"created_at"`
 	UpdatedAt            time.Time `json:"updated_at"`
 }

@@ -9,6 +9,7 @@ type Config struct {
 	UserAPI    Auth0Config    `mapstructure:"USER_API"`
 	Cron       CronConfig     `mapstructure:"CRON"`
 	Loyalty    LoyaltyConfig  `mapstructure:"LOYALTY"`
+	SessionM   SessionMConfig `mapstructure:"SESSION_M"`
 	SentryDSN  string         `mapstructure:"SENTRY_DSN"`
 }
 
@@ -54,4 +55,15 @@ type LoyaltyConfig struct {
 	BatchSize                  int `mapstructure:"BATCH_SIZE"`
 	JobTimeoutMinutes          int `mapstructure:"JOB_TIMEOUT_MINUTES"`
 	RecalcJobTimeoutMinutes    int `mapstructure:"RECALC_JOB_TIMEOUT_MINUTES"`
+}
+
+type SessionMConfig struct {
+	APIBaseURL       string `mapstructure:"API_BASE_URL"`
+	AppKey           string `mapstructure:"APP_KEY"`
+	Secret           string `mapstructure:"SECRET"`
+	RetailerID       string `mapstructure:"RETAILER_ID"`
+	PointSourceID    string `mapstructure:"POINT_SOURCE_ID"`
+	PointAccountID   string `mapstructure:"POINT_ACCOUNT_ID"`
+	IncentivesAPIURL string `mapstructure:"INCENTIVES_API_URL"`
+	IncentivesAuth   string `mapstructure:"INCENTIVES_AUTH"`
 }
