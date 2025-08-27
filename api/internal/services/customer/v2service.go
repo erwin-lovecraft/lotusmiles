@@ -45,20 +45,23 @@ func (s v2service) GetCustomer(ctx context.Context, userID string) (entity.Custo
 		if err != nil {
 			return entity.Customer{}, err
 		}
-
+		phone := auth0Data.PhoneNumber
+		if phone == "" {
+			phone = "1112223333"
+		}
 		// Tạo khách hàng mới trong SessionM
-		externalID := fmt.Sprintf("MC-SESS-%s", time.Now().Format("2006"))
+		externalID := fmt.Sprintf("MC-SESS-%d", time.Now().UnixMilli())
 		sessionMRequest := dto.SessionMCreateUserRequest{
 			User: dto.SessionMCreateUserData{
-				ExternalID:    externalID,
-				OptedIn:       "true",
+				ExternalID:     externalID,
+				OptedIn:        "true",
 				ExternalIDType: "merchant_identifier",
-				Email:         auth0Data.Email,
-				FirstName:     auth0Data.GivenName,
-				LastName:      auth0Data.FamilyName,
+				Email:          auth0Data.Email,
+				FirstName:      auth0Data.GivenName,
+				LastName:       auth0Data.FamilyName,
 				PhoneNumbers: []dto.SessionMPhoneNumber{
 					{
-						PhoneNumber:     auth0Data.PhoneNumber,
+						PhoneNumber:     phone,
 						PhoneType:       "mobile",
 						PreferenceFlags: []string{"primary"},
 					},

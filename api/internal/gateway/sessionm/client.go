@@ -19,10 +19,10 @@ type Client interface {
 }
 
 type client struct {
-	getUserClient     *httpclient.Client
-	createUserClient  *httpclient.Client
+	getUserClient      *httpclient.Client
+	createUserClient   *httpclient.Client
 	depositPointClient *httpclient.Client
-	cfg               config.SessionMConfig
+	cfg                config.SessionMConfig
 }
 
 func New(cfg config.SessionMConfig) (Client, error) {
@@ -44,10 +44,10 @@ func New(cfg config.SessionMConfig) (Client, error) {
 	}
 
 	return &client{
-		getUserClient:     getUserClient,
-		createUserClient:  createUserClient,
+		getUserClient:      getUserClient,
+		createUserClient:   createUserClient,
 		depositPointClient: depositPointClient,
-		cfg:               cfg,
+		cfg:                cfg,
 	}, nil
 }
 
@@ -57,7 +57,7 @@ func (c client) GetUser(ctx context.Context, userID string) (dto.SessionMUserPro
 	queryParams.Add("show_identifiers", "true")
 	queryParams.Add("user[user_profile]", "true")
 	queryParams.Add("expand_incentives", "true")
-	
+
 	resp, err := c.getUserClient.Send(ctx, httpclient.Payload{
 		PathVars: map[string]string{
 			"user_id": userID,
@@ -85,7 +85,6 @@ func (c client) CreateUser(ctx context.Context, request dto.SessionMCreateUserRe
 	if err != nil {
 		return dto.SessionMCreateUserResponse{}, err
 	}
-
 	resp, err := c.createUserClient.Send(ctx, httpclient.Payload{
 		Body: body,
 	})

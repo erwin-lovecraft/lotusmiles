@@ -1,7 +1,9 @@
 package sessionm
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/viebiz/lit/httpclient"
@@ -15,10 +17,24 @@ func getUserClientFunc(
 	clientPool *httpclient.SharedCustomPool,
 	cfg config.SessionMConfig,
 ) (*httpclient.Client, error) {
+	apiBaseURL := strings.TrimRight(strings.TrimSpace(cfg.APIBaseURL), "/")
+	if apiBaseURL == "" {
+		return nil, fmt.Errorf("API Base URL is empty")
+	}
+	
+	// Đảm bảo URL có giao thức
+	if !strings.HasPrefix(apiBaseURL, "http://") && !strings.HasPrefix(apiBaseURL, "https://") {
+		apiBaseURL = "https://" + apiBaseURL
+	}
+	
+	appKey := strings.TrimSpace(cfg.AppKey)
+	// Sử dụng URL đúng, không thêm "priv/v1/apps" vì đã có trong apiBaseURL
+	urlStr := fmt.Sprintf("%s/%s/users/:%s", apiBaseURL, appKey, "user_id")
+	fmt.Println("Creating SessionM client with URL:", urlStr)
 	return httpclient.NewWithOAuth(
 		httpclient.Config{
 			ServiceName: serviceName,
-			URL:         cfg.APIBaseURL + "/users/:user_id",
+			URL:         urlStr,
 			Method:      http.MethodGet,
 		},
 		clientPool,
@@ -33,10 +49,26 @@ func createUserClientFunc(
 	clientPool *httpclient.SharedCustomPool,
 	cfg config.SessionMConfig,
 ) (*httpclient.Client, error) {
+	// Đảm bảo URL có định dạng đúng với giao thức
+	apiBaseURL := strings.TrimRight(strings.TrimSpace(cfg.APIBaseURL), "/")
+	if apiBaseURL == "" {
+		return nil, fmt.Errorf("API Base URL is empty")
+	}
+	
+	// Đảm bảo URL có giao thức
+	if !strings.HasPrefix(apiBaseURL, "http://") && !strings.HasPrefix(apiBaseURL, "https://") {
+		apiBaseURL = "https://" + apiBaseURL
+	}
+	
+	appKey := strings.TrimSpace(cfg.AppKey)
+	// Sử dụng URL đúng, không thêm "priv/v1/apps" vì đã có trong apiBaseURL
+	urlStr := fmt.Sprintf("%s/%s/users", apiBaseURL, appKey)
+	fmt.Println("Creating SessionM client with URL:", urlStr)
+	
 	return httpclient.NewWithOAuth(
 		httpclient.Config{
 			ServiceName: serviceName,
-			URL:         cfg.APIBaseURL + "/users",
+			URL:         urlStr,
 			Method:      http.MethodPost,
 		},
 		clientPool,
@@ -51,18 +83,30 @@ func depositPointsClientFunc(
 	clientPool *httpclient.SharedCustomPool,
 	cfg config.SessionMConfig,
 ) (*httpclient.Client, error) {
-	// Phân tách IncentivesAuth thành clientID và clientSecret
-	// Giả sử IncentivesAuth có định dạng "clientID:clientSecret"
+	// Đảm bảo URL có định dạng đúng với giao thức
+	incentivesAPIURL := strings.TrimRight(strings.TrimSpace(cfg.IncentivesAPIURL), "/")
+	if incentivesAPIURL == "" {
+		return nil, fmt.Errorf("Incentives API URL is empty")
+	}
+	
+	// Đảm bảo URL có giao thức
+	if !strings.HasPrefix(incentivesAPIURL, "http://") && !strings.HasPrefix(incentivesAPIURL, "https://") {
+		incentivesAPIURL = "https://" + incentivesAPIURL
+	}
+	
+	urlStr := fmt.Sprintf("%s/user_points/deposit", incentivesAPIURL)
+	fmt.Println("Creating SessionM deposit points client with URL:", urlStr)
+	
 	return httpclient.NewWithOAuth(
 		httpclient.Config{
 			ServiceName: serviceName,
-			URL:         cfg.IncentivesAPIURL + "/user_points/deposit",
+			URL:         urlStr,
 			Method:      http.MethodPost,
 		},
 		clientPool,
 		httpclient.OAuthConfig{
-			ClientID:     cfg.IncentivesAuth, // Đây là giả định, có thể cần điều chỉnh
-			ClientSecret: "",               // Đây là giả định, có thể cần điều chỉnh
+			ClientID:     cfg.AppKey,
+			ClientSecret: cfg.Secret,
 		},
 	)
 }

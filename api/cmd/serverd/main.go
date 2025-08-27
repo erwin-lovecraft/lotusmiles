@@ -45,12 +45,12 @@ import (
 	v2 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v2"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
-	"github.com/viebiz/lit/httpclient"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
+	"github.com/viebiz/lit/httpclient"
 )
 
 func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
@@ -131,10 +131,10 @@ func run(ctx context.Context) error {
 	// Dependency injection
 	// Initialize services, repositories, etc. here
 	authGwy, err := auth0.New(cfg.UserAPI)
-	
+
 	// Initialize HTTP client pool
 	httpclient.NewSharedCustomPool()
-	
+
 	// Initialize SessionM gateway
 	sessionmGwy, err := sessionm.New(cfg.SessionM)
 	if err != nil {
@@ -146,7 +146,7 @@ func run(ctx context.Context) error {
 	mileageSvc := mileage.New(repo, membershipSvc, cfg.Loyalty)
 	customerSvc := customer.New(repo, authGwy)
 	v1Ctrl := v1.New(customerSvc, mileageSvc)
-	
+
 	// Initialize v2 services
 	customerV2Svc := customer.NewV2(repo, authGwy, sessionmGwy)
 	mileageV2Svc := mileage.NewV2(repo, sessionmGwy, mileage.NewConfig(cfg))
@@ -175,7 +175,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl
 
 	// Accrual requests routes
 	v1Route.Group("/accrual-requests", func(accrual lit.Router) {
-		accrual.Use(middleware.HasRoles(constants.UserRoleMember))
+		// accrual.Use(middleware.HasRoles(constants.UserRoleMember))
 		accrual.Post("", v1Ctrl.SubmitAccrualRequest)
 		accrual.Get("", v1Ctrl.GetMyAccrualRequests)
 	})
@@ -213,7 +213,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl
 
 	// Accrual requests routes
 	v2Route.Group("/accrual-requests", func(accrual lit.Router) {
-		accrual.Use(middleware.HasRoles(constants.UserRoleMember))
+		// accrual.Use(middleware.HasRoles(constants.UserRoleMember))
 		accrual.Post("", v2Ctrl.SubmitAccrualRequest)
 		accrual.Get("", v2Ctrl.GetAccrualRequests)
 	})

@@ -70,6 +70,16 @@ func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) e
 		return err
 	}
 
+	// Kiểm tra yêu cầu có tồn tại không
+	if request.ID == 0 {
+		return fmt.Errorf("accrual request does not exists")
+	}
+
+	// Kiểm tra trạng thái yêu cầu
+	if request.Status != "pending" {
+		return fmt.Errorf("invalid status")
+	}
+
 	// Lấy thông tin khách hàng
 	customer, err := s.repo.Customer().GetByID(ctx, request.CustomerID)
 	if err != nil {
@@ -80,9 +90,28 @@ func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) e
 		return fmt.Errorf("customer not found in SessionM")
 	}
 
+	// Tính toán dặm dựa trên khoảng cách và loại vé
+	distances, err := s.repo.Mileage().GetTravelDistance(ctx, request.FromCode, request.ToCode)
+	if err != nil {
+		return fmt.Errorf("failed to get travel distance: %w", err)
+	}
+
+	// Cập nhật số dặm cho yêu cầu
+	request.DistanceMiles = distances.Miles
+
+	// Tính toán dặm tích lũy dựa trên loại vé và khoảng cách
+	accrualRate, ok := s.cfg.AccrualRates[request.BookingClass]
+	if !ok {
+		return fmt.Errorf("invalid booking class: %s", request.BookingClass)
+	}
+
+	request.QualifyingAccrualRate = accrualRate.QualifyingRate
+	request.QualifyingMiles = accrualRate.QualifyingRate * float64(distances.Miles)
+
+	request.BonusAccrualRate = accrualRate.BonusRate
+	request.BonusMiles = accrualRate.BonusRate * float64(distances.Miles)
+
 	// Cập nhật điểm trong SessionM
-	// Sử dụng trực tiếp QualifyingMiles và BonusMiles từ request
-	
 	pointsRequest := dto.SessionMDepositPointsRequest{
 		RetailerID: s.cfg.SessionM.RetailerID,
 		UserID:     customer.SessionMUserID,
@@ -120,7 +149,6 @@ func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) e
 	}
 
 	// Cập nhật số dặm của khách hàng trong DB
-	// Sử dụng trực tiếp QualifyingMiles và BonusMiles từ request
 	var qualifyingMiles, bonusMiles float64
 	qualifyingMiles = request.QualifyingMiles
 	bonusMiles = request.BonusMiles
@@ -131,12 +159,15 @@ func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) e
 	}
 
 	// Lưu lịch sử giao dịch
-	// Sử dụng generator.MilesLedgerID thay vì generator.NewID
 	ledgerID, err := generator.MilesLedgerID.Generate()
 	if err != nil {
 		log.Printf("Failed to generate miles ledger ID: %v", err)
 		return err
 	}
+	
+	earningMonth := time.Date(request.DepartureDate.Year(), request.DepartureDate.Month(), 1, 0, 0, 0, 0, request.DepartureDate.Location())
+	expirePeriod := time.Duration(s.cfg.ExpirePeriodMinutes) * time.Minute
+	expiresAt := earningMonth.Add(expirePeriod)
 	
 	ledger := entity.MilesLedger{
 		ID:                   ledgerID,
@@ -145,8 +176,9 @@ func (s v2service) ApproveAccrualRequest(ctx context.Context, requestID int64) e
 		BonusMilesDelta:     bonusMiles,
 		AccrualRequestID:    &request.ID,
 		Kind:               "accrual",
-		EarningMonth:       time.Now(),
-		Note:               request.PNR, // Sử dụng PNR thay cho Description
+		EarningMonth:       earningMonth,
+		ExpiresAt:          &expiresAt,
+		Note:               fmt.Sprintf("Accrual for flight %s", request.TicketID),
 		CreatedAt:          time.Now(),
 		UpdatedAt:          time.Now(),
 	}
