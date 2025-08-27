@@ -219,6 +219,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl
 	v2Route.Group("/admin/accrual-requests", func(admin lit.Router) {
 		admin.Use(middleware.HasRoles(constants.UserRoleAdmin))
 		admin.Patch(":id/approve", v2Ctrl.ApproveRequest)
+		admin.Patch(":id/reject", v1Ctrl.RejectRequest)
 	})
 
 	// Miles ledger routes
