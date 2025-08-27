@@ -37,7 +37,8 @@ func convertErr(err error) error {
 	switch err.Error() {
 	case "accrual request already exists",
 		"accrual request does not exists",
-		"invalid status":
+		"invalid status",
+		"user not found":
 		return lit.HTTPError{Status: http.StatusBadRequest, Code: "invalid_request", Desc: err.Error()}
 	default:
 		return err

@@ -2,11 +2,13 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type AccrualRequest struct {
-	ID                    int64      `json:"id,string" gorm:"primaryKey"`
-	CustomerID            int64      `json:"customer_id,string"`
+	ID                    uuid.UUID  `json:"id,string" gorm:"primaryKey"`
+	CustomerID            uuid.UUID  `json:"customer_id,string"`
 	Status                string     `json:"status"`
 	TicketID              string     `json:"ticket_id"`
 	PNR                   string     `json:"pnr"`

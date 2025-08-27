@@ -17,11 +17,11 @@ type AccrualRequestInput struct {
 }
 
 type ApproveRequestInput struct {
-	ID int64 `uri:"id" binding:"required"`
+	ID string `uri:"id" binding:"required"`
 }
 
 type RejectedRequestInput struct {
-	ID             int64  `uri:"id" binding:"required"`
+	ID             string `uri:"id" binding:"required"`
 	RejectedReason string `json:"rejected_reason" binding:"required,min=1"`
 }
 

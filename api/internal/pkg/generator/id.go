@@ -1,38 +1,23 @@
 package generator
 
 import (
-	"github.com/viebiz/lit/snowflake"
+	"github.com/google/uuid"
 )
 
 var (
-	CustomerID          *snowflake.Generator
-	AccrualRequestID    *snowflake.Generator
-	MilesLedgerID       *snowflake.Generator
-	MembershipHistoryID *snowflake.Generator
+	CustomerID          UUIDGenerator
+	AccrualRequestID    UUIDGenerator
+	MilesLedgerID       UUIDGenerator
+	MembershipHistoryID UUIDGenerator
 	// Create ID generator for each entity
 )
 
 func Setup() error {
-	var err error
-	CustomerID, err = snowflake.New()
-	if err != nil {
-		return err
-	}
-
-	AccrualRequestID, err = snowflake.New()
-	if err != nil {
-		return err
-	}
-
-	MilesLedgerID, err = snowflake.New()
-	if err != nil {
-		return err
-	}
-
-	MembershipHistoryID, err = snowflake.New()
-	if err != nil {
-		return err
-	}
-
 	return nil
+}
+
+type UUIDGenerator struct{}
+
+func (u UUIDGenerator) Generate() (uuid.UUID, error) {
+	return uuid.NewRandom()
 }

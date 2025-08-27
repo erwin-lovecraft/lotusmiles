@@ -7,6 +7,7 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
+	"github.com/google/uuid"
 )
 
 type Service interface {
@@ -31,7 +32,7 @@ func (s service) GetCustomer(ctx context.Context, userID string) (entity.Custome
 		return entity.Customer{}, err
 	}
 
-	if customer.ID == 0 {
+	if customer.ID == uuid.Nil {
 		data, err := s.auth0Svc.GetUser(ctx, userID)
 		if err != nil {
 			return entity.Customer{}, err

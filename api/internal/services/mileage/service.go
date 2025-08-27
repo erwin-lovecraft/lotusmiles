@@ -12,6 +12,7 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
+	"github.com/google/uuid"
 	"github.com/viebiz/lit/iam"
 )
 
@@ -22,15 +23,13 @@ type Service interface {
 
 	SubmitAccrualRequest(ctx context.Context, request dto.AccrualRequestInput) error
 
-	ApproveAccrualRequest(ctx context.Context, reqID int64) error
+	ApproveAccrualRequest(ctx context.Context, reqID string) error
 
-	RejectAccrualRequest(ctx context.Context, reqID int64, rejectedReason string) error
+	RejectAccrualRequest(ctx context.Context, reqID string, rejectedReason string) error
 
 	GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
 
 	GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
-
-	ExpireQualifyingMilesForMonth(ctx context.Context, monthToExpire time.Time) error
 }
 
 type service struct {
@@ -56,13 +55,17 @@ func (s service) SubmitAccrualRequest(ctx context.Context, request dto.AccrualRe
 		return err
 	}
 
+	if customer.ID == uuid.Nil {
+		return errors.New("user not found")
+	}
+
 	// 2. Check exists request exists
-	existedRequest, err := s.repo.Mileage().GetAccrualRequestByFilter(ctx, customer.ID, request.TicketID, request.PNR)
+	existedRequest, err := s.repo.Mileage().GetAccrualRequestByFilter(ctx, customer.ID.String(), request.TicketID, request.PNR)
 	if err != nil {
 		return err
 	}
 
-	if existedRequest.ID != 0 {
+	if existedRequest.ID != uuid.Nil {
 		return errors.New("accrual request already exists")
 	}
 
@@ -111,14 +114,14 @@ func (s service) calculateMiles(ctx context.Context, req *entity.AccrualRequest)
 	return nil
 }
 
-func (s service) ApproveAccrualRequest(ctx context.Context, reqID int64) error {
+func (s service) ApproveAccrualRequest(ctx context.Context, reqID string) error {
 	// 1. Get existed accrual request
 	existedRequest, err := s.repo.Mileage().GetAccrualRequest(ctx, reqID)
 	if err != nil {
 		return err
 	}
 
-	if existedRequest.ID == 0 {
+	if existedRequest.ID == uuid.Nil {
 		return errors.New("accrual request does not exists")
 	}
 
@@ -140,7 +143,7 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID int64) error {
 	}
 
 	// 3. Update related customer miles
-	if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, existedRequest.CustomerID, existedRequest.QualifyingMiles, existedRequest.BonusMiles); err != nil {
+	if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, existedRequest.CustomerID.String(), existedRequest.QualifyingMiles, existedRequest.BonusMiles); err != nil {
 		return err
 	}
 
@@ -164,20 +167,20 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID int64) error {
 
 	// 5. Check and update membership tier with current month
 	currentMonth := time.Now().UTC()
-	if _, _, err := s.membershipSvc.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, existedRequest.CustomerID, currentMonth); err != nil {
+	if _, _, err := s.membershipSvc.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, existedRequest.CustomerID.String(), currentMonth); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s service) RejectAccrualRequest(ctx context.Context, reqID int64, rejectedReason string) error {
+func (s service) RejectAccrualRequest(ctx context.Context, reqID string, rejectedReason string) error {
 	existedRequest, err := s.repo.Mileage().GetAccrualRequest(ctx, reqID)
 	if err != nil {
 		return err
 	}
 
-	if existedRequest.ID == 0 {
+	if existedRequest.ID == uuid.Nil {
 		return errors.New("accrual request does not exists")
 	}
 
@@ -212,7 +215,7 @@ func (s service) GetMyAccrualRequests(ctx context.Context, filter dto.AccrualReq
 	return s.repo.Mileage().GetAccrualRequests(
 		ctx,
 		filter.Keyword,
-		customer.ID,
+		customer.ID.String(),
 		filter.Status,
 		filter.SubmittedDate,
 		filter.Page,
@@ -224,7 +227,7 @@ func (s service) GetAccrualRequests(ctx context.Context, filter dto.AccrualReque
 	return s.repo.Mileage().GetAccrualRequests(
 		ctx,
 		filter.Keyword,
-		0, // Means not filter by customer_id
+		"", // Means not filter by customer_id
 		filter.Status,
 		filter.SubmittedDate,
 		filter.Page,
@@ -242,7 +245,7 @@ func (s service) GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedg
 
 	return s.repo.Mileage().GetMileageLedgers(
 		ctx,
-		customer.ID,
+		customer.ID.String(),
 		filter.Date,
 		filter.Page,
 		filter.Size,
@@ -252,73 +255,9 @@ func (s service) GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedg
 func (s service) GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error) {
 	return s.repo.Mileage().GetMileageLedgers(
 		ctx,
-		0, // Means not filter by customer_id
+		"", // Means not filter by customer_id
 		filter.Date,
 		filter.Page,
 		filter.Size,
 	)
-}
-
-// ExpireQualifyingMilesForMonth expires qualifying miles for the specified month
-func (s service) ExpireQualifyingMilesForMonth(ctx context.Context, monthToExpire time.Time) error {
-	// Get customers with positive QM deltas for the month
-	customerIDs, err := s.repo.Mileage().GetCustomersWithPositiveQMDeltasForMonth(ctx, monthToExpire)
-	if err != nil {
-		return fmt.Errorf("failed to get customers with positive QM deltas: %w", err)
-	}
-
-	var totalExpired float64
-	var affectedCustomers int
-
-	// Process each customer
-	for _, customerID := range customerIDs {
-		// Check if expire record already exists (idempotency)
-		exists, err := s.repo.Mileage().CheckExpireRecordExists(ctx, customerID, monthToExpire)
-		if err != nil {
-			return fmt.Errorf("failed to check expire record for customer %d: %w", customerID, err)
-		}
-
-		if exists {
-			continue // Skip if already processed
-		}
-
-		// Calculate total QM deltas for the month
-		totalDeltas, err := s.repo.Mileage().GetTotalQMDeltasForCustomerAndMonth(ctx, customerID, monthToExpire)
-		if err != nil {
-			return fmt.Errorf("failed to get total QM deltas for customer %d: %w", customerID, err)
-		}
-
-		if totalDeltas <= 0 {
-			continue // No positive miles to expire
-		}
-
-		// Create expire ledger entry
-		currentMonth := time.Now().UTC()
-		expireLedger := entity.MilesLedger{
-			CustomerID:           customerID,
-			QualifyingMilesDelta: -totalDeltas, // Negative to expire
-			BonusMilesDelta:      0,
-			Kind:                 constants.LedgerKindExpire,
-			EarningMonth:         currentMonth,
-			Note:                 fmt.Sprintf("expire QM for %s", monthToExpire.Format("2006-01")),
-		}
-
-		if err := s.repo.Mileage().SaveMileageLedger(ctx, expireLedger); err != nil {
-			return fmt.Errorf("failed to save expire ledger for customer %d: %w", customerID, err)
-		}
-
-		// Update customer's total qualifying miles
-		if err := s.repo.Mileage().IncreaseCustomerMiles(ctx, customerID, -totalDeltas, 0); err != nil {
-			return fmt.Errorf("failed to update customer miles for customer %d: %w", customerID, err)
-		}
-
-		totalExpired += totalDeltas
-		affectedCustomers++
-	}
-
-	// Log the results
-	fmt.Printf("Expired %.2f qualifying miles for %d customers in month %s\n",
-		totalExpired, affectedCustomers, monthToExpire.Format("2006-01"))
-
-	return nil
 }

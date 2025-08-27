@@ -10,17 +10,17 @@ import (
 )
 
 type Repository interface {
-	GetCustomerQualifyingMiles(ctx context.Context, customerID int64) (float64, error)
+	GetCustomerQualifyingMiles(ctx context.Context, customerID string) (float64, error)
 
-	UpdateCustomerMembershipTier(ctx context.Context, customerID int64, memberTier string) error
+	UpdateCustomerMembershipTier(ctx context.Context, customerID string, memberTier string) error
 
-	GetCustomerByID(ctx context.Context, customerID int64) (entity.Customer, error)
+	GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error)
 
-	GetRollingWindowQualifyingMiles(ctx context.Context, customerID int64, effectiveMonth time.Time) (float64, error)
+	GetRollingWindowQualifyingMiles(ctx context.Context, customerID string, effectiveMonth time.Time) (float64, error)
 
 	SaveMembershipHistory(ctx context.Context, history entity.MembershipHistory) error
 
-	GetAllCustomerIDs(ctx context.Context, page, size int) ([]int64, int64, error)
+	GetAllCustomerIDs(ctx context.Context, page, size int) ([]string, int64, error)
 }
 
 type repository struct {
@@ -35,7 +35,7 @@ func NewRepository(db *gorm.DB, cfg config.LoyaltyConfig) Repository {
 	}
 }
 
-func (r repository) GetCustomerQualifyingMiles(ctx context.Context, customerID int64) (float64, error) {
+func (r repository) GetCustomerQualifyingMiles(ctx context.Context, customerID string) (float64, error) {
 	var customer entity.Customer
 	if err := r.db.WithContext(ctx).Select("qualifying_miles_total").Where("id = ?", customerID).First(&customer).Error; err != nil {
 		return 0, err
@@ -43,14 +43,14 @@ func (r repository) GetCustomerQualifyingMiles(ctx context.Context, customerID i
 	return customer.QualifyingMilesTotal, nil
 }
 
-func (r repository) UpdateCustomerMembershipTier(ctx context.Context, customerID int64, memberTier string) error {
-	if err := r.db.WithContext(ctx).Model(entity.Customer{ID: customerID}).Update("member_tier", memberTier).Error; err != nil {
+func (r repository) UpdateCustomerMembershipTier(ctx context.Context, customerID string, memberTier string) error {
+	if err := r.db.WithContext(ctx).Model(entity.Customer{}).Update("member_tier", memberTier).Where("id = ?", customerID).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r repository) GetCustomerByID(ctx context.Context, customerID int64) (entity.Customer, error) {
+func (r repository) GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error) {
 	var customer entity.Customer
 	if err := r.db.WithContext(ctx).Where("id = ?", customerID).First(&customer).Error; err != nil {
 		return entity.Customer{}, err
@@ -58,7 +58,7 @@ func (r repository) GetCustomerByID(ctx context.Context, customerID int64) (enti
 	return customer, nil
 }
 
-func (r repository) GetRollingWindowQualifyingMiles(ctx context.Context, customerID int64, effectiveMonth time.Time) (float64, error) {
+func (r repository) GetRollingWindowQualifyingMiles(ctx context.Context, customerID string, effectiveMonth time.Time) (float64, error) {
 	// Calculate rolling window based on configured period
 	rollingWindowPeriod := time.Duration(r.cfg.RollingWindowPeriodMinutes) * time.Minute
 	startDate := effectiveMonth.Add(-rollingWindowPeriod)
@@ -79,8 +79,8 @@ func (r repository) SaveMembershipHistory(ctx context.Context, history entity.Me
 	return r.db.WithContext(ctx).Save(&history).Error
 }
 
-func (r repository) GetAllCustomerIDs(ctx context.Context, page, size int) ([]int64, int64, error) {
-	var customerIDs []int64
+func (r repository) GetAllCustomerIDs(ctx context.Context, page, size int) ([]string, int64, error) {
+	var customerIDs []string
 	var total int64
 
 	// Get total count

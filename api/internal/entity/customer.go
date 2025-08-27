@@ -2,10 +2,12 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Customer struct {
-	ID                   int64     `json:"id" gorm:"primaryKey"`
+	ID                   uuid.UUID `json:"id" gorm:"primaryKey"`
 	QualifyingMilesTotal float64   `json:"qualifying_miles_total"`
 	BonusMilesTotal      float64   `json:"bonus_miles_total"`
 	MemberTier           string    `json:"member_tier"`

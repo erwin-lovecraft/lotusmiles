@@ -2,11 +2,13 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type MembershipHistory struct {
-	ID         int64     `json:"id,string" gorm:"primaryKey"`
-	CustomerID int64     `json:"customer_id,string"`
+	ID         uuid.UUID `json:"id,string" gorm:"primaryKey"`
+	CustomerID string    `json:"customer_id"`
 	OldTier    string    `json:"old_tier" gorm:"type:text;not null"`
 	NewTier    string    `json:"new_tier" gorm:"type:text;not null"`
 	Reason     string    `json:"reason" gorm:"type:text;not null"` // 'cron_recalc', 'accrual', 'manual'

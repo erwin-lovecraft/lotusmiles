@@ -10,15 +10,12 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
-	"github.com/viebiz/lit/monitoring"
 )
 
 type Service interface {
-	CalculateAndUpdateMembershipTier(ctx context.Context, customerID int64) error
+	CalculateAndUpdateMembershipTier(ctx context.Context, customerID string) error
 
-	CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx context.Context, customerID int64, effectiveMonth time.Time) (string, float64, error)
-
-	RecalculateAllTiers(ctx context.Context) error
+	CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx context.Context, customerID string, effectiveMonth time.Time) (string, float64, error)
 }
 
 type service struct {
@@ -33,12 +30,12 @@ func New(repo repository.Repository, cfg config.LoyaltyConfig) Service {
 	}
 }
 
-func (s service) CalculateAndUpdateMembershipTier(ctx context.Context, customerID int64) error {
+func (s service) CalculateAndUpdateMembershipTier(ctx context.Context, customerID string) error {
 	_, _, err := s.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, customerID, time.Now().UTC())
 	return err
 }
 
-func (s service) CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx context.Context, customerID int64, effectiveMonth time.Time) (string, float64, error) {
+func (s service) CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx context.Context, customerID string, effectiveMonth time.Time) (string, float64, error) {
 	// Get current customer data
 	customer, err := s.repo.Customer().GetByID(ctx, customerID)
 	if err != nil {
@@ -95,40 +92,4 @@ func (s service) getMembershipTierForMiles(qualifyingMiles float64) string {
 	}
 
 	return highestTier
-}
-
-func (s service) RecalculateAllTiers(ctx context.Context) error {
-	batchSize := s.cfg.BatchSize
-	page := 1
-	effectiveMonth := time.Now().UTC()
-
-	for {
-		customerIDs, total, err := s.repo.Membership().GetAllCustomerIDs(ctx, page, batchSize)
-		if err != nil {
-			return fmt.Errorf("failed to get customer IDs: %w", err)
-		}
-
-		if len(customerIDs) == 0 {
-			break
-		}
-
-		// Process each customer in the batch
-		for _, customerID := range customerIDs {
-			if _, _, err := s.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, customerID, effectiveMonth); err != nil {
-				// Log error but continue processing other customers
-				// In production, you might want to collect errors and return them
-				fmt.Printf("Failed to recalculate tier for customer %d: %v\n", customerID, err)
-				monitoring.FromContext(ctx).Errorf(err, "failed to recalculate tier for customer %d", customerID)
-			}
-		}
-
-		// Check if we've processed all customers
-		if page*batchSize >= int(total) {
-			break
-		}
-
-		page++
-	}
-
-	return nil
 }

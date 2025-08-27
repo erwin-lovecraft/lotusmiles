@@ -2,14 +2,16 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type MilesLedger struct {
-	ID                   int64      `json:"id,string" gorm:"primaryKey"`
-	CustomerID           int64      `json:"customer_id,string"`
+	ID                   uuid.UUID  `json:"id,string" gorm:"primaryKey"`
+	CustomerID           uuid.UUID  `json:"customer_id,string"`
 	QualifyingMilesDelta float64    `json:"qualifying_miles_delta"`
 	BonusMilesDelta      float64    `json:"bonus_miles_delta"`
-	AccrualRequestID     *int64     `json:"accrual_request_id"`
+	AccrualRequestID     *uuid.UUID `json:"accrual_request_id"`
 	Kind                 string     `json:"kind" gorm:"type:text;not null"` // 'accrual','adjustment','expire','correction'
 	EarningMonth         time.Time  `json:"earning_month" gorm:"type:date;not null"`
 	ExpiresAt            *time.Time `json:"expires_at" gorm:"type:date"`
