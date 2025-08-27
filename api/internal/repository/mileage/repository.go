@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/pagination"
@@ -33,8 +32,6 @@ type Repository interface {
 	GetCustomersWithPositiveQMDeltasForMonth(ctx context.Context, monthToExpire time.Time) ([]int64, error)
 
 	GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, customerID string, monthToExpire time.Time) (float64, error)
-
-	CheckExpireRecordExists(ctx context.Context, customerID string, monthToExpire time.Time) (bool, error)
 }
 
 type repository struct {
@@ -235,20 +232,4 @@ func (r repository) GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, cus
 		Scan(&total).Error
 
 	return total, err
-}
-
-func (r repository) CheckExpireRecordExists(ctx context.Context, customerID string, monthToExpire time.Time) (bool, error) {
-	var count int64
-
-	// Get first day of the month
-	monthStart := time.Date(monthToExpire.Year(), monthToExpire.Month(), 1, 0, 0, 0, 0, monthToExpire.Location())
-	monthEnd := monthStart.AddDate(0, 1, 0)
-
-	err := r.db.WithContext(ctx).
-		Model(&entity.MilesLedger{}).
-		Where("customer_id = ? AND earning_month >= ? AND earning_month < ? AND kind = ?",
-			customerID, monthStart, monthEnd, constants.LedgerKindExpire).
-		Count(&count).Error
-
-	return count > 0, err
 }

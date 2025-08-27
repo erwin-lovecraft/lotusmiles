@@ -30,12 +30,12 @@ export const useAccrualRequestsService = () => {
 
   const approveAccrualRequest = async (id: string): Promise<void> => {
     console.log('Approving request with ID:', id);
-    await apiClient.patch(`/api/v1/admin/accrual-requests/${id}/approve`);
+    await apiClient.patch(`/api/v2/admin/accrual-requests/${id}/approve`);
   };
 
   const rejectAccrualRequest = async (id: string, rejectReason: string): Promise<void> => {
     console.log('Rejecting request with ID:', id);
-    await apiClient.patch(`/api/v1/admin/accrual-requests/${id}/reject`, {
+    await apiClient.patch(`/api/v2/admin/accrual-requests/${id}/reject`, {
       rejected_reason: rejectReason
     });
   };

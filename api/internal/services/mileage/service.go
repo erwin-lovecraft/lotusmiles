@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
 	"github.com/google/uuid"
 	"github.com/viebiz/lit/iam"
 )
@@ -33,16 +31,12 @@ type Service interface {
 }
 
 type service struct {
-	repo          repository.Repository
-	membershipSvc membership.Service
-	cfg           config.LoyaltyConfig
+	repo repository.Repository
 }
 
-func New(repo repository.Repository, membershipSvc membership.Service, cfg config.LoyaltyConfig) Service {
+func New(repo repository.Repository) Service {
 	return service{
-		repo:          repo,
-		membershipSvc: membershipSvc,
-		cfg:           cfg,
+		repo: repo,
 	}
 }
 
@@ -149,15 +143,14 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID string) error 
 
 	// 4. Update miles ledgers with new fields
 	earningMonth := time.Date(existedRequest.DepartureDate.Year(), existedRequest.DepartureDate.Month(), 1, 0, 0, 0, 0, existedRequest.DepartureDate.Location())
-	expirePeriod := time.Duration(s.cfg.ExpirePeriodMinutes) * time.Minute
-	expiresAt := earningMonth.Add(expirePeriod)
+	expiresAt := earningMonth.AddDate(0, 13, 0)
 
 	if err := s.repo.Mileage().SaveMileageLedger(ctx, entity.MilesLedger{
 		CustomerID:           existedRequest.CustomerID,
 		QualifyingMilesDelta: existedRequest.QualifyingMiles,
 		BonusMilesDelta:      existedRequest.BonusMiles,
 		AccrualRequestID:     &existedRequest.ID,
-		Kind:                 constants.LedgerKindAccrual,
+		Kind:                 "accrual",
 		EarningMonth:         earningMonth,
 		ExpiresAt:            &expiresAt,
 		Note:                 fmt.Sprintf("Accrual for flight %s", existedRequest.TicketID),
@@ -166,10 +159,10 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID string) error 
 	}
 
 	// 5. Check and update membership tier with current month
-	currentMonth := time.Now().UTC()
-	if _, _, err := s.membershipSvc.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, existedRequest.CustomerID.String(), currentMonth); err != nil {
-		return err
-	}
+	//currentMonth := time.Now().UTC()
+	//if _, _, err := s.membershipSvc.CalculateAndUpdateMembershipTierWithEffectiveMonth(ctx, existedRequest.CustomerID.String(), currentMonth); err != nil {
+	//	return err
+	//}
 
 	return nil
 }

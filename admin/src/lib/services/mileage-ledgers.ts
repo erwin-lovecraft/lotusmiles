@@ -20,7 +20,7 @@ export const useMileageLedgersService = () => {
       queryParams.append('size', params.size.toString());
     }
 
-    const response = await apiClient.get<MileageLedgerResponse>(`/api/v1/admin/miles-ledgers?${queryParams.toString()}`);
+    const response = await apiClient.get<MileageLedgerResponse>(`/api/v2/admin/miles-ledgers?${queryParams.toString()}`);
 
     return response.data;
   };

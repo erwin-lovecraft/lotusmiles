@@ -42,12 +42,14 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
+	v2 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v2"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
+	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/membership"
 	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
+	"github.com/viebiz/lit/httpclient"
 )
 
 func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
@@ -129,19 +131,32 @@ func run(ctx context.Context) error {
 	// Initialize services, repositories, etc. here
 	authGwy, err := auth0.New(cfg.UserAPI)
 
-	repo := repository.New(db, cfg.Loyalty)
-	membershipSvc := membership.New(repo, cfg.Loyalty)
-	mileageSvc := mileage.New(repo, membershipSvc, cfg.Loyalty)
+	// Initialize HTTP client pool
+	httpclient.NewSharedCustomPool()
+
+	// Initialize SessionM gateway
+	sessionmGwy, err := sessionm.New(cfg.SessionM)
+	if err != nil {
+		return err
+	}
+
+	repo := repository.New(db)
+	mileageSvc := mileage.New(repo)
 	customerSvc := customer.New(repo, authGwy)
 	v1Ctrl := v1.New(customerSvc, mileageSvc)
 
+	// Initialize v2 services
+	customerV2Svc := customer.NewV2(cfg.SessionM, repo, authGwy, sessionmGwy)
+	mileageV2Svc := mileage.NewV2(cfg.SessionM, sessionmGwy, repo)
+	v2Ctrl := v2.New(customerV2Svc, mileageV2Svc)
+
 	// Initialize the server with the handler
-	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl))
+	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl, v2Ctrl))
 
 	return srv.Run()
 }
 
-func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.Handler {
+func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl v2.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
 	r.Use(cors.Middleware(configCORS(cfg.Cors)))
 
@@ -158,7 +173,7 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 
 	// Accrual requests routes
 	v1Route.Group("/accrual-requests", func(accrual lit.Router) {
-		accrual.Use(middleware.HasRoles(constants.UserRoleMember))
+		// accrual.Use(middleware.HasRoles(constants.UserRoleMember))
 		accrual.Post("", v1Ctrl.SubmitAccrualRequest)
 		accrual.Get("", v1Ctrl.GetMyAccrualRequests)
 	})
@@ -178,6 +193,41 @@ func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller) http.H
 
 	// Admin miles ledger routes
 	v1Route.Group("/admin/miles-ledgers", func(admin lit.Router) {
+		admin.Use(middleware.HasRoles("admin"))
+		admin.Get("", v1Ctrl.GetMileageLedgers)
+	})
+
+	// v2 API routes
+	v2Route := r.Route("/api/v2",
+		httpmw.RequestIDMiddleware(),
+		middleware.Authenticate(cfg),
+	)
+
+	// User profile
+	v2Route.Group("/profile", func(profile lit.Router) {
+		profile.Get("", v2Ctrl.GetCustomerProfile)
+	})
+
+	// Accrual requests routes
+	v2Route.Group("/accrual-requests", func(accrual lit.Router) {
+		// accrual.Use(middleware.HasRoles(constants.UserRoleMember))
+		accrual.Post("", v2Ctrl.SubmitAccrualRequest)
+		accrual.Get("", v2Ctrl.GetAccrualRequests)
+	})
+
+	// Admin accrual requests routes
+	v2Route.Group("/admin/accrual-requests", func(admin lit.Router) {
+		admin.Use(middleware.HasRoles(constants.UserRoleAdmin))
+		admin.Patch(":id/approve", v2Ctrl.ApproveRequest)
+	})
+
+	// Miles ledger routes
+	v2Route.Group("/miles-ledgers", func(ledger lit.Router) {
+		ledger.Get("", v1Ctrl.GetMyMileageLedgers)
+	})
+
+	// Admin miles ledger routes
+	v2Route.Group("/admin/miles-ledgers", func(admin lit.Router) {
 		admin.Use(middleware.HasRoles("admin"))
 		admin.Get("", v1Ctrl.GetMileageLedgers)
 	})

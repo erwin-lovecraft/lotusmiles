@@ -1,9 +1,11 @@
 package constants
 
-// Ledger entry kinds
-const (
-	LedgerKindAccrual = "accrual"
-	LedgerKindExpire  = "expire"
-
-	MembershipReasonCronRecalc = "cron_recalc"
+var (
+	MemberTiers = []string{
+		"silver",
+		"titan",
+		"gold",
+		"platinum",
+		"million_miler",
+	}
 )
