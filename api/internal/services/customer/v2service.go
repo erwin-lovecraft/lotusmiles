@@ -45,10 +45,9 @@ func (s v2service) GetCustomer(ctx context.Context, userID string) (entity.Custo
 				ExternalID:     userID,
 				OptedIn:        "true",
 				ExternalIDType: "lotusmiles",
-				Email:          "customertest2@gmail.com", // TODO: Use real email
-				//Email:          auth0Data.Email,
-				FirstName: auth0Data.GivenName,
-				LastName:  auth0Data.FamilyName,
+				Email:          auth0Data.Email,
+				FirstName:      auth0Data.GivenName,
+				LastName:       auth0Data.FamilyName,
 			},
 		}
 
@@ -101,6 +100,7 @@ func convertCustomerEntity(cfg config.SessionMConfig, customer dto.SessionMUserP
 		Email:                customer.Email,
 		FirstName:            customer.FirstName,
 		LastName:             customer.LastName,
+		MemberTier:           "register",
 	}
 	// TODO: Add phone
 
@@ -112,7 +112,7 @@ func convertCustomerEntity(cfg config.SessionMConfig, customer dto.SessionMUserP
 
 	for _, detail := range customer.TierDetails.PointAccountBalances.Details {
 		if detail.PointAccountID == cfg.PointAccountID {
-			rs.QualifyingMilesTotal = float64(detail.AvailableBalance)
+			rs.QualifyingMilesTotal = detail.AvailableBalance
 		}
 	}
 
