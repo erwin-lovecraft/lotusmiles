@@ -25,7 +25,7 @@ export const useAccrualRequests = (params: AccrualRequestsParams = {}) => {
       if (size !== 5) searchParams.append('size', size.toString());
       if (keyword) searchParams.append('keyword', keyword);
 
-      const url = `/api/v1/accrual-requests${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+      const url = `/api/v2/accrual-requests${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
       const response = await apiClient.get(url);
       return response.data;
     },

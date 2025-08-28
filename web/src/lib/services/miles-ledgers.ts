@@ -16,7 +16,7 @@ export const useMilesLedgers = (params: MilesLedgersParams = {}) => {
       if (date_to) searchParams.append('date_to', date_to);
       if (transaction_id) searchParams.append('transaction_id', transaction_id);
 
-      const url = `/api/v1/miles-ledgers${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+      const url = `/api/v2/miles-ledgers${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
       const response = await apiClient.get(url);
       return response.data;
     },
