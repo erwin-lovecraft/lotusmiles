@@ -2,9 +2,7 @@ package membership
 
 import (
 	"context"
-	"time"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/entity"
 	"gorm.io/gorm"
 )
@@ -16,22 +14,18 @@ type Repository interface {
 
 	GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error)
 
-	GetRollingWindowQualifyingMiles(ctx context.Context, customerID string, effectiveMonth time.Time) (float64, error)
-
 	SaveMembershipHistory(ctx context.Context, history entity.MembershipHistory) error
 
 	GetAllCustomerIDs(ctx context.Context, page, size int) ([]string, int64, error)
 }
 
 type repository struct {
-	db  *gorm.DB
-	cfg config.LoyaltyConfig
+	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB, cfg config.LoyaltyConfig) Repository {
+func NewRepository(db *gorm.DB) Repository {
 	return repository{
-		db:  db,
-		cfg: cfg,
+		db: db,
 	}
 }
 
@@ -56,23 +50,6 @@ func (r repository) GetCustomerByID(ctx context.Context, customerID string) (ent
 		return entity.Customer{}, err
 	}
 	return customer, nil
-}
-
-func (r repository) GetRollingWindowQualifyingMiles(ctx context.Context, customerID string, effectiveMonth time.Time) (float64, error) {
-	// Calculate rolling window based on configured period
-	rollingWindowPeriod := time.Duration(r.cfg.RollingWindowPeriodMinutes) * time.Minute
-	startDate := effectiveMonth.Add(-rollingWindowPeriod)
-	endDate := effectiveMonth
-
-	var total float64
-	err := r.db.WithContext(ctx).
-		Model(&entity.MilesLedger{}).
-		Where("customer_id = ? AND earning_month >= ? AND earning_month < ?",
-			customerID, startDate, endDate).
-		Select("COALESCE(SUM(qualifying_miles_delta), 0)").
-		Scan(&total).Error
-
-	return total, err
 }
 
 func (r repository) SaveMembershipHistory(ctx context.Context, history entity.MembershipHistory) error {
