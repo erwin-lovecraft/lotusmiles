@@ -8,17 +8,10 @@ import (
 	"net/url"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/viebiz/lit/httpclient"
 )
-
-type Client interface {
-	GetUser(ctx context.Context, userID string) (dto.SessionMUserProfile, error)
-
-	CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMUserProfile, error)
-
-	DepositPoints(ctx context.Context, request dto.SessionMDepositPointsRequest) (dto.SessionMDepositPointsResponse, error)
-}
 
 type client struct {
 	getUserClient      HTTPClient
@@ -27,7 +20,7 @@ type client struct {
 	cfg                config.SessionMConfig
 }
 
-func New(cfg config.SessionMConfig) (Client, error) {
+func New(cfg config.SessionMConfig) (ports.SessionMGateway, error) {
 	clientPool := httpclient.NewSharedCustomPool()
 
 	getUserClient, err := getUserClientFunc(clientPool, cfg)

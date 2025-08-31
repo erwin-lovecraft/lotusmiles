@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"github.com/erwin-lovecraft/aegismiles/core/ports"
 	customerpostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/customer"
 	membershippostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/membership"
 	mileagepostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/mileage"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"gorm.io/gorm"
 )
 

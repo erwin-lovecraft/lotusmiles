@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
-	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 )
 
 type CustomerRepository interface {
@@ -39,14 +38,4 @@ type Repository interface {
 	Customer() CustomerRepository
 	Mileage() MileageRepository
 	Membership() MembershipRepository
-}
-
-type AuthGateway interface {
-	GetUser(ctx context.Context, profileID string) (dto.Auth0UserProfile, error)
-}
-
-type SessionMGateway interface {
-	GetUser(ctx context.Context, userID string) (dto.SessionMUserProfile, error)
-	CreateUser(ctx context.Context, request dto.SessionMCreateUserRequest) (dto.SessionMUserProfile, error)
-	DepositPoints(ctx context.Context, request dto.SessionMDepositPointsRequest) (dto.SessionMDepositPointsResponse, error)
 }
