@@ -44,11 +44,11 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
 	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
 	v2 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v2"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/service/customer"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/service/mileage"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
 	"github.com/viebiz/lit/httpclient"
 )
 
