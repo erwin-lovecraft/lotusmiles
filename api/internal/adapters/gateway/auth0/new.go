@@ -7,19 +7,16 @@ import (
 	"net/http"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/viebiz/lit/httpclient"
 )
-
-type Client interface {
-	GetUser(ctx context.Context, profileID string) (dto.Auth0UserProfile, error)
-}
 
 type client struct {
 	getUserClient *httpclient.Client
 }
 
-func New(cfg config.Auth0Config) (Client, error) {
+func New(cfg config.Auth0Config) (ports.AuthGateway, error) {
 	clientPool := httpclient.NewSharedCustomPool()
 	getUserClient, err := getUserClientFunc(clientPool, cfg)
 	if err != nil {
