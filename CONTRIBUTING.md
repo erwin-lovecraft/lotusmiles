@@ -132,16 +132,38 @@ This will start all services using Docker Compose.
 lotusmiles/
 ├── api/                    # Go backend API
 │   ├── cmd/               # Application entry points
-│   ├── internal/          # Internal packages
-│   │   ├── config/        # Configuration
-│   │   ├── controller/    # HTTP controllers
-│   │   ├── entity/        # Database entities
-│   │   ├── gateway/       # External service integrations
-│   │   ├── repository/    # Data access layer
-│   │   ├── services/      # Business logic
-│   │   └── pkg/           # Shared packages
+│   │   └── serverd/       # Main server application
+│   ├── internal/          # Internal packages (Clean Architecture)
+│   │   ├── adapters/      # External adapters (REST, Repository, External Services)
+│   │   │   ├── auth0/     # Auth0 authentication adapter
+│   │   │   ├── repository/ # Database repository adapters
+│   │   │   │   ├── customer/    # Customer data access
+│   │   │   │   ├── membership/  # Membership data access
+│   │   │   │   └── mileage/     # Mileage data access
+│   │   │   ├── rest/      # REST API adapters
+│   │   │   │   ├── middleware/  # HTTP middleware (auth, roles)
+│   │   │   │   ├── v1/          # API version 1 controllers
+│   │   │   │   └── v2/          # API version 2 controllers
+│   │   │   └── sessionm/  # Session management adapter
+│   │   ├── config/        # Application configuration
+│   │   ├── constants/     # Application constants
+│   │   ├── core/          # Core business logic (Clean Architecture)
+│   │   │   ├── domain/    # Domain entities
+│   │   │   ├── dto/       # Data Transfer Objects
+│   │   │   ├── ports/     # Interface definitions (Dependency Inversion)
+│   │   │   └── services/  # Business logic services
+│   │   │       ├── customer/  # Customer business logic
+│   │   │       └── mileage/   # Mileage business logic
+│   │   └── pkg/           # Shared utility packages
+│   │       ├── generator/     # ID generation utilities
+│   │       └── pagination/    # Pagination utilities
 │   ├── data/              # Database migrations and seeds
-│   └── docs/              # API documentation
+│   │   ├── migrations/    # Database schema migrations
+│   │   └── seeds/         # Database seed data
+│   ├── config.env         # Environment configuration
+│   ├── config.env.template # Environment template
+│   ├── go.mod            # Go module dependencies
+│   └── go.sum            # Go module checksums
 ├── web/                   # React frontend (member portal)
 │   ├── src/
 │   │   ├── components/    # Reusable UI components
@@ -155,6 +177,32 @@ lotusmiles/
 │   │   └── lib/           # Admin utilities
 └── build/                 # Docker configurations
 ```
+
+### API Architecture Overview
+
+The API follows **Clean Architecture** principles with clear separation of concerns:
+
+#### Core Layer (`internal/core/`)
+- **Domain**: Contains business entities and domain models
+- **Services**: Implements business logic and use cases
+- **Ports**: Defines interfaces for external dependencies (Repository, Gateways)
+- **DTOs**: Data Transfer Objects for API communication
+
+#### Adapters Layer (`internal/adapters/`)
+- **REST**: HTTP controllers and middleware for API endpoints
+- **Repository**: Database access implementations
+- **External Services**: Integrations with Auth0, SessionM, etc.
+
+#### Key Benefits
+- **Testability**: Business logic is isolated and easily testable
+- **Maintainability**: Clear boundaries between layers
+- **Flexibility**: Easy to swap implementations (e.g., different databases)
+- **Dependency Inversion**: Core doesn't depend on external frameworks
+
+#### API Versioning
+- **v1**: Legacy API endpoints
+- **v2**: Current API endpoints with improved structure
+- Both versions coexist to support backward compatibility
 
 ## Development Workflow
 

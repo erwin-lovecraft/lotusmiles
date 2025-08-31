@@ -1,23 +1,3 @@
-// @title           AegisMiles API
-// @version         1.0
-// @description     API for AegisMiles mileage accrual system
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /api/v1
-
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-// @description Type "Bearer" followed by a space and JWT token.
-
 package main
 
 import (
@@ -37,19 +17,17 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	_ "github.com/erwin-lovecraft/aegismiles/docs"
-	"github.com/erwin-lovecraft/aegismiles/internal/config"
-	"github.com/erwin-lovecraft/aegismiles/internal/constants"
-	"github.com/erwin-lovecraft/aegismiles/internal/controller/rest/middleware"
-	v1 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v1"
-	v2 "github.com/erwin-lovecraft/aegismiles/internal/controller/rest/v2"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
-	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
-	"github.com/erwin-lovecraft/aegismiles/internal/repository"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
-	"github.com/viebiz/lit/httpclient"
+	"github.com/erwin-lovecraft/lotusmiles/internal/adapters/auth0"
+	"github.com/erwin-lovecraft/lotusmiles/internal/adapters/repository"
+	"github.com/erwin-lovecraft/lotusmiles/internal/adapters/rest/middleware"
+	restv1 "github.com/erwin-lovecraft/lotusmiles/internal/adapters/rest/v1"
+	restv2 "github.com/erwin-lovecraft/lotusmiles/internal/adapters/rest/v2"
+	"github.com/erwin-lovecraft/lotusmiles/internal/adapters/sessionm"
+	"github.com/erwin-lovecraft/lotusmiles/internal/config"
+	"github.com/erwin-lovecraft/lotusmiles/internal/constants"
+	"github.com/erwin-lovecraft/lotusmiles/internal/core/services/customer"
+	"github.com/erwin-lovecraft/lotusmiles/internal/core/services/mileage"
+	"github.com/erwin-lovecraft/lotusmiles/internal/pkg/generator"
 )
 
 func connectDatabase(ctx context.Context, cfg config.Config) (*gorm.DB, error) {
@@ -129,26 +107,26 @@ func run(ctx context.Context) error {
 
 	// Dependency injection
 	// Initialize services, repositories, etc. here
-	authGwy, err := auth0.New(cfg.UserAPI)
-
-	// Initialize HTTP client pool
-	httpclient.NewSharedCustomPool()
+	authGateway, err := auth0.New(cfg.UserAPI)
+	if err != nil {
+		return err
+	}
 
 	// Initialize SessionM gateway
-	sessionmGwy, err := sessionm.New(cfg.SessionM)
+	sessionmGateway, err := sessionm.New(cfg.SessionM)
 	if err != nil {
 		return err
 	}
 
 	repo := repository.New(db)
 	mileageSvc := mileage.New(repo)
-	customerSvc := customer.New(repo, authGwy)
-	v1Ctrl := v1.New(customerSvc, mileageSvc)
+	customerSvc := customer.New(repo, authGateway)
+	v1Ctrl := restv1.New(customerSvc, mileageSvc)
 
 	// Initialize v2 services
-	customerV2Svc := customer.NewV2(cfg.SessionM, repo, authGwy, sessionmGwy)
-	mileageV2Svc := mileage.NewV2(cfg.SessionM, sessionmGwy, repo)
-	v2Ctrl := v2.New(customerV2Svc, mileageV2Svc)
+	customerV2Svc := customer.NewV2(cfg.SessionM, repo, authGateway, sessionmGateway)
+	mileageV2Svc := mileage.NewV2(cfg.SessionM, sessionmGateway, repo)
+	v2Ctrl := restv2.New(customerV2Svc, mileageV2Svc)
 
 	// Initialize the server with the handler
 	srv := lit.NewHttpServer(cfg.Web.Addr(), routes(ctx, cfg, v1Ctrl, v2Ctrl))
@@ -156,7 +134,7 @@ func run(ctx context.Context) error {
 	return srv.Run()
 }
 
-func routes(ctx context.Context, cfg config.Config, v1Ctrl v1.Controller, v2Ctrl v2.Controller) http.Handler {
+func routes(ctx context.Context, cfg config.Config, v1Ctrl restv1.Controller, v2Ctrl restv2.Controller) http.Handler {
 	r := lit.NewRouter(ctx)
 	r.Use(cors.Middleware(configCORS(cfg.Cors)))
 
