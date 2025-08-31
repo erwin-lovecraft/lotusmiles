@@ -1,4 +1,4 @@
-package mileage
+package postgres
 
 import (
 	"context"
@@ -39,7 +39,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) ports.MileageRepository {
+func New(db *gorm.DB) ports.MileageRepository {
 	return repository{db: db}
 }
 
@@ -234,3 +234,5 @@ func (r repository) GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, cus
 
 	return total, err
 }
+
+var _ ports.MileageRepository = (*repository)(nil)

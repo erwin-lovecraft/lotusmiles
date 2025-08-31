@@ -1,4 +1,4 @@
-package customer
+package postgres
 
 import (
 	"context"
@@ -23,7 +23,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) ports.CustomerRepository {
+func New(db *gorm.DB) ports.CustomerRepository {
 	return repository{db: db}
 }
 
@@ -60,3 +60,5 @@ func (r repository) GetByID(ctx context.Context, customerID string) (domain.Cust
 	}
 	return customer, nil
 }
+
+var _ ports.CustomerRepository = (*repository)(nil)

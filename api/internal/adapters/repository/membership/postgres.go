@@ -1,4 +1,4 @@
-package membership
+package postgres
 
 import (
 	"context"
@@ -24,7 +24,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) ports.MembershipRepository {
+func New(db *gorm.DB) ports.MembershipRepository {
 	return repository{
 		db: db,
 	}
@@ -77,3 +77,5 @@ func (r repository) GetAllCustomerIDs(ctx context.Context, page, size int) ([]st
 
 	return customerIDs, total, err
 }
+
+var _ ports.MembershipRepository = (*repository)(nil)
