@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,7 +23,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) Repository {
+func NewRepository(db *gorm.DB) ports.CustomerRepository {
 	return repository{db: db}
 }
 

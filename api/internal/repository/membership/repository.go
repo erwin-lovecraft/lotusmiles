@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +24,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) Repository {
+func NewRepository(db *gorm.DB) ports.MembershipRepository {
 	return repository{
 		db: db,
 	}

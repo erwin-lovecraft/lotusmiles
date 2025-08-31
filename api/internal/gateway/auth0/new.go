@@ -42,7 +42,7 @@ func (c client) GetUser(ctx context.Context, userID string) (dto.Auth0UserProfil
 	}
 
 	if resp.Status != http.StatusOK {
-		return dto.Auth0UserProfile{}, fmt.Errorf("[auth0] failed to retrieve user profile: %s", resp.Status)
+		return dto.Auth0UserProfile{}, fmt.Errorf("[auth0] failed to retrieve user profile: %d", resp.Status)
 	}
 
 	var profile dto.Auth0UserProfile

@@ -9,9 +9,8 @@ import (
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/google/uuid"
 	"github.com/viebiz/lit/iam"
 )
@@ -20,10 +19,10 @@ type serviceV2 struct {
 	service
 
 	cfg         config.SessionMConfig
-	sessionmSvc sessionm.Client
+	sessionmSvc ports.SessionMGateway
 }
 
-func NewV2(cfg config.SessionMConfig, sessionmGwy sessionm.Client, repo repository.Repository) Service {
+func NewV2(cfg config.SessionMConfig, sessionmGwy ports.SessionMGateway, repo ports.Repository) Service {
 	return serviceV2{
 		cfg:         cfg,
 		sessionmSvc: sessionmGwy,

@@ -5,8 +5,7 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
-	"github.com/erwin-lovecraft/aegismiles/internal/repository"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/google/uuid"
 )
 
@@ -15,11 +14,11 @@ type Service interface {
 }
 
 type service struct {
-	repo     repository.Repository
-	auth0Svc auth0.Client
+	repo     ports.Repository
+	auth0Svc ports.AuthGateway
 }
 
-func New(repo repository.Repository, authGwy auth0.Client) Service {
+func New(repo ports.Repository, authGwy ports.AuthGateway) Service {
 	return service{
 		repo:     repo,
 		auth0Svc: authGwy,
