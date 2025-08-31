@@ -1,33 +1,37 @@
 package repository
 
 import (
-	customerpostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/customer"
-	membershippostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/membership"
-	mileagepostgres "github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/mileage"
+	"github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/customer"
+	"github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/membership"
+	"github.com/erwin-lovecraft/aegismiles/internal/adapters/repository/mileage"
 	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"gorm.io/gorm"
 )
 
 type repository struct {
 	db         *gorm.DB
-	customer   ports.CustomerRepository
-	mileage    ports.MileageRepository
-	membership ports.MembershipRepository
+	customer   customer.Repository
+	mileage    mileage.Repository
+	membership membership.Repository
 }
 
 func New(db *gorm.DB) ports.Repository {
 	return repository{
 		db:         db,
-		customer:   customerpostgres.New(db),
-		mileage:    mileagepostgres.New(db),
-		membership: membershippostgres.New(db),
+		customer:   customer.New(db),
+		mileage:    mileage.New(db),
+		membership: membership.New(db),
 	}
 }
 
-func (r repository) Customer() ports.CustomerRepository { return r.customer }
+func (r repository) Customer() ports.CustomerRepository {
+	return r.customer
+}
 
-func (r repository) Mileage() ports.MileageRepository { return r.mileage }
+func (r repository) Mileage() ports.MileageRepository {
+	return r.mileage
+}
 
-func (r repository) Membership() ports.MembershipRepository { return r.membership }
-
-var _ ports.Repository = (*repository)(nil)
+func (r repository) Membership() ports.MembershipRepository {
+	return r.membership
+}

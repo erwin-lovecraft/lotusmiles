@@ -1,10 +1,10 @@
-package rest
+package v1
 
 import (
 	"net/http"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/core/service/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/core/service/mileage"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/services/customer"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/services/mileage"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/iam"
