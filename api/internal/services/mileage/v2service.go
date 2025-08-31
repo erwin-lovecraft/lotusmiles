@@ -8,7 +8,7 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
@@ -86,7 +86,7 @@ func (s serviceV2) ApproveAccrualRequest(ctx context.Context, reqID string) erro
 	earningMonth := time.Date(existedRequest.DepartureDate.Year(), existedRequest.DepartureDate.Month(), 1, 0, 0, 0, 0, existedRequest.DepartureDate.Location())
 	expiresAt := earningMonth.AddDate(0, 13, 0)
 
-	if err := s.repo.Mileage().SaveMileageLedger(ctx, entity.MilesLedger{
+	if err := s.repo.Mileage().SaveMileageLedger(ctx, domain.MilesLedger{
 		CustomerID:           existedRequest.CustomerID,
 		QualifyingMilesDelta: existedRequest.QualifyingMiles,
 		BonusMilesDelta:      existedRequest.BonusMiles,

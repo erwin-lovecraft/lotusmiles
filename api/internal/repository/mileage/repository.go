@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/generator"
 	"github.com/erwin-lovecraft/aegismiles/internal/pkg/pagination"
 	"github.com/google/uuid"
@@ -13,21 +13,21 @@ import (
 )
 
 type Repository interface {
-	GetAccrualRequests(ctx context.Context, keyword string, customerID string, status string, submittedDate time.Time, page int, size int) ([]entity.AccrualRequest, int64, error)
+	GetAccrualRequests(ctx context.Context, keyword string, customerID string, status string, submittedDate time.Time, page int, size int) ([]domain.AccrualRequest, int64, error)
 
-	GetAccrualRequestByFilter(ctx context.Context, customerID string, ticketID string, pnr string) (entity.AccrualRequest, error)
+	GetAccrualRequestByFilter(ctx context.Context, customerID string, ticketID string, pnr string) (domain.AccrualRequest, error)
 
-	GetTravelDistance(ctx context.Context, fromCode string, toCode string) (entity.TravelDistance, error)
+	GetTravelDistance(ctx context.Context, fromCode string, toCode string) (domain.TravelDistance, error)
 
-	SaveAccrualRequest(ctx context.Context, accrualRequest entity.AccrualRequest) error
+	SaveAccrualRequest(ctx context.Context, accrualRequest domain.AccrualRequest) error
 
-	GetAccrualRequest(ctx context.Context, id string) (entity.AccrualRequest, error)
+	GetAccrualRequest(ctx context.Context, id string) (domain.AccrualRequest, error)
 
 	IncreaseCustomerMiles(ctx context.Context, customerID string, qMiles float64, bMiles float64) error
 
-	SaveMileageLedger(ctx context.Context, e entity.MilesLedger) error
+	SaveMileageLedger(ctx context.Context, e domain.MilesLedger) error
 
-	GetMileageLedgers(ctx context.Context, customerID string, date time.Time, page int, size int) ([]entity.MilesLedger, int64, error)
+	GetMileageLedgers(ctx context.Context, customerID string, date time.Time, page int, size int) ([]domain.MilesLedger, int64, error)
 
 	GetCustomersWithPositiveQMDeltasForMonth(ctx context.Context, monthToExpire time.Time) ([]int64, error)
 
@@ -42,13 +42,13 @@ func NewRepository(db *gorm.DB) Repository {
 	return repository{db: db}
 }
 
-func (r repository) GetAccrualRequests(ctx context.Context, keyword string, customerID string, status string, submittedDate time.Time, page int, size int) ([]entity.AccrualRequest, int64, error) {
-	qb := r.db.WithContext(ctx).Model(&entity.AccrualRequest{})
+func (r repository) GetAccrualRequests(ctx context.Context, keyword string, customerID string, status string, submittedDate time.Time, page int, size int) ([]domain.AccrualRequest, int64, error) {
+	qb := r.db.WithContext(ctx).Model(&domain.AccrualRequest{})
 
 	if keyword != "" {
 		qb = qb.Scopes(func(db *gorm.DB) *gorm.DB {
 			var customerIDs []int64
-			db.Session(&gorm.Session{NewDB: true}).Model(&entity.Customer{}).
+			db.Session(&gorm.Session{NewDB: true}).Model(&domain.Customer{}).
 				Where("email ILIKE ?", "%"+keyword+"%").
 				Or("first_name || ' ' || last_name ILIKE ?", "%"+keyword+"%").
 				Select("id").
@@ -88,14 +88,14 @@ func (r repository) GetAccrualRequests(ctx context.Context, keyword string, cust
 
 	qb = qb.Preload("Customer")
 
-	var accrualRequests []entity.AccrualRequest
+	var accrualRequests []domain.AccrualRequest
 	if err := qb.Find(&accrualRequests).Error; err != nil {
 		return nil, 0, err
 	}
 	return accrualRequests, total, nil
 }
 
-func (r repository) GetAccrualRequestByFilter(ctx context.Context, customerID string, ticketID string, pnr string) (entity.AccrualRequest, error) {
+func (r repository) GetAccrualRequestByFilter(ctx context.Context, customerID string, ticketID string, pnr string) (domain.AccrualRequest, error) {
 	qb := r.db.WithContext(ctx)
 	if customerID != "" {
 		qb = qb.Where("customer_id = ?", customerID)
@@ -107,26 +107,26 @@ func (r repository) GetAccrualRequestByFilter(ctx context.Context, customerID st
 		qb = qb.Where("pnr = ?", pnr)
 	}
 
-	var accrualRequest entity.AccrualRequest
+	var accrualRequest domain.AccrualRequest
 	if err := qb.Find(&accrualRequest).Error; err != nil {
-		return entity.AccrualRequest{}, err
+		return domain.AccrualRequest{}, err
 	}
 
 	return accrualRequest, nil
 }
 
-func (r repository) GetTravelDistance(ctx context.Context, fromCode string, toCode string) (entity.TravelDistance, error) {
-	var travelDistance entity.TravelDistance
+func (r repository) GetTravelDistance(ctx context.Context, fromCode string, toCode string) (domain.TravelDistance, error) {
+	var travelDistance domain.TravelDistance
 	if err := r.db.WithContext(ctx).
 		Where("from_code = ? AND to_code = ?", fromCode, toCode).
 		Or("from_code = ? AND to_code = ?", toCode, fromCode).
 		First(&travelDistance).Error; err != nil {
-		return entity.TravelDistance{}, err
+		return domain.TravelDistance{}, err
 	}
 	return travelDistance, nil
 }
 
-func (r repository) SaveAccrualRequest(ctx context.Context, accrualRequest entity.AccrualRequest) error {
+func (r repository) SaveAccrualRequest(ctx context.Context, accrualRequest domain.AccrualRequest) error {
 	if accrualRequest.ID == uuid.Nil {
 		id, err := generator.AccrualRequestID.Generate()
 		if err != nil {
@@ -137,19 +137,19 @@ func (r repository) SaveAccrualRequest(ctx context.Context, accrualRequest entit
 	return r.db.WithContext(ctx).Save(&accrualRequest).Error
 }
 
-func (r repository) GetAccrualRequest(ctx context.Context, id string) (entity.AccrualRequest, error) {
-	var accrualRequest entity.AccrualRequest
+func (r repository) GetAccrualRequest(ctx context.Context, id string) (domain.AccrualRequest, error) {
+	var accrualRequest domain.AccrualRequest
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&accrualRequest).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return entity.AccrualRequest{}, nil
+			return domain.AccrualRequest{}, nil
 		}
-		return entity.AccrualRequest{}, err
+		return domain.AccrualRequest{}, err
 	}
 	return accrualRequest, nil
 }
 
 func (r repository) IncreaseCustomerMiles(ctx context.Context, customerID string, qMiles float64, bMiles float64) error {
-	if err := r.db.WithContext(ctx).Model(entity.Customer{}).
+	if err := r.db.WithContext(ctx).Model(domain.Customer{}).
 		Where("id = ?", customerID).
 		Updates(map[string]interface{}{
 			"qualifying_miles_total": gorm.Expr("qualifying_miles_total + ?", qMiles),
@@ -160,7 +160,7 @@ func (r repository) IncreaseCustomerMiles(ctx context.Context, customerID string
 	return nil
 }
 
-func (r repository) SaveMileageLedger(ctx context.Context, e entity.MilesLedger) error {
+func (r repository) SaveMileageLedger(ctx context.Context, e domain.MilesLedger) error {
 	if e.ID == uuid.Nil {
 		id, err := generator.MilesLedgerID.Generate()
 		if err != nil {
@@ -171,8 +171,8 @@ func (r repository) SaveMileageLedger(ctx context.Context, e entity.MilesLedger)
 	return r.db.WithContext(ctx).Save(&e).Error
 }
 
-func (r repository) GetMileageLedgers(ctx context.Context, customerID string, date time.Time, page int, size int) ([]entity.MilesLedger, int64, error) {
-	qb := r.db.WithContext(ctx).Model(&entity.MilesLedger{})
+func (r repository) GetMileageLedgers(ctx context.Context, customerID string, date time.Time, page int, size int) ([]domain.MilesLedger, int64, error) {
+	qb := r.db.WithContext(ctx).Model(&domain.MilesLedger{})
 
 	if customerID != "" {
 		qb = qb.Where("customer_id = ?", customerID)
@@ -195,7 +195,7 @@ func (r repository) GetMileageLedgers(ctx context.Context, customerID string, da
 		qb = qb.Limit(limit)
 	}
 
-	var accrualRequests []entity.MilesLedger
+	var accrualRequests []domain.MilesLedger
 	if err := qb.Find(&accrualRequests).Error; err != nil {
 		return nil, 0, err
 	}
@@ -210,7 +210,7 @@ func (r repository) GetCustomersWithPositiveQMDeltasForMonth(ctx context.Context
 	monthEnd := monthStart.AddDate(0, 1, 0)
 
 	err := r.db.WithContext(ctx).
-		Model(&entity.MilesLedger{}).
+		Model(&domain.MilesLedger{}).
 		Where("earning_month >= ? AND earning_month < ? AND qualifying_miles_delta > 0", monthStart, monthEnd).
 		Distinct("customer_id").
 		Pluck("customer_id", &customerIDs).Error
@@ -226,7 +226,7 @@ func (r repository) GetTotalQMDeltasForCustomerAndMonth(ctx context.Context, cus
 	monthEnd := monthStart.AddDate(0, 1, 0)
 
 	err := r.db.WithContext(ctx).
-		Model(&entity.MilesLedger{}).
+		Model(&domain.MilesLedger{}).
 		Where("customer_id = ? AND earning_month >= ? AND earning_month < ?", customerID, monthStart, monthEnd).
 		Select("COALESCE(SUM(qualifying_miles_delta), 0)").
 		Scan(&total).Error

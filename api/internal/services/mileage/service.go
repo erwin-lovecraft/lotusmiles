@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/google/uuid"
@@ -15,9 +15,9 @@ import (
 )
 
 type Service interface {
-	GetMyAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]entity.AccrualRequest, int64, error)
+	GetMyAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]domain.AccrualRequest, int64, error)
 
-	GetAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]entity.AccrualRequest, int64, error)
+	GetAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]domain.AccrualRequest, int64, error)
 
 	SubmitAccrualRequest(ctx context.Context, request dto.AccrualRequestInput) error
 
@@ -25,9 +25,9 @@ type Service interface {
 
 	RejectAccrualRequest(ctx context.Context, reqID string, rejectedReason string) error
 
-	GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
+	GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]domain.MilesLedger, int64, error)
 
-	GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error)
+	GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]domain.MilesLedger, int64, error)
 }
 
 type service struct {
@@ -64,7 +64,7 @@ func (s service) SubmitAccrualRequest(ctx context.Context, request dto.AccrualRe
 	}
 
 	// 2. Mapping value
-	e := entity.AccrualRequest{
+	e := domain.AccrualRequest{
 		CustomerID:           customer.ID,
 		TicketID:             request.TicketID,
 		PNR:                  request.PNR,
@@ -91,7 +91,7 @@ func (s service) SubmitAccrualRequest(ctx context.Context, request dto.AccrualRe
 	return nil
 }
 
-func (s service) calculateMiles(ctx context.Context, req *entity.AccrualRequest) error {
+func (s service) calculateMiles(ctx context.Context, req *domain.AccrualRequest) error {
 	distances, err := s.repo.Mileage().GetTravelDistance(ctx, req.FromCode, req.ToCode)
 	if err != nil {
 		return err
@@ -145,7 +145,7 @@ func (s service) ApproveAccrualRequest(ctx context.Context, reqID string) error 
 	earningMonth := time.Date(existedRequest.DepartureDate.Year(), existedRequest.DepartureDate.Month(), 1, 0, 0, 0, 0, existedRequest.DepartureDate.Location())
 	expiresAt := earningMonth.AddDate(0, 13, 0)
 
-	if err := s.repo.Mileage().SaveMileageLedger(ctx, entity.MilesLedger{
+	if err := s.repo.Mileage().SaveMileageLedger(ctx, domain.MilesLedger{
 		CustomerID:           existedRequest.CustomerID,
 		QualifyingMilesDelta: existedRequest.QualifyingMiles,
 		BonusMilesDelta:      existedRequest.BonusMiles,
@@ -197,7 +197,7 @@ func (s service) RejectAccrualRequest(ctx context.Context, reqID string, rejecte
 	return nil
 }
 
-func (s service) GetMyAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]entity.AccrualRequest, int64, error) {
+func (s service) GetMyAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]domain.AccrualRequest, int64, error) {
 	userProfile := iam.GetUserProfileFromContext(ctx)
 
 	customer, err := s.repo.Customer().GetByUserID(ctx, userProfile.ID())
@@ -216,7 +216,7 @@ func (s service) GetMyAccrualRequests(ctx context.Context, filter dto.AccrualReq
 	)
 }
 
-func (s service) GetAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]entity.AccrualRequest, int64, error) {
+func (s service) GetAccrualRequests(ctx context.Context, filter dto.AccrualRequestFilter) ([]domain.AccrualRequest, int64, error) {
 	return s.repo.Mileage().GetAccrualRequests(
 		ctx,
 		filter.Keyword,
@@ -228,7 +228,7 @@ func (s service) GetAccrualRequests(ctx context.Context, filter dto.AccrualReque
 	)
 }
 
-func (s service) GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error) {
+func (s service) GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]domain.MilesLedger, int64, error) {
 	userProfile := iam.GetUserProfileFromContext(ctx)
 
 	customer, err := s.repo.Customer().GetByUserID(ctx, userProfile.ID())
@@ -245,7 +245,7 @@ func (s service) GetMyMileageLedgers(ctx context.Context, filter dto.MileageLedg
 	)
 }
 
-func (s service) GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]entity.MilesLedger, int64, error) {
+func (s service) GetMileageLedgers(ctx context.Context, filter dto.MileageLedgerFilter) ([]domain.MilesLedger, int64, error) {
 	return s.repo.Mileage().GetMileageLedgers(
 		ctx,
 		"", // Means not filter by customer_id
