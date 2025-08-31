@@ -1,26 +1,21 @@
 package repository
 
 import (
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository/customer"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository/membership"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository/mileage"
 	"gorm.io/gorm"
 )
 
-type Repository interface {
-	Customer() customer.Repository
-	Mileage() mileage.Repository
-	Membership() membership.Repository
-}
-
 type repository struct {
 	db         *gorm.DB
-	customer   customer.Repository
-	mileage    mileage.Repository
-	membership membership.Repository
+	customer   ports.CustomerRepository
+	mileage    ports.MileageRepository
+	membership ports.MembershipRepository
 }
 
-func New(db *gorm.DB) Repository {
+func New(db *gorm.DB) ports.Repository {
 	return repository{
 		db:         db,
 		customer:   customer.NewRepository(db),
@@ -29,14 +24,14 @@ func New(db *gorm.DB) Repository {
 	}
 }
 
-func (r repository) Customer() customer.Repository {
+func (r repository) Customer() ports.CustomerRepository {
 	return r.customer
 }
 
-func (r repository) Mileage() mileage.Repository {
+func (r repository) Mileage() ports.MileageRepository {
 	return r.mileage
 }
 
-func (r repository) Membership() membership.Repository {
+func (r repository) Membership() ports.MembershipRepository {
 	return r.membership
 }

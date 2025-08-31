@@ -8,8 +8,8 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/google/uuid"
 	"github.com/viebiz/lit/iam"
 )
@@ -31,10 +31,10 @@ type Service interface {
 }
 
 type service struct {
-	repo repository.Repository
+	repo ports.Repository
 }
 
-func New(repo repository.Repository) Service {
+func New(repo ports.Repository) Service {
 	return service{
 		repo: repo,
 	}

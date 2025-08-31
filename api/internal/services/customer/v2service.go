@@ -5,21 +5,19 @@ import (
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
 	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
-	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/ports"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/google/uuid"
 )
 
 type v2service struct {
 	cfg         config.SessionMConfig
-	repo        repository.Repository
-	auth0Svc    auth0.Client
-	sessionmSvc sessionm.Client
+	repo        ports.Repository
+	auth0Svc    ports.AuthGateway
+	sessionmSvc ports.SessionMGateway
 }
 
-func NewV2(cfg config.SessionMConfig, repo repository.Repository, authGwy auth0.Client, sessionmGwy sessionm.Client) Service {
+func NewV2(cfg config.SessionMConfig, repo ports.Repository, authGwy ports.AuthGateway, sessionmGwy ports.SessionMGateway) Service {
 	return v2service{
 		cfg:         cfg,
 		repo:        repo,
