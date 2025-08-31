@@ -1,9 +1,8 @@
-module github.com/erwin-lovecraft/aegismiles
+module github.com/erwin-lovecraft/lotusmiles
 
 go 1.24.6
 
 require (
-	github.com/swaggo/swag v1.16.6
 	github.com/viebiz/lit v1.1.4
 )
 
