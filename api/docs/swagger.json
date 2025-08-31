@@ -37,7 +37,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Customer"
+                            "$ref": "#/definitions/domain.Customer"
                         }
                     },
                     "401": {
@@ -106,7 +106,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/entity.AccrualRequest"
+                                        "$ref": "#/definitions/domain.AccrualRequest"
                                     }
                                 },
                                 "total": {
@@ -235,7 +235,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/entity.AccrualRequest"
+                                        "$ref": "#/definitions/domain.AccrualRequest"
                                     }
                                 },
                                 "total": {
@@ -418,7 +418,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/entity.MilesLedger"
+                                        "$ref": "#/definitions/domain.MilesLedger"
                                     }
                                 },
                                 "total": {
@@ -481,7 +481,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/entity.MilesLedger"
+                                        "$ref": "#/definitions/domain.MilesLedger"
                                     }
                                 },
                                 "total": {
@@ -571,7 +571,7 @@
                 }
             }
         },
-        "entity.AccrualRequest": {
+        "domain.AccrualRequest": {
             "type": "object",
             "properties": {
                 "boarding_pass_image_url": {
@@ -646,7 +646,7 @@
                 }
             }
         },
-        "entity.Customer": {
+        "domain.Customer": {
             "type": "object",
             "properties": {
                 "auth0_user_id": {
@@ -686,7 +686,7 @@
                 }
             }
         },
-        "entity.MilesLedger": {
+        "domain.MilesLedger": {
             "type": "object",
             "properties": {
                 "accrual_request_id": {

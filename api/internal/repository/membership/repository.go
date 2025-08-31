@@ -3,7 +3,7 @@ package membership
 import (
 	"context"
 
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"gorm.io/gorm"
 )
 
@@ -12,9 +12,9 @@ type Repository interface {
 
 	UpdateCustomerMembershipTier(ctx context.Context, customerID string, memberTier string) error
 
-	GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error)
+	GetCustomerByID(ctx context.Context, customerID string) (domain.Customer, error)
 
-	SaveMembershipHistory(ctx context.Context, history entity.MembershipHistory) error
+	SaveMembershipHistory(ctx context.Context, history domain.MembershipHistory) error
 
 	GetAllCustomerIDs(ctx context.Context, page, size int) ([]string, int64, error)
 }
@@ -30,7 +30,7 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 func (r repository) GetCustomerQualifyingMiles(ctx context.Context, customerID string) (float64, error) {
-	var customer entity.Customer
+	var customer domain.Customer
 	if err := r.db.WithContext(ctx).Select("qualifying_miles_total").Where("id = ?", customerID).First(&customer).Error; err != nil {
 		return 0, err
 	}
@@ -38,21 +38,21 @@ func (r repository) GetCustomerQualifyingMiles(ctx context.Context, customerID s
 }
 
 func (r repository) UpdateCustomerMembershipTier(ctx context.Context, customerID string, memberTier string) error {
-	if err := r.db.WithContext(ctx).Model(entity.Customer{}).Update("member_tier", memberTier).Where("id = ?", customerID).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(domain.Customer{}).Update("member_tier", memberTier).Where("id = ?", customerID).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r repository) GetCustomerByID(ctx context.Context, customerID string) (entity.Customer, error) {
-	var customer entity.Customer
+func (r repository) GetCustomerByID(ctx context.Context, customerID string) (domain.Customer, error) {
+	var customer domain.Customer
 	if err := r.db.WithContext(ctx).Where("id = ?", customerID).First(&customer).Error; err != nil {
-		return entity.Customer{}, err
+		return domain.Customer{}, err
 	}
 	return customer, nil
 }
 
-func (r repository) SaveMembershipHistory(ctx context.Context, history entity.MembershipHistory) error {
+func (r repository) SaveMembershipHistory(ctx context.Context, history domain.MembershipHistory) error {
 	return r.db.WithContext(ctx).Save(&history).Error
 }
 
@@ -61,14 +61,14 @@ func (r repository) GetAllCustomerIDs(ctx context.Context, page, size int) ([]st
 	var total int64
 
 	// Get total count
-	if err := r.db.WithContext(ctx).Model(&entity.Customer{}).Count(&total).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&domain.Customer{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// Get paginated customer IDs
 	offset := (page - 1) * size
 	err := r.db.WithContext(ctx).
-		Model(&entity.Customer{}).
+		Model(&domain.Customer{}).
 		Select("id").
 		Offset(offset).
 		Limit(size).

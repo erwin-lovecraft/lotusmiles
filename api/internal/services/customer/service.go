@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/constants"
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/repository"
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	GetCustomer(ctx context.Context, userID string) (entity.Customer, error)
+	GetCustomer(ctx context.Context, userID string) (domain.Customer, error)
 }
 
 type service struct {
@@ -26,16 +26,16 @@ func New(repo repository.Repository, authGwy auth0.Client) Service {
 	}
 }
 
-func (s service) GetCustomer(ctx context.Context, userID string) (entity.Customer, error) {
+func (s service) GetCustomer(ctx context.Context, userID string) (domain.Customer, error) {
 	customer, err := s.repo.Customer().GetByUserID(ctx, userID)
 	if err != nil {
-		return entity.Customer{}, err
+		return domain.Customer{}, err
 	}
 
 	if customer.ID == uuid.Nil {
 		data, err := s.auth0Svc.GetUser(ctx, userID)
 		if err != nil {
-			return entity.Customer{}, err
+			return domain.Customer{}, err
 		}
 
 		customer.QualifyingMilesTotal = 0
@@ -48,7 +48,7 @@ func (s service) GetCustomer(ctx context.Context, userID string) (entity.Custome
 		customer.LastName = data.FamilyName
 
 		if err := s.repo.Customer().Save(ctx, customer); err != nil {
-			return entity.Customer{}, err
+			return domain.Customer{}, err
 		}
 	}
 

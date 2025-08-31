@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/erwin-lovecraft/aegismiles/internal/config"
-	"github.com/erwin-lovecraft/aegismiles/internal/entity"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/domain"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/auth0"
 	"github.com/erwin-lovecraft/aegismiles/internal/gateway/sessionm"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
@@ -28,16 +28,16 @@ func NewV2(cfg config.SessionMConfig, repo repository.Repository, authGwy auth0.
 	}
 }
 
-func (s v2service) GetCustomer(ctx context.Context, userID string) (entity.Customer, error) {
+func (s v2service) GetCustomer(ctx context.Context, userID string) (domain.Customer, error) {
 	customer, err := s.sessionmSvc.GetUser(ctx, userID)
 	if err != nil {
-		return entity.Customer{}, err
+		return domain.Customer{}, err
 	}
 
 	if customer.ID == uuid.Nil {
 		auth0Data, err := s.auth0Svc.GetUser(ctx, userID)
 		if err != nil {
-			return entity.Customer{}, err
+			return domain.Customer{}, err
 		}
 
 		sessionMRequest := dto.SessionMCreateUserRequest{
@@ -63,13 +63,13 @@ func (s v2service) GetCustomer(ctx context.Context, userID string) (entity.Custo
 
 		customer, err = s.sessionmSvc.CreateUser(ctx, sessionMRequest)
 		if err != nil {
-			return entity.Customer{}, err
+			return domain.Customer{}, err
 		}
 	}
 
 	rs := convertCustomerEntity(s.cfg, customer)
 	if err := s.repo.Customer().Save(ctx, rs); err != nil {
-		return entity.Customer{}, err
+		return domain.Customer{}, err
 	}
 
 	return rs, nil
@@ -91,8 +91,8 @@ func convertMemberTier(tier string) string {
 	return "register"
 }
 
-func convertCustomerEntity(cfg config.SessionMConfig, customer dto.SessionMUserProfile) entity.Customer {
-	rs := entity.Customer{
+func convertCustomerEntity(cfg config.SessionMConfig, customer dto.SessionMUserProfile) domain.Customer {
+	rs := domain.Customer{
 		ID:                   customer.ID,
 		QualifyingMilesTotal: customer.TierPoints,
 		BonusMilesTotal:      customer.TestPoints,
