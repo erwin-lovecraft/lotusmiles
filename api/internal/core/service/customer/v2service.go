@@ -15,7 +15,6 @@ type v2service struct {
 	repo        ports.Repository
 	auth0Svc    ports.AuthGateway
 	sessionmSvc ports.SessionMGateway
-	repo        ports.Repository
 }
 
 func NewV2(cfg config.SessionMConfig, repo ports.Repository, authGwy ports.AuthGateway, sessionmGwy ports.SessionMGateway) Service {

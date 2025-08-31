@@ -3,9 +3,9 @@ package v1
 import (
 	"net/http"
 
+	"github.com/erwin-lovecraft/aegismiles/internal/core/service/customer"
+	"github.com/erwin-lovecraft/aegismiles/internal/core/service/mileage"
 	"github.com/erwin-lovecraft/aegismiles/internal/models/dto"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/customer"
-	"github.com/erwin-lovecraft/aegismiles/internal/services/mileage"
 	"github.com/viebiz/lit"
 	"github.com/viebiz/lit/iam"
 )
