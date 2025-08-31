@@ -1,0 +1,61 @@
+# CODEOWNERS file for LotusMiles
+# This file defines who should review changes to different parts of the codebase
+# For more information, see: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - these users will be requested for review on any pull request
+* @erwin-lovecraft
+
+# Documentation
+*.md @erwin-lovecraft
+docs/ @erwin-lovecraft
+CONTRIBUTING.md @erwin-lovecraft
+SECURITY.md @erwin-lovecraft
+README.md @erwin-lovecraft
+
+# Backend API (Go)
+api/ @erwin-lovecraft
+api/cmd/ @erwin-lovecraft
+api/internal/ @erwin-lovecraft
+api/data/ @erwin-lovecraft
+api/docs/ @erwin-lovecraft
+api/go.mod @erwin-lovecraft
+api/go.sum @erwin-lovecraft
+api/config.env.template @erwin-lovecraft
+
+# Frontend Web App (React)
+web/ @erwin-lovecraft
+web/src/ @erwin-lovecraft
+web/package.json @erwin-lovecraft
+web/bun.lockb @erwin-lovecraft
+web/vite.config.ts @erwin-lovecraft
+web/tsconfig*.json @erwin-lovecraft
+
+# Admin Panel (React)
+admin/ @erwin-lovecraft
+admin/src/ @erwin-lovecraft
+admin/package.json @erwin-lovecraft
+admin/bun.lockb @erwin-lovecraft
+admin/vite.config.ts @erwin-lovecraft
+admin/tsconfig*.json @erwin-lovecraft
+
+# Docker and Infrastructure
+build/ @erwin-lovecraft
+Dockerfile* @erwin-lovecraft
+docker-compose*.yml @erwin-lovecraft
+Makefile @erwin-lovecraft
+
+# Configuration files
+.gitignore @erwin-lovecraft
+.gitattributes @erwin-lovecraft
+.editorconfig @erwin-lovecraft
+eslint.config.js @erwin-lovecraft
+prettier.config.js @erwin-lovecraft
+tailwind.config.js @erwin-lovecraft
+components.json @erwin-lovecraft
+
+# CI/CD
+.github/ @erwin-lovecraft
+.github/workflows/ @erwin-lovecraft
+
+# License and legal
+LICENSE @erwin-lovecraft
